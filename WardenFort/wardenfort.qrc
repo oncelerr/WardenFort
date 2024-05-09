@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/wardenfort">
+        <file>eye_closed.png</file>
+        <file>wfIcon.ico</file>
+        <file>frame.png</file>
+        <file>wardenfort_word (1).png</file>
+        <file>wardenfort 1.png</file>
+        <file>eye_open.png</file>
+        <file>7-removebg-preview 1.png</file>
+        <file>pass_icon (4).png</file>
+        <file>pass_icon (11).png</file>
+        <file>dd1.png</file>
+        <file>dd1_rotated.png</file>
+        <file>notif_icon.png</file>
+        <file>report_icon.png</file>
+        <file>user_icon.png</file>
+        <file>View_hide_lightsss.png</file>
+        <file>cal_icon.png</file>
+        <file>wave (1).png</file>
+        <file>wave (2).png</file>
+        <file>wave (3).png</file>
+    </qresource>
+</RCC>

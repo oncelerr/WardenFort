@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>forgotpass</class>
+ <widget class="QDialog" name="forgotpass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1088</width>
+    <height>567</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Forgot Password</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(25, 31, 50);
+</string>
+  </property>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>278</x>
+     <y>81</y>
+     <width>529</width>
+     <height>411</height>
+    </rect>
+   </property>
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(44, 60, 75, 0.6); 
+border-radius: 50px;</string>
+   </property>
+   <widget class="QLabel" name="timer">
+    <property name="geometry">
+     <rect>
+      <x>246</x>
+      <y>150</y>
+      <width>51</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+font: 700 12pt &quot;Segoe UI&quot;;
+color: rgb(1, 253, 245);
+</string>
+    </property>
+    <property name="text">
+     <string>null</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reset_password_button">
+    <property name="geometry">
+     <rect>
+      <x>129</x>
+      <y>330</y>
+      <width>275</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>275</width>
+      <height>34</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>275</width>
+      <height>34</height>
+     </size>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+border-radius: 15px; 
+background-color: rgb(22, 27, 46);
+color: rgb(1,253,245);
+}
+QPushButton:hover {
+}
+QPushButton:pressed {
+background-color: rgb(24, 40, 55); /* Adjust pressed color if needed */
+}</string>
+    </property>
+    <property name="text">
+     <string>Submit</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="pass_change">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>220</y>
+      <width>371</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+border-radius: 15px; 
+background-color: rgb(44, 60, 75);
+color: rgb(1, 253, 245);
+	font: 700 18pt &quot;Segoe UI&quot;;
+    padding-left: 20px;
+qproperty-alignment: AlignCenter;
+}
+</string>
+    </property>
+    <property name="placeholderText">
+     <string>Enter 6 digit code</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="wardenfort">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>10</y>
+      <width>191</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>C:/Users/admin/Downloads/wardenfort_word (1).png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="verify_text">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>60</y>
+      <width>241</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 700 20pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);
+qproperty-alignment: AlignCenter;</string>
+    </property>
+    <property name="text">
+     <string>Verify User</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="email_show">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>130</y>
+      <width>161</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>1920</width>
+      <height>16777215</height>
+     </size>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(1, 253, 245);
+background-color: rgba(255, 255, 255, 0);
+font: 700 10pt &quot;Segoe UI&quot;;</string>
+    </property>
+    <property name="text">
+     <string>null</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="enter_text">
+    <property name="geometry">
+     <rect>
+      <x>96</x>
+      <y>125</y>
+      <width>291</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+font: 10pt &quot;Segoe UI&quot;;
+color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>The 6 digit code has been sent to</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="cyber_bg">
+   <property name="geometry">
+    <rect>
+     <x>610</x>
+     <y>120</y>
+     <width>421</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>C:/Users/admin/Downloads/cyber (1).png</pixmap>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="back_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>13</y>
+     <width>41</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton::indicator {
+    border: none; /* Remove border */
+}
+
+QPushButton {
+    background-color: transparent; /* Remove background color */
+}
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>C:/Users/admin/Downloads/dd1_rotated.png</normaloff>C:/Users/admin/Downloads/dd1_rotated.png</iconset>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget_2" native="true">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>80</y>
+     <width>529</width>
+     <height>411</height>
+    </rect>
+   </property>
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(44, 60, 75, 0.6); 
+border-radius: 50px;</string>
+   </property>
+   <widget class="QPushButton" name="reset_password_button_2">
+    <property name="geometry">
+     <rect>
+      <x>129</x>
+      <y>330</y>
+      <width>275</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>275</width>
+      <height>34</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>275</width>
+      <height>34</height>
+     </size>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+border-radius: 15px; 
+background-color: rgb(22, 27, 46);
+color: rgb(1,253,245);
+}
+QPushButton:hover {
+}
+QPushButton:pressed {
+background-color: rgb(24, 40, 55); /* Adjust pressed color if needed */
+}</string>
+    </property>
+    <property name="text">
+     <string>Submit</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="pass_change_2">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>220</y>
+      <width>371</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+border-radius: 15px; 
+background-color: rgb(44, 60, 75);
+color: rgb(1, 253, 245);
+	font: 700 18pt &quot;Segoe UI&quot;;
+    padding-left: 20px;
+qproperty-alignment: AlignCenter;
+}
+</string>
+    </property>
+    <property name="placeholderText">
+     <string>Enter your new Password</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="wardenfort_2">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>10</y>
+      <width>191</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>C:/Users/admin/Downloads/wardenfort_word (1).png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="verify_text_2">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>60</y>
+      <width>241</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 700 20pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);
+qproperty-alignment: AlignCenter;</string>
+    </property>
+    <property name="text">
+     <string>Reset Password</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="enter_text_2">
+    <property name="geometry">
+     <rect>
+      <x>114</x>
+      <y>125</y>
+      <width>291</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+font: 10pt &quot;Segoe UI&quot;;
+color: rgb(255, 255, 255);
+qproperty-alignment: AlignCenter;</string>
+    </property>
+    <property name="text">
+     <string>Enter your new password</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

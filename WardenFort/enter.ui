@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>enter</class>
+ <widget class="QDialog" name="enter">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1088</width>
+    <height>567</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(25, 31, 50);
+</string>
+  </property>
+  <widget class="QLabel" name="wardenfort">
+   <property name="geometry">
+    <rect>
+     <x>446</x>
+     <y>120</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>C:/Users/admin/Downloads/wardenfort_word (1).png</pixmap>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>281</x>
+     <y>107</y>
+     <width>529</width>
+     <height>361</height>
+    </rect>
+   </property>
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(44, 60, 75, 0.6); 
+border-radius: 50px;</string>
+   </property>
+   <widget class="QPushButton" name="submitButton">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>280</y>
+      <width>275</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>275</width>
+      <height>34</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>275</width>
+      <height>34</height>
+     </size>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+border-radius: 15px; 
+background-color: rgb(22, 27, 46);
+color: rgb(1,253,245);
+}
+QPushButton:hover {
+}
+QPushButton:pressed {
+background-color: rgb(24, 40, 55); /* Adjust pressed color if needed */
+}</string>
+    </property>
+    <property name="text">
+     <string>Submit</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="user_find">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>180</y>
+      <width>371</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+border-radius: 15px; 
+background-color: rgb(44, 60, 75);
+	font: 700 12pt &quot;Segoe UI&quot;;
+    padding-left: 20px; 
+	color: rgb(255, 255, 255);
+}
+
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="enter_text">
+    <property name="geometry">
+     <rect>
+      <x>211</x>
+      <y>119</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+font: 15pt &quot;Segoe UI&quot;;
+color: rgb(1, 253, 245);
+font: 700 9pt &quot;Segoe UI&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Enter your username</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="cyber_bg">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>130</y>
+     <width>401</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>C:/Users/admin/Downloads/cyber (1).png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="verify_text">
+   <property name="geometry">
+    <rect>
+     <x>428</x>
+     <y>170</y>
+     <width>241</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 700 20pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>RESET PASSWORD</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="back_button">
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>10</y>
+     <width>41</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton::indicator {
+    border: none; /* Remove border */
+}
+
+QPushButton {
+    background-color: transparent; /* Remove background color */
+}
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>C:/Users/admin/Downloads/dd1_rotated.png</normaloff>C:/Users/admin/Downloads/dd1_rotated.png</iconset>
+   </property>
+  </widget>
+  <zorder>widget</zorder>
+  <zorder>wardenfort</zorder>
+  <zorder>cyber_bg</zorder>
+  <zorder>verify_text</zorder>
+  <zorder>back_button</zorder>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
