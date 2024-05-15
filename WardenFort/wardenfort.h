@@ -43,6 +43,10 @@ public:
     void checkIPQualityScore(const QString &ipAddress);
 
 private slots:
+    void onTriButtonClicked();
+    void onTriReversedButtonClicked();
+    void onProfilePushButtonClicked();
+    void onProfileLessButtonClicked();
 
 signals:
     void networkError(QNetworkReply::NetworkError error);
@@ -54,7 +58,7 @@ private:
     void on_passwordButton_released();
     void on_accountButton_released();
     void on_logoutButton_released();
-
+    void hideSpecifiedButtons();
     void sendRequestToChatGPT(const QString &inputText);
     QString extractResponseText(const QJsonDocument &responseJson);
 };

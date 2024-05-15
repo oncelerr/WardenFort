@@ -40,6 +40,7 @@ FORMS += \
     forgotpass.ui \
     form.ui \
     login.ui \
+    newdb.ui \
     otp.ui \
     passwordsec.ui \
     signup.ui \
@@ -61,4 +62,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
+    img.qrc \
     wardenfort.qrc

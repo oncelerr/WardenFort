@@ -40,36 +40,22 @@ WardenFort::WardenFort(QWidget* parent)
 {
     ui->setupUi(this);
 
-    // Connect the clicked signal of dd buttons to the toggle function
-    connect(ui->dd1, &QPushButton::clicked, this, &WardenFort::toggleButtons);
-    connect(ui->dd2, &QPushButton::clicked, this, &WardenFort::toggleButtons);
-    connect(ui->dd3, &QPushButton::clicked, this, &WardenFort::toggleButtons);
-    connect(ui->dd4, &QPushButton::clicked, this, &WardenFort::toggleButtons);
-    connect(ui->dd5, &QPushButton::clicked, this, &WardenFort::toggleButtons);
-    connect(ui->dd6, &QPushButton::clicked, this, &WardenFort::toggleButtons);
-    connect(ui->dd7, &QPushButton::clicked, this, &WardenFort::toggleButtons);
-    connect(ui->dd8, &QPushButton::clicked, this, &WardenFort::toggleButtons);
-
-    //profiletab links
-    connect(ui->passwordButton, &QPushButton::released, this, &WardenFort::on_passwordButton_released);
-    connect(ui->accountButton, &QPushButton::released, this, &WardenFort::on_accountButton_released);
-    connect(ui->logoutButton, &QPushButton::released, this, &WardenFort::on_logoutButton_released);
-
     connect(ui->tableWidget, &QTableWidget::itemClicked, this, &WardenFort::onRowClicked);
 
     networkManager = new QNetworkAccessManager(this);
     manager = new QNetworkAccessManager(this);
 
-    // Initially hide dd5 to dd8 buttons
-    ui->dd5->setVisible(false);
-    ui->dd6->setVisible(false);
-    ui->dd7->setVisible(false);
-    ui->dd8->setVisible(false);
-    ui->profileTab_2->setVisible(false);
-    ui->profileTab_3->setVisible(false);
-    ui->profileTab_4->setVisible(false);
-    ui->profileTab_5->setVisible(false);
-    ui->frame_2->setVisible(false);
+    // Set initial width of listWidget to 201 and hide triReversedButton
+    ui->listWidget->setFixedWidth(201);
+    ui->triReversedButton->setVisible(false);
+
+    // Connect the clicked() signals of the buttons to their respective slots
+    connect(ui->triButton, &QPushButton::clicked, this, &WardenFort::onTriButtonClicked);
+    connect(ui->triReversedButton, &QPushButton::clicked, this, &WardenFort::onTriReversedButtonClicked);
+    connect(ui->profilePushButton, &QPushButton::clicked, this, &WardenFort::onProfilePushButtonClicked);
+    connect(ui->profileLessButton, &QPushButton::clicked, this, &WardenFort::onProfileLessButtonClicked);
+
+    hideSpecifiedButtons();
 
     ui->tableWidget->setColumnWidth(0, 120);
     ui->tableWidget->setColumnWidth(1, 60);
@@ -685,7 +671,94 @@ void WardenFort::toggleButtonVisibility(QPushButton* buttonToHide, QPushButton* 
     buttonToShow->setVisible(true);
 }
 
-void WardenFort::toggleButtons()
+void WardenFort::onTriButtonClicked()
+{
+    // Adjust the width of the QListWidget based on its current width
+    if (ui->listWidget->width() == 201) {
+        ui->listWidget->setFixedWidth(21);
+        ui->triButton->setVisible(false); // Hide triButton
+        ui->triReversedButton->setVisible(true); // Show triReversedButton
+        ui->frame->setVisible(false); // Hide frame QLabel
+        ui->welcome_text->setVisible(false); // Hide welcome_text QLabel
+        ui->wardenfort->setVisible(false); // Hide wardenfort QLabel
+        ui->profilePushButton->setVisible(false);
+        ui->profileLessButton->setVisible(false);
+        ui->alertPushButton->setVisible(false);
+        ui->alertLessButton->setVisible(false);
+        ui->reportPushButton->setVisible(false);
+        ui->reportLessButton->setVisible(false);
+        ui->calPushButton->setVisible(false);
+        ui->calLessButton->setVisible(false);
+    } else {
+        ui->listWidget->setFixedWidth(201);
+        ui->triButton->setVisible(true); // Show triButton
+        ui->triReversedButton->setVisible(false); // Hide triReversedButton
+
+        // Make the QLabel elements visible when the width is set back to 201
+        ui->frame->setVisible(true); // Show frame QLabel
+        ui->welcome_text->setVisible(true); // Show welcome_text QLabel
+        ui->wardenfort->setVisible(true); // Show wardenfort QLabel
+
+        ui->profilePushButton->setVisible(true);
+        ui->profileLessButton->setVisible(true);
+        ui->alertPushButton->setVisible(true);
+        ui->alertLessButton->setVisible(true);
+        ui->reportPushButton->setVisible(true);
+        ui->reportLessButton->setVisible(true);
+        ui->calPushButton->setVisible(true);
+        ui->calLessButton->setVisible(true);
+    }
+
+    hideSpecifiedButtons();
+}
+
+void WardenFort::onTriReversedButtonClicked()
+{
+    // Adjust the width of the QListWidget based on its current width
+    if (ui->listWidget->width() == 21) {
+        ui->listWidget->setFixedWidth(201);
+        ui->triButton->setVisible(true); // Show triButton
+        ui->triReversedButton->setVisible(false); // Hide triReversedButton
+
+        // Make the QLabel elements visible when the width is set back to 201
+        ui->frame->setVisible(true); // Show frame QLabel
+        ui->welcome_text->setVisible(true); // Show welcome_text QLabel
+        ui->wardenfort->setVisible(true); // Show wardenfort QLabel
+        ui->profilePushButton->setVisible(true);
+        ui->profileLessButton->setVisible(true);
+        ui->alertPushButton->setVisible(true);
+        ui->alertLessButton->setVisible(true);
+        ui->reportPushButton->setVisible(true);
+        ui->reportLessButton->setVisible(true);
+        ui->calPushButton->setVisible(true);
+        ui->calLessButton->setVisible(true);
+    }
+
+    hideSpecifiedButtons();
+}
+
+void WardenFort::onProfilePushButtonClicked()
+{
+    // Hide profilePushButton and show profileLessButton
+    ui->profilePushButton->setVisible(false);
+    ui->profileLessButton->setVisible(true);
+}
+
+void WardenFort::onProfileLessButtonClicked()
+{
+    // Hide profileLessButton and show profilePushButton
+    ui->profileLessButton->setVisible(false);
+    ui->profilePushButton->setVisible(true);
+}
+
+void WardenFort::hideSpecifiedButtons() {
+    ui->profileLessButton->setVisible(false);
+    ui->alertLessButton->setVisible(false);
+    ui->reportLessButton->setVisible(false);
+    ui->calLessButton->setVisible(false);
+}
+
+/*void WardenFort::toggleButtons()
 {
     int newY;
     QPushButton* clickedButton = qobject_cast<QPushButton*>(sender());
@@ -817,6 +890,7 @@ void WardenFort::on_logoutButton_released() {
     loginWindow->show();
     disconnect(ui->logoutButton, &QPushButton::released, this, &WardenFort::on_logoutButton_released);
 }
+*/
 
 void WardenFort::onRowClicked(QTableWidgetItem *item) {
     // Get the row index of the clicked item
