@@ -21,6 +21,8 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class WardenFort; }
 QT_END_NAMESPACE
 
+class CaptureThread; // Forward declaration
+
 class WardenFort : public QMainWindow
 {
     Q_OBJECT
@@ -36,6 +38,8 @@ public:
     void setLabelText1(const QString& text);
     QTableWidget* getTableWidget(); // Getter method for tableWidget
     void scanActiveLANAdapters(); // Corrected declaration
+    void stopScanningActiveLANAdapters();
+    void restartScanningActiveLANAdapters();
     void setWelcomeText(const QString& text);
     void toggleButtons();
     void handleScrollBarValueChange(int value);
@@ -73,6 +77,8 @@ private:
     QString extractResponseText(const QJsonDocument &responseJson);
     bool isFilteredAdapter(pcap_if_t* adapter);
     BOOL LoadNpcapDlls();
+
+    QVector<CaptureThread*> captureThreads; // Declaration of captureThreads vector
 };
 
 #endif // WARDENFORT_H

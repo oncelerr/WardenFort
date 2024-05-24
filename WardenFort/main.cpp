@@ -27,7 +27,6 @@ int main(int argc, char* argv[])
     
         WardenFort wardenfort;
         wardenfort.show();
-        wardenfort.scanActiveLANAdapters();
     
 
     return a.exec();
