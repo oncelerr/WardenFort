@@ -12,10 +12,16 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <pcap.h>
+#include <Winsock2.h>
+
+#pragma comment(lib, "Ws2_32.lib")
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class WardenFort; }
 QT_END_NAMESPACE
+
+class CaptureThread; // Forward declaration
 
 class WardenFort : public QMainWindow
 {
@@ -25,12 +31,15 @@ public:
     void toggleButtonVisibility(QPushButton* buttonToHide, QPushButton* buttonToShow);
     WardenFort(QWidget* parent = nullptr);
     ~WardenFort();
+
     void settrafficAnomalies(const QString& text);
     void setcriticalAnomalies(const QString& text);
     void setOverallAlert(const QString& text);
     void setLabelText1(const QString& text);
     QTableWidget* getTableWidget(); // Getter method for tableWidget
     void scanActiveLANAdapters(); // Corrected declaration
+    void stopScanningActiveLANAdapters();
+    void restartScanningActiveLANAdapters();
     void setWelcomeText(const QString& text);
     void toggleButtons();
     void handleScrollBarValueChange(int value);
@@ -41,6 +50,11 @@ public:
     void checkVirusTotal(const QString &ipAddress);
     void checkGreyNoise(const QString &ipAddress);
     void checkIPQualityScore(const QString &ipAddress);
+    void performSearch();
+
+    void startPacketCapture();
+    void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
+    void saveDataToFile();
 
 private slots:
     void onTriButtonClicked();
@@ -61,6 +75,10 @@ private:
     void hideSpecifiedButtons();
     void sendRequestToChatGPT(const QString &inputText);
     QString extractResponseText(const QJsonDocument &responseJson);
+    bool isFilteredAdapter(pcap_if_t* adapter);
+    BOOL LoadNpcapDlls();
+
+    QVector<CaptureThread*> captureThreads; // Declaration of captureThreads vector
 };
 
 #endif // WARDENFORT_H
