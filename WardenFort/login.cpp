@@ -200,11 +200,15 @@ void login::on_loginButton_clicked()
     QString username = ui->typeUN_box->text();
     QString password = ui->typePASS_box->text();
 
+    // Hash the input password using SHA-256
+    QByteArray passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
+    QString hashedPassword = QString(passwordHash.toHex());
+
     // Query the database to check if the entered credentials are valid
     QSqlQuery query;
     query.prepare("SELECT * FROM user_db WHERE username = :username AND passwd = :password");
     query.bindValue(":username", username);
-    query.bindValue(":password", password);
+    query.bindValue(":password", hashedPassword); // Compare with hashed password
 
     if (query.exec() && query.next()) {
         // Credentials are valid, proceed with login
@@ -221,7 +225,7 @@ void login::on_loginButton_clicked()
                 hiddenEmail[i] = '*';
             }
         }
-        
+
         // Generate OTP
         generateCode();
 

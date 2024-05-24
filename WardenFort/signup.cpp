@@ -4,6 +4,8 @@
 #include <QMessageBox>
 #include <QRegularExpression> // Include QRegularExpression header
 #include "login.h"
+#include <QCryptographicHash>
+
 
 signup::signup(QWidget *parent) :
     QDialog(parent),
@@ -33,7 +35,11 @@ void signup::onCreateButtonClicked()
     QString email = ui->email_address->text();
     QString password = ui->password->text();
 
+    // Hash the password
+    QByteArray passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
 
+    // Convert the hashed password to a hex string
+    QString hashedPassword = QString(passwordHash.toHex());
     // Insert data into the database
     QSqlQuery query;
     query.prepare("INSERT INTO user_db (firstName, lastName, username, email, passwd) "
@@ -42,13 +48,26 @@ void signup::onCreateButtonClicked()
     query.bindValue(":last_name", lastName);
     query.bindValue(":username", username);
     query.bindValue(":email", email);
-    query.bindValue(":password", password);
+    query.bindValue(":password", hashedPassword);
 
     if (query.exec()) {
-        QMessageBox::information(this, "Success", "Signup successful!");
-    } else {
-        QMessageBox::critical(this, "Error", "Signup failed!");
+        QMessageBox successMessageBox(QMessageBox::Information, "Success", "Signup successful!", QMessageBox::Ok, this);
+        successMessageBox.setStyleSheet("background-color: white;");
+        successMessageBox.exec();
+
+        ui->first_name->clear();
+        ui->last_name->clear();
+        ui->username->clear();
+        ui->email_address->clear();
+        ui->password->clear();
+        ui->pass_rest->clear();
     }
+    else {
+        QMessageBox errorMessageBox(QMessageBox::Critical, "Error", "Signup failed!", QMessageBox::Ok, this);
+        errorMessageBox.setStyleSheet("background-color: white;");
+        errorMessageBox.exec();
+    }
+
 }
 
 void signup::onBackButtonClicked()
