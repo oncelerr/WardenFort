@@ -45,7 +45,7 @@
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>40</y>
+      <y>55</y>
       <width>141</width>
       <height>106</height>
      </rect>
@@ -170,6 +170,11 @@ border-radius: 10px;
     </column>
     <column>
      <property name="text">
+      <string>Protocol</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
       <string>Info</string>
      </property>
     </column>
@@ -178,7 +183,7 @@ border-radius: 10px;
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>40</y>
+      <y>55</y>
       <width>141</width>
       <height>106</height>
      </rect>
@@ -249,7 +254,7 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>40</y>
+      <y>55</y>
       <width>141</width>
       <height>106</height>
      </rect>
@@ -262,7 +267,7 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="maximumSize">
      <size>
-      <width>180</width>
+      <width>9999</width>
       <height>106</height>
      </size>
     </property>
@@ -964,6 +969,53 @@ QListWidget::item:selected {
      <pixmap resource="wardenfort.qrc">:/wardenfort/cyber (1).png</pixmap>
     </property>
    </widget>
+   <widget class="QPushButton" name="searchBTN">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>20</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton#searchBTN {
+    border: none;
+    color: white;
+    border-radius: 5px;
+    background-color: rgb(44, 60, 75);
+}
+
+QPushButton#searchBTN:pressed {
+    background-color: rgb(34, 50, 65); /* Change the color to a darker shade when pressed */
+}</string>
+    </property>
+    <property name="text">
+     <string>Search</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="searchIP">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>20</y>
+      <width>351</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+                        border: none;
+                        color: white;
+                        border-radius: 5px;
+                        background-color: rgb(44, 60, 75);
+						padding-left: 10px;
+                        }</string>
+    </property>
+    <property name="placeholderText">
+     <string>Search Source IP</string>
+    </property>
+   </widget>
    <zorder>label</zorder>
    <zorder>listWidget</zorder>
    <zorder>reportPushButton</zorder>
@@ -984,6 +1036,8 @@ QListWidget::item:selected {
    <zorder>triButton</zorder>
    <zorder>welcome_text</zorder>
    <zorder>alertLessButton</zorder>
+   <zorder>searchBTN</zorder>
+   <zorder>searchIP</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

@@ -12,6 +12,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <pcap.h>
+#include <Winsock2.h>
+
+#pragma comment(lib, "Ws2_32.lib")
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class WardenFort; }
@@ -25,6 +29,7 @@ public:
     void toggleButtonVisibility(QPushButton* buttonToHide, QPushButton* buttonToShow);
     WardenFort(QWidget* parent = nullptr);
     ~WardenFort();
+
     void settrafficAnomalies(const QString& text);
     void setcriticalAnomalies(const QString& text);
     void setOverallAlert(const QString& text);
@@ -41,6 +46,11 @@ public:
     void checkVirusTotal(const QString &ipAddress);
     void checkGreyNoise(const QString &ipAddress);
     void checkIPQualityScore(const QString &ipAddress);
+    void performSearch();
+
+    void startPacketCapture();
+    void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
+    void saveDataToFile();
 
 private slots:
     void onTriButtonClicked();
@@ -61,6 +71,8 @@ private:
     void hideSpecifiedButtons();
     void sendRequestToChatGPT(const QString &inputText);
     QString extractResponseText(const QJsonDocument &responseJson);
+    bool isFilteredAdapter(pcap_if_t* adapter);
+    BOOL LoadNpcapDlls();
 };
 
 #endif // WARDENFORT_H

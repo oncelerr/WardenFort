@@ -6,15 +6,17 @@
 #include <ws2tcpip.h>
 #include <QApplication>
 #include <QThread>
-#include <iphlpapi.h>    
+#include <iphlpapi.h>
 #include <ctime>
 #include <QScrollBar>
 #include <pcap.h>
-#include <QDebug> 
+#include <tchar.h>
+#include <QDebug>
 #include "accountsettings.h"
 #include "passwordsec.h"
 #include "login.h"
 #include "loginsession.h"
+#include <QFileDialog>
 
 #include <QCoreApplication>
 #include <QNetworkAccessManager>
@@ -33,6 +35,7 @@ int j = 0;
 int k = 0;
 int portScanningDetected = 0;
 int DOSDetected = 0;
+int lastFoundRow = -1;
 
 WardenFort::WardenFort(QWidget* parent)
     : QMainWindow(parent)
@@ -54,12 +57,14 @@ WardenFort::WardenFort(QWidget* parent)
     connect(ui->triReversedButton, &QPushButton::clicked, this, &WardenFort::onTriReversedButtonClicked);
     connect(ui->profilePushButton, &QPushButton::clicked, this, &WardenFort::onProfilePushButtonClicked);
     connect(ui->profileLessButton, &QPushButton::clicked, this, &WardenFort::onProfileLessButtonClicked);
+    connect(ui->searchBTN, &QPushButton::clicked, this, &WardenFort::performSearch);
+    connect(ui->actionSave, &QAction::triggered, this, &WardenFort::saveDataToFile);
 
     hideSpecifiedButtons();
 
     ui->tableWidget->setColumnWidth(0, 120);
-    ui->tableWidget->setColumnWidth(1, 60);
-    ui->tableWidget->setColumnWidth(2, 80);
+    ui->tableWidget->setColumnWidth(1, 120);
+    ui->tableWidget->setColumnWidth(2, 120);
     ui->tableWidget->setColumnWidth(3, 50);
     ui->tableWidget->setColumnWidth(4, 50);
     ui->tableWidget->setColumnWidth(6, 30);
@@ -126,6 +131,49 @@ struct IPHeader {
     u_long  Destination;             // Destination address
 };
 
+typedef struct ip_address {
+    u_char byte1;
+    u_char byte2;
+    u_char byte3;
+    u_char byte4;
+} ip_address;
+
+typedef struct ip_header {
+    u_char  ver_ihl; // Version (4 bits) + IP header length (4 bits)
+    u_char  tos;     // Type of service
+    u_short tlen;    // Total length
+    u_short identification; // Identification
+    u_short flags_fo; // Flags (3 bits) + Fragment offset (13 bits)
+    u_char  ttl;      // Time to live
+    u_char  proto;    // Protocol
+    u_short crc;      // Header checksum
+    ip_address  saddr; // Source address
+    ip_address  daddr; // Destination address
+    u_int  op_pad;     // Option + Padding
+} ip_header;
+
+QString getProtocolName(u_char protocol) {
+    switch (protocol) {
+    case 1:
+        return "ICMP";
+    case 6:
+        return "TCP";
+    case 42:
+        return "UDP";
+    case 131:
+        return "UDP";
+    default:
+        return "Unknown";
+    }
+}
+
+typedef struct udp_header {
+    u_short sport; // Source port
+    u_short dport; // Destination port
+    u_short len;   // Datagram length
+    u_short crc;   // Checksum
+} udp_header;
+
 struct ICMPHeader {
     uint8_t type;      // ICMP message type
     uint8_t code;      // ICMP message code
@@ -168,6 +216,44 @@ bool isFilteredAdapter(pcap_if_t* adapter) {
     return false;
 }
 
+BOOL WardenFort::LoadNpcapDlls()
+{
+    _TCHAR npcap_dir[512];
+    UINT len;
+    len = GetSystemDirectory(npcap_dir, 480);
+    if (!len) {
+        qDebug() << "Error in GetSystemDirectory:" << GetLastError();
+        return FALSE;
+    }
+    _tcscat_s(npcap_dir, 512, _T("\\Npcap"));
+    if (SetDllDirectory(npcap_dir) == 0) {
+        qDebug() << "Error in SetDllDirectory:" << GetLastError();
+        return FALSE;
+    }
+    return TRUE;
+}
+
+bool WardenFort::isFilteredAdapter(pcap_if_t* adapter)
+{
+    if (adapter->description) {
+        QString description = QString(adapter->description).toLower();
+        if (description.contains("wan miniport") || description.contains("virtualbox"))
+            return true;
+    }
+
+    if (adapter->flags & PCAP_IF_LOOPBACK)
+    {
+        return true;
+    }
+
+    if (!(adapter->flags & PCAP_IF_CONNECTION_STATUS_CONNECTED))
+    {
+        return true;
+    }
+
+    return false;
+}
+
 void analyzeTCPPacket(const u_char* packet, int packetLength, WardenFort& wardenFort) {
 
     // Ensure the packet is large enough to contain IP and TCP headers
@@ -202,12 +288,49 @@ void analyzeTCPPacket(const u_char* packet, int packetLength, WardenFort& warden
     // Analyze TCP flags
     // Analyze other aspects of the TCP packet as needed
     // For example, you could check sequence numbers, window size, etc.
+
+
 }
 
 void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
     bool isVeryBottom = false;
 
-    //TEST qDebug() << "Packet captured. Length:" << pkthdr->len;
+    struct tm ltime;
+    char timestr[16];
+    ip_header *ih;
+    udp_header *uh;
+    u_int ip_len;
+    u_short sport, dport;
+    time_t local_tv_sec;
+
+    local_tv_sec = pkthdr->ts.tv_sec;
+    localtime_s(&ltime, &local_tv_sec);
+    strftime(timestr, sizeof timestr, "%H:%M:%S", &ltime);
+
+    qDebug() << timestr << pkthdr->ts.tv_usec << "Packet Length:" << pkthdr->len;
+
+    ih = (ip_header *)(packet + 14); // length of ethernet header
+
+    ip_len = (ih->ver_ihl & 0xf) * 4;
+    uh = (udp_header *)((u_char*)ih + ip_len);
+
+    sport = ntohs(uh->sport);
+    dport = ntohs(uh->dport);
+
+    QString src_ip = QString("%1.%2.%3.%4:%5")
+                         .arg(ih->saddr.byte1)
+                         .arg(ih->saddr.byte2)
+                         .arg(ih->saddr.byte3)
+                         .arg(ih->saddr.byte4)
+                         .arg(sport);
+    QString dst_ip = QString("%1.%2.%3.%4:%5")
+                         .arg(ih->daddr.byte1)
+                         .arg(ih->daddr.byte2)
+                         .arg(ih->daddr.byte3)
+                         .arg(ih->daddr.byte4)
+                         .arg(dport);
+
+    qDebug().noquote() << src_ip.toUtf8().constData() << "->" << dst_ip.toUtf8().constData();
 
     struct tm* timeinfo;
     char buffer[80];
@@ -224,12 +347,18 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     const IPHeader* ipHeader = reinterpret_cast<const IPHeader*>(packet);
     const struct my_tcphdr* tcpHeader = reinterpret_cast<const struct my_tcphdr*>(packet + sizeof(IPHeader));
 
-    char sourceIp[INET_ADDRSTRLEN];
-    char destIp[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &(ipHeader->Source), sourceIp, INET_ADDRSTRLEN);
-    inet_ntop(AF_INET, &(ipHeader->Destination), destIp, INET_ADDRSTRLEN);
+    QString sourceIp = QString("%1.%2.%3.%4")
+                           .arg(ih->saddr.byte1)
+                           .arg(ih->saddr.byte2)
+                           .arg(ih->saddr.byte3)
+                           .arg(ih->saddr.byte4);
+    QString destIp = QString("%1.%2.%3.%4")
+                         .arg(ih->daddr.byte1)
+                         .arg(ih->daddr.byte2)
+                         .arg(ih->daddr.byte3)
+                         .arg(ih->daddr.byte4);
 
-    QString sourcePort = QString::number(ntohs(tcpHeader->th_sport));
+    QString sourcePort = QString::number(ntohs(sport));
     QString destPort = QString::number(ntohs(tcpHeader->th_dport));
     QString flags;
     if (tcpHeader->th_flags & TH_SYN) flags += "SYN ";
@@ -241,6 +370,9 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     int payloadLength = pkthdr->caplen - sizeof(IPHeader) - tcpHeaderLength;
 
     QString info = QString("No Information");
+
+    QString protocol = QString::number(ipHeader->Protocol);
+    u_char protocol2 = ipHeader->Protocol;
 
     if (ipHeader->Protocol == IPPROTO_ICMP) {
         int totalLength = ntohs(ipHeader->TotalLength);
@@ -324,7 +456,8 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     tableWidget->setItem(row, 4, new QTableWidgetItem(destPort));
     tableWidget->setItem(row, 5, new QTableWidgetItem(flags));
     tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(pkthdr->caplen)));
-    tableWidget->setItem(row, 7, new QTableWidgetItem(info));
+    tableWidget->setItem(row, 7, new QTableWidgetItem(protocol));
+    tableWidget->setItem(row, 8, new QTableWidgetItem(info));
 
     if (payloadLength > MAX_EXPECTED_PAYLOAD_LENGTH) {
         wardenFort->settrafficAnomalies(QString::number(i));
@@ -537,7 +670,8 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
         tableWidget->setItem(row, 4, new QTableWidgetItem(destPort));
         tableWidget->setItem(row, 5, new QTableWidgetItem(flags));
         tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(pkthdr->caplen)));
-        tableWidget->setItem(row, 7, new QTableWidgetItem(info));
+        tableWidget->setItem(row, 7, new QTableWidgetItem(protocol));
+        tableWidget->setItem(row, 8, new QTableWidgetItem(info));
         for (int col = 0; col < tableWidget->columnCount(); ++col) {
             tableWidget->item(row, col)->setBackground(QColor(163, 0, 0));
         }
@@ -555,7 +689,8 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
         tableWidget->setItem(row, 4, new QTableWidgetItem(destPort));
         tableWidget->setItem(row, 5, new QTableWidgetItem(flags));
         tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(pkthdr->caplen)));
-        tableWidget->setItem(row, 7, new QTableWidgetItem(info));
+        tableWidget->setItem(row, 7, new QTableWidgetItem(protocol));
+        tableWidget->setItem(row, 8, new QTableWidgetItem(info));
         for (int col = 0; col < tableWidget->columnCount(); ++col) {
             tableWidget->item(row, col)->setBackground(QColor(163, 0, 0));
         }
@@ -573,7 +708,8 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
         tableWidget->setItem(row, 4, new QTableWidgetItem(destPort));
         tableWidget->setItem(row, 5, new QTableWidgetItem(flags));
         tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(pkthdr->caplen)));
-        tableWidget->setItem(row, 7, new QTableWidgetItem(info));
+        tableWidget->setItem(row, 7, new QTableWidgetItem(protocol));
+        tableWidget->setItem(row, 8, new QTableWidgetItem(info));
         for (int col = 0; col < tableWidget->columnCount(); ++col) {
             tableWidget->item(row, col)->setBackground(QColor(163, 0, 0));
         }
@@ -594,15 +730,24 @@ void captureTCPPackets(pcap_if_t* adapter, WardenFort& wardenFort) {
     char errbuf[PCAP_ERRBUF_SIZE];
 
     // Open the adapter for live capturing
-    pcap_t* pcapHandle = pcap_open_live(adapter->name, 65535, 1, 1000, errbuf);
+    pcap_t* pcapHandle = pcap_open(adapter->name, // name of the device
+                                   65536, // portion of the packet to capture
+                                   // 65536 guarantees that the whole packet will
+                                   // be captured on all the link layers
+                                   PCAP_OPENFLAG_PROMISCUOUS, // promiscuous mode
+                                   1000, // read timeout
+                                   NULL, // authentication on the remote machine
+                                   errbuf // error buffer
+                                   );
+
     if (pcapHandle == nullptr) {
         qDebug() << "Error opening adapter for capturing:" << errbuf;
         return;
     }
 
-    // Apply a filter to capture only TCP packets
+    // Apply a filter to capture TCP, UDP, and ICMP packets
     struct bpf_program filter;
-    if (pcap_compile(pcapHandle, &filter, "tcp", 0, PCAP_NETMASK_UNKNOWN) == -1) {
+    if (pcap_compile(pcapHandle, &filter, "tcp or udp or icmp", 0, PCAP_NETMASK_UNKNOWN) == -1) {
         qDebug() << "Error compiling filter:" << pcap_geterr(pcapHandle);
         pcap_close(pcapHandle);
         return;
@@ -623,6 +768,7 @@ void captureTCPPackets(pcap_if_t* adapter, WardenFort& wardenFort) {
     // Close the capture handle when done
     pcap_close(pcapHandle);
 }
+
 
 class CaptureThread : public QThread {
 public:
@@ -653,7 +799,7 @@ void WardenFort::scanActiveLANAdapters() {
         if (adapter->name != nullptr && !isFilteredAdapter(adapter)) {
             // Display the name and description of the LAN adapter
             qDebug() << "Active LAN adapter found:" << adapter->name << "Description:" << (adapter->description ? adapter->description : "No Description");
-            
+
 
             // Start capturing TCP packets from this adapter in a separate thread
             CaptureThread* thread = new CaptureThread(adapter, *this); // Pass reference to this object
@@ -757,140 +903,6 @@ void WardenFort::hideSpecifiedButtons() {
     ui->reportLessButton->setVisible(false);
     ui->calLessButton->setVisible(false);
 }
-
-/*void WardenFort::toggleButtons()
-{
-    int newY;
-    QPushButton* clickedButton = qobject_cast<QPushButton*>(sender());
-    if (!clickedButton)
-        return; // Safety check
-
-    if (clickedButton == ui->dd1) {
-        // Remove the border-top style
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; }");
-
-        toggleButtonVisibility(ui->dd1, ui->dd5);
-        //alerts tab
-        newY = ui->alertsTab->y() + 90;
-        ui->alertsTab->move(ui->alertsTab->x(), newY);
-        //reports tab
-        newY = ui->reportsTab->y() + 90;
-        ui->reportsTab->move(ui->reportsTab->x(), newY);
-        //calendarTab
-        newY = ui->calendarTab->y() + 90;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-
-        ui->profileTab_2->setVisible(true);
-        ui->frame_2->setVisible(true);
-    }
-
-    else if (clickedButton == ui->dd2) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; }");
-
-        toggleButtonVisibility(ui->dd2, ui->dd6);
-
-        //reports tab
-        newY = ui->reportsTab->y() + 65;
-        ui->reportsTab->move(ui->reportsTab->x(), newY);
-        //calendarTab
-        newY = ui->calendarTab->y() + 65;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_3->setVisible(true);
-        ui->frame_2->setVisible(true);
-    }
-    else if (clickedButton == ui->dd3) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; }");
-        toggleButtonVisibility(ui->dd3, ui->dd7);
-        //calendarTab
-        newY = ui->calendarTab->y() + 42;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_4->setVisible(true);
-        ui->frame_2->setVisible(true);
-    }
-    else if (clickedButton == ui->dd4) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; }");
-        toggleButtonVisibility(ui->dd4, ui->dd8);
-        ui->profileTab_5->setVisible(true);
-        ui->frame_2->setVisible(true);
-    }
-    else if (clickedButton == ui->dd5) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; border-top: 1px solid rgb(25, 31, 50);}");
-
-        toggleButtonVisibility(ui->dd5, ui->dd1);
-        //alerts tab
-        newY = ui->alertsTab->y() - 90;
-        ui->alertsTab->move(ui->alertsTab->x(), newY);
-        //reports tab
-        newY = ui->reportsTab->y() - 90;
-        ui->reportsTab->move(ui->reportsTab->x(), newY);
-        //calendarTab
-        newY = ui->calendarTab->y() - 90;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_2->setVisible(false);
-        ui->frame_2->setVisible(false);
-    }
-    else if (clickedButton == ui->dd6) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; border-top: 1px solid rgb(25, 31, 50);}");
-
-        toggleButtonVisibility(ui->dd6, ui->dd2);
-        //reports tab
-        newY = ui->reportsTab->y() - 65;
-        ui->reportsTab->move(ui->reportsTab->x(), newY);
-        //calendarTab
-        newY = ui->calendarTab->y() - 65;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_3->setVisible(false);
-        ui->frame_2->setVisible(false);
-    }
-    else if (clickedButton == ui->dd7) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; border-top: 1px solid rgb(25, 31, 50);}");
-        toggleButtonVisibility(ui->dd7, ui->dd3);
-        //calendarTab
-        newY = ui->calendarTab->y() - 42;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_4->setVisible(false);
-        ui->frame_2->setVisible(false);
-    }
-    else if (clickedButton == ui->dd8) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; border-top: 1px solid rgb(25, 31, 50);}");
-        toggleButtonVisibility(ui->dd8, ui->dd4);
-        ui->profileTab_5->setVisible(false);
-        ui->frame_2->setVisible(false);
-    }
-}
-
-void WardenFort::on_passwordButton_released() {
-
-    ui->passwordButton->setStyleSheet("QPushButton { font: 8pt \"Inter\"; background-color: transparent; color: white; }"
-        "QPushButton:pressed { background-color: lightgray; }");
-    passwordSec* passWindow = new passwordSec;
-     passWindow->getUsername(ui->welcome_text->text());
-    this->close();
-    passWindow->show();
-    disconnect(ui->passwordButton, &QPushButton::released, this, &WardenFort::on_passwordButton_released);
-
-}
-
-void WardenFort::on_accountButton_released() {
-
-    ui->accountButton->setStyleSheet("QPushButton { font: 8pt \"Inter\"; background-color: transparent; color: white; }"
-        "QPushButton:pressed { background-color: lightgray; }");
-    accountSettings* accountWindow = new accountSettings;
-    this->close();
-    accountWindow->show();
-    disconnect(ui->accountButton, &QPushButton::released, this, &WardenFort::on_accountButton_released);
-}
-
-void WardenFort::on_logoutButton_released() {
-
-    ui->logoutButton->setStyleSheet("QPushButton { font: 8pt \"Inter\"; background-color: transparent; color: red; }"
-        "QPushButton:pressed { background-color: #FFA07A; }");
-    login* loginWindow = new login;
-    this->close();
-    loginWindow->show();
-    disconnect(ui->logoutButton, &QPushButton::released, this, &WardenFort::on_logoutButton_released);
-}
-*/
 
 void WardenFort::onRowClicked(QTableWidgetItem *item) {
     // Get the row index of the clicked item
@@ -1030,4 +1042,76 @@ void WardenFort::checkIPQualityScore(const QString &ipAddress)
 
         reply->deleteLater();
     });
+}
+
+void WardenFort::performSearch()
+{
+    QString searchText = ui->searchIP->text(); // Retrieve text from QLineEdit
+    if(searchText.isEmpty()) {
+        // Handle empty search
+        return;
+    }
+
+    // Start searching from the next row if the button is clicked again
+    int startRow = (lastFoundRow == -1) ? 0 : lastFoundRow + 1;
+
+    // Loop through the rows of the table starting from the specified row
+    for(int row = startRow; row < ui->tableWidget->rowCount(); ++row) {
+        for(int column = 0; column < ui->tableWidget->columnCount(); ++column) {
+            QTableWidgetItem* item = ui->tableWidget->item(row, column);
+            if(item && item->text().contains(searchText, Qt::CaseInsensitive)) {
+                // If the text is found, select the row, scroll to it, and update lastFoundRow
+                ui->tableWidget->selectRow(row);
+                ui->tableWidget->scrollToItem(item);
+                lastFoundRow = row;
+                return; // Stop searching after the first occurrence
+            }
+        }
+    }
+
+    // If the text is not found, you can display a message or handle it as per your requirement
+    qDebug() << "Text not found";
+}
+
+void WardenFort::saveDataToFile() {
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("Text Files (*.txt)"));
+    if (filePath.isEmpty()) {
+        return; // User canceled or no file selected
+    }
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "Error: Unable to open file for writing";
+        return;
+    }
+
+    QTextStream out(&file);
+    const int rowCount = ui->tableWidget->rowCount();
+    const int columnCount = ui->tableWidget->columnCount();
+
+    // Write table headers
+    for (int col = 0; col < columnCount; ++col) {
+        out << ui->tableWidget->horizontalHeaderItem(col)->text();
+        if (col < columnCount - 1) {
+            out << "\t"; // Use tab as delimiter
+        }
+    }
+    out << "\n";
+
+    // Write table data
+    for (int row = 0; row < rowCount; ++row) {
+        for (int col = 0; col < columnCount; ++col) {
+            QTableWidgetItem *item = ui->tableWidget->item(row, col);
+            if (item) {
+                out << item->text();
+            }
+            if (col < columnCount - 1) {
+                out << "\t"; // Use tab as delimiter
+            }
+        }
+        out << "\n";
+    }
+
+    file.close();
+    qDebug() << "Data saved to" << filePath;
 }
