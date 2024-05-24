@@ -1155,11 +1155,17 @@ QMenu::item:hover {
     <property name="title">
      <string>Capture</string>
     </property>
+    <widget class="QMenu" name="menuCapture_Filters">
+     <property name="title">
+      <string>Capture Filters...</string>
+     </property>
+     <addaction name="actionTCP"/>
+    </widget>
     <addaction name="actionStart"/>
     <addaction name="actionStop"/>
     <addaction name="actionRestart"/>
     <addaction name="separator"/>
-    <addaction name="actionCapture_Filters"/>
+    <addaction name="menuCapture_Filters"/>
    </widget>
    <widget class="QMenu" name="menuAnalyze">
     <property name="title">
@@ -1422,11 +1428,6 @@ QMenu::item:hover {
     <string>Restart</string>
    </property>
   </action>
-  <action name="actionCapture_Filters">
-   <property name="text">
-    <string>Capture Filters...</string>
-   </property>
-  </action>
   <action name="actionDisplay_Filters">
    <property name="text">
     <string>Display Filters</string>
@@ -1520,6 +1521,11 @@ QMenu::item:hover {
   <action name="actionAsk_QA">
    <property name="text">
     <string>Ask (QA)</string>
+   </property>
+  </action>
+  <action name="actionTCP">
+   <property name="text">
+    <string>TCP</string>
    </property>
   </action>
  </widget>
