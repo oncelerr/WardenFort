@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     accountsettings.cpp \
     animatedlabel.cpp \
+    chat.cpp \
     enter.cpp \
     forgotpass.cpp \
     login.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
 HEADERS += \
     accountsettings.h \
     animatedlabel.h \
+    chat.h \
     enter.h \
     forgotpass.h \
     login.h \
@@ -35,6 +37,7 @@ HEADERS += \
 
 FORMS += \
     accountsettings.ui \
+    chat.ui \
     dialog.ui \
     enter.ui \
     forgotpass.ui \
