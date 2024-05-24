@@ -289,7 +289,6 @@ void login::openAlertNotif() {
     WardenFort* wardenfortWindow = new WardenFort;
     // Show the alertnotif window
     wardenfortWindow->show();
-    wardenfortWindow->scanActiveLANAdapters();
 
     QString userName;
 

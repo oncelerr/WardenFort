@@ -394,7 +394,7 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
 
         if (flagCount != 1 && !(tcpHeader->th_flags & (TH_SYN | TH_ACK)) && !(tcpHeader->th_flags & (TH_FIN | TH_ACK))) {
             // Protocol anomaly detected
-            info = QString("Protocol Anomaly Detected. Source: %1 Destination: %2").arg(sourceIp).arg(destIp);
+            info = QString("Protocol Anomaly Detected.").arg(sourceIp).arg(destIp);
         }
     }
 
@@ -450,7 +450,7 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
             if (icmpPayloadLength > MAX_ICMP_PAYLOAD_LENGTH) {
                 //wardenFort->settrafficAnomalies(QString::number(i));
                 //k = i + j;
-               // wardenFort->setOverallAlert(QString::number(k));
+               //wardenFort->setOverallAlert(QString::number(k));
                 for (int col = 0; col < tableWidget->columnCount(); ++col) {
                     //tableWidget->item(row, col)->setBackground(QColor(44, 75, 68));
                 }
@@ -1024,7 +1024,7 @@ void WardenFort::performSearch()
 }
 
 void WardenFort::saveDataToFile() {
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("Text Files (*.txt)"));
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("CSV Files (*.csv)"));
     if (filePath.isEmpty()) {
         return; // User canceled or no file selected
     }
@@ -1043,23 +1043,28 @@ void WardenFort::saveDataToFile() {
     for (int col = 0; col < columnCount; ++col) {
         out << ui->tableWidget->horizontalHeaderItem(col)->text();
         if (col < columnCount - 1) {
-            out << "\t"; // Use tab as delimiter
+            out << ","; // Use comma as delimiter
         }
     }
     out << "\n";
 
     // Write table data
     for (int row = 0; row < rowCount; ++row) {
-        for (int col = 0; col < columnCount; ++col) {
-            QTableWidgetItem *item = ui->tableWidget->item(row, col);
-            if (item) {
-                out << item->text();
-            }
-            if (col < columnCount - 1) {
-                out << "\t"; // Use tab as delimiter
+        QTableWidgetItem *infoItem = ui->tableWidget->item(row, 8); // Column 8 is the information column
+        if (infoItem && infoItem->text() != "No Information") {
+            if(infoItem->text() != "Protocol Anomaly Detected."){
+                for (int col = 0; col < columnCount; ++col) {
+                    QTableWidgetItem *item = ui->tableWidget->item(row, col);
+                    if (item) {
+                        out << item->text();
+                    }
+                    if (col < columnCount - 1) {
+                        out << ","; // Use comma as delimiter
+                    }
+                }
+                out << "\n";
             }
         }
-        out << "\n";
     }
 
     file.close();
