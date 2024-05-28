@@ -1042,29 +1042,48 @@ void WardenFort::saveDataToFile() {
     // Write table headers
     for (int col = 0; col < columnCount; ++col) {
         out << ui->tableWidget->horizontalHeaderItem(col)->text();
-        if (col < columnCount - 1) {
-            out << ","; // Use comma as delimiter
-        }
+        out << ","; // Use comma as delimiter
     }
-    out << "\n";
+    out << "Occurrence\n"; // Add the new Occurrence column header
 
-    // Write table data
+    QMap<QString, QStringList> mergedData;
+    QMap<QString, int> occurrenceCount;
+
+    // Collect and merge table data
     for (int row = 0; row < rowCount; ++row) {
         QTableWidgetItem *infoItem = ui->tableWidget->item(row, 8); // Column 8 is the information column
-        if (infoItem && infoItem->text() != "No Information") {
-            if(infoItem->text() != "Protocol Anomaly Detected."){
+        if (infoItem && infoItem->text() != "No Information" && infoItem->text() != "Protocol Anomaly Detected.") {
+            QString sourceIP = ui->tableWidget->item(row, 1)->text(); // Column 1 is "Source IP"
+            QStringList rowData;
+            for (int col = 0; col < columnCount; ++col) {
+                QTableWidgetItem *item = ui->tableWidget->item(row, col);
+                rowData << (item ? item->text() : "");
+            }
+            if (mergedData.contains(sourceIP)) {
+                QStringList &existingData = mergedData[sourceIP];
                 for (int col = 0; col < columnCount; ++col) {
-                    QTableWidgetItem *item = ui->tableWidget->item(row, col);
-                    if (item) {
-                        out << item->text();
-                    }
-                    if (col < columnCount - 1) {
-                        out << ","; // Use comma as delimiter
+                    if (!existingData[col].contains(rowData[col]) && !rowData[col].isEmpty()) {
+                        existingData[col] += "; " + rowData[col];
                     }
                 }
-                out << "\n";
+                occurrenceCount[sourceIP]++;
+            } else {
+                mergedData[sourceIP] = rowData;
+                occurrenceCount[sourceIP] = 1;
             }
         }
+    }
+
+    // Write merged data to file
+    QMapIterator<QString, QStringList> it(mergedData);
+    while (it.hasNext()) {
+        it.next();
+        QStringList rowData = it.value();
+        for (int col = 0; col < columnCount; ++col) {
+            out << rowData[col];
+            out << ","; // Use comma as delimiter
+        }
+        out << occurrenceCount[it.key()] << "\n"; // Write the occurrence count
     }
 
     file.close();
