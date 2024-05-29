@@ -1,4 +1,9 @@
 QT       += core gui
+QT       += printsupport
+QT       += charts
+QT       += core gui printsupport
+QT       += network
+QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,8 +23,11 @@ SOURCES += \
     main.cpp \
     otp.cpp \
     passwordsec.cpp \
+    reports.cpp \
     signup.cpp \
     wardenfort.cpp
+
+
 
 HEADERS += \
     accountsettings.h \
@@ -30,8 +38,11 @@ HEADERS += \
     loginsession.h \
     otp.h \
     passwordsec.h \
+    reports.h \
     signup.h \
     wardenfort.h
+
+
 
 FORMS += \
     accountsettings.ui \
@@ -43,13 +54,13 @@ FORMS += \
     newdb.ui \
     otp.ui \
     passwordsec.ui \
+    reports.ui \
     signup.ui \
     wardenfort.ui
 
-QT += charts
-QT += core gui printsupport
-QT += network
-QT += sql
+
+
+
 
 INCLUDEPATH += C:\npcap\Include
 LIBS += -LC:\npcap\Lib\x64 -lwpcap
@@ -60,6 +71,8 @@ LIBS += -LC:\npcap\Lib\x64 -lwpcap
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+
 
 RESOURCES += \
     img.qrc \
