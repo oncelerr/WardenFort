@@ -5,6 +5,8 @@
 #include <QDebug>
 #include "login.h"
 #include "wardenfort.h"
+#include "calendarnotifications.h"
+#include "notificationwidget.h"
 #include "reports.h"
 #include <QSqlError>
 
@@ -24,8 +26,10 @@ int main(int argc, char* argv[])
 
     //login login;
     //login.show();
-    reports reports;
-    reports.show();
+    //reports reports;
+    //reports.show();
+    CalendarNotifications calendarnotifications;
+    calendarnotifications.show();
     
         //WardenFort wardenfort;
         //wardenfort.show();

@@ -85,8 +85,8 @@ color: white;</string>
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="CalendarNotifications.qrc">
-          <normaloff>:/CalendarNotifications/triReversedButton.png</normaloff>:/CalendarNotifications/triReversedButton.png</iconset>
+         <iconset resource="wardenfort.qrc">
+          <normaloff>:/wardenfort/triReversedButton.png</normaloff>:/wardenfort/triReversedButton.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -131,7 +131,7 @@ color: white;</string>
   <zorder>dateLabel</zorder>
  </widget>
  <resources>
-  <include location="CalendarNotifications.qrc"/>
+  <include location="wardenfort.qrc"/>
  </resources>
  <connections/>
 </ui>

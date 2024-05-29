@@ -16,6 +16,8 @@ CONFIG += c++17
 SOURCES += \
     accountsettings.cpp \
     animatedlabel.cpp \
+    calendarnotifications.cpp\
+    notificationwidget.cpp\
     enter.cpp \
     forgotpass.cpp \
     login.cpp \
@@ -31,6 +33,8 @@ SOURCES += \
 
 HEADERS += \
     accountsettings.h \
+    calendarnotifications.h\
+    notificationwidget.h\
     animatedlabel.h \
     enter.h \
     forgotpass.h \
@@ -46,6 +50,8 @@ HEADERS += \
 
 FORMS += \
     accountsettings.ui \
+    calendarnotifications.ui\
+    notificationwidget.ui\
     dialog.ui \
     enter.ui \
     forgotpass.ui \
@@ -75,5 +81,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 
 RESOURCES += \
+    CalendarNotifications.qrc \
+    CalendarNotifications.qrc \
     img.qrc \
     wardenfort.qrc

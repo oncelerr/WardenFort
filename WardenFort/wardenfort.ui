@@ -1304,25 +1304,6 @@ border:0;</string>
       <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
     </property>
    </widget>
-   <widget class="QLabel" name="frame_2">
-    <property name="geometry">
-     <rect>
-      <x>225</x>
-      <y>362</y>
-      <width>151</width>
-      <height>141</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="wardenfort.qrc">:/wardenfort/frame.png</pixmap>
-    </property>
-   </widget>
    <widget class="QPushButton" name="triReversedButton_3">
     <property name="geometry">
      <rect>
@@ -1437,27 +1418,6 @@ border:0;</string>
       <normaloff>:/wardenfort/downButton.png</normaloff>:/wardenfort/downButton.png</iconset>
     </property>
    </widget>
-   <widget class="QLabel" name="welcome_text_2">
-    <property name="geometry">
-     <rect>
-      <x>187</x>
-      <y>323</y>
-      <width>221</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QLabel {
-    qproperty-alignment: AlignCenter;
-	font: 700 10pt &quot;Segoe UI&quot;;
-	color: rgb(255, 255, 255);
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-    </property>
-    <property name="text">
-     <string>Welcome, User!</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="profilePushButton_2">
     <property name="geometry">
      <rect>
@@ -1545,94 +1505,6 @@ border:0;</string>
       <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
     </property>
    </widget>
-   <widget class="QListWidget" name="listWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>201</x>
-      <y>290</y>
-      <width>201</width>
-      <height>531</height>
-     </rect>
-    </property>
-    <property name="cursor" stdset="0">
-     <cursorShape>PointingHandCursor</cursorShape>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QListWidget {
-    background-color: rgb(44, 60, 75);
-    border-top-left-radius: 0px;
-    border-bottom-right-radius: 20px;
-    border-top-right-radius: 20px;
-    border-bottom-left-radius: 0px;
-    padding: 30px;
-    padding-left: 15px;
-    padding-top: 250px;
-    font: 700 11pt &quot;Segoe UI&quot;;
-    color: rgb(255, 255, 255);
-}
-QListWidget::item {
-    margin-bottom: 25px; /* Adjust the spacing between items by setting a bottom margin */
-    border-bottom: 1px solid rgb(52, 78, 102);
-}
-
-
-QListWidget::item:hover {
-    background-color:rgb(25, 31, 50);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5); /* Adjust border on hover */
-}
-
-
-QListWidget::item:selected {
-    background-color: transparent; /* Make selection color transparent */
-    border: none;
-}</string>
-    </property>
-    <item>
-     <property name="text">
-      <string>Profile</string>
-     </property>
-     <property name="icon">
-      <iconset resource="wardenfort.qrc">
-       <normaloff>:/wardenfort/user_icon.png</normaloff>:/wardenfort/user_icon.png</iconset>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Alerts</string>
-     </property>
-     <property name="icon">
-      <iconset resource="wardenfort.qrc">
-       <normaloff>:/wardenfort/notif_icon.png</normaloff>:/wardenfort/notif_icon.png</iconset>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Reports</string>
-     </property>
-     <property name="icon">
-      <iconset resource="wardenfort.qrc">
-       <normaloff>:/wardenfort/report_icon.png</normaloff>:/wardenfort/report_icon.png</iconset>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Event Calendar</string>
-     </property>
-     <property name="icon">
-      <iconset resource="wardenfort.qrc">
-       <normaloff>:/wardenfort/cal_icon.png</normaloff>:/wardenfort/cal_icon.png</iconset>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Fort Chat</string>
-     </property>
-     <property name="icon">
-      <iconset resource="wardenfort.qrc">
-       <normaloff>:/wardenfort/mess_icon.png</normaloff>:/wardenfort/mess_icon.png</iconset>
-     </property>
-    </item>
-   </widget>
    <widget class="QPushButton" name="calLessButton_3">
     <property name="enabled">
      <bool>true</bool>
@@ -1661,25 +1533,6 @@ border:0;</string>
     <property name="icon">
      <iconset resource="wardenfort.qrc">
       <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
-    </property>
-   </widget>
-   <widget class="QLabel" name="wardenfort_2">
-    <property name="geometry">
-     <rect>
-      <x>196</x>
-      <y>303</y>
-      <width>191</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="wardenfort.qrc">:/wardenfort/wardenfort_word (1).png</pixmap>
     </property>
    </widget>
    <zorder>label</zorder>
@@ -1714,18 +1567,14 @@ border:0;</string>
    <zorder>triButton_2</zorder>
    <zorder>alertPushButton_3</zorder>
    <zorder>alertLessButton_3</zorder>
-   <zorder>frame_2</zorder>
    <zorder>triReversedButton_3</zorder>
    <zorder>reportPushButton_3</zorder>
    <zorder>reportLessButton_3</zorder>
    <zorder>calPushButton_3</zorder>
-   <zorder>welcome_text_2</zorder>
    <zorder>profilePushButton_2</zorder>
    <zorder>triButton_3</zorder>
    <zorder>profileLessButton_2</zorder>
-   <zorder>listWidget_2</zorder>
    <zorder>calLessButton_3</zorder>
-   <zorder>wardenfort_2</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -1854,6 +1703,7 @@ QMenu::item:hover {
     <addaction name="actionRestart"/>
     <addaction name="separator"/>
     <addaction name="menuCapture_Filters"/>
+    <addaction name="actionCheck_Online"/>
    </widget>
    <widget class="QMenu" name="menuAnalyze">
     <property name="title">
@@ -2214,6 +2064,11 @@ QMenu::item:hover {
   <action name="actionTCP">
    <property name="text">
     <string>TCP</string>
+   </property>
+  </action>
+  <action name="actionCheck_Online">
+   <property name="text">
+    <string>Check Online</string>
    </property>
   </action>
  </widget>
