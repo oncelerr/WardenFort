@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     QApplication a(argc, argv);
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("D:/WardenFort3/WardenFort/WardenFort/wardenfort.db");
+    db.setDatabaseName("D:/Projects/WardenFort/WardenFort/WardenFort/wardenfort.db");
 
     if (!db.open()) {
         qWarning() << "Failed to open database:" << db.lastError().text();
@@ -21,12 +21,12 @@ int main(int argc, char* argv[])
 
     qDebug() << "Database connected successfully";
 
-    //login login;
-    //login.show();
+    login login;
+    login.show();
 
     
-        WardenFort wardenfort;
-        wardenfort.show();
+        //WardenFort wardenfort;
+        //wardenfort.show();
     
 
     return a.exec();
