@@ -56,6 +56,9 @@ public:
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
     void saveDataToFile();
 
+public slots:
+    void showDoSPopup();
+
 private slots:
     void onTriButtonClicked();
     void onTriReversedButtonClicked();
@@ -64,6 +67,7 @@ private slots:
 
 signals:
     void networkError(QNetworkReply::NetworkError error);
+    void dosAttackDetected();
 
 private:
     Ui::WardenFort* ui;

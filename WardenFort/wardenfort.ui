@@ -1139,18 +1139,6 @@ QMenu::item:hover {
     <addaction name="separator"/>
     <addaction name="actionReload"/>
    </widget>
-   <widget class="QMenu" name="menuGo">
-    <property name="title">
-     <string>Go</string>
-    </property>
-    <addaction name="actionGo_to_Packet"/>
-    <addaction name="separator"/>
-    <addaction name="actionNew_Packet"/>
-    <addaction name="actionPrevious_Packet"/>
-    <addaction name="actionLast_Packet"/>
-    <addaction name="separator"/>
-    <addaction name="actionAuto_Scroll_in_Live_Capture"/>
-   </widget>
    <widget class="QMenu" name="menuCapture">
     <property name="title">
      <string>Capture</string>
@@ -1176,26 +1164,6 @@ QMenu::item:hover {
     <addaction name="actionEnabled_Protocols"/>
     <addaction name="actionDecode_As"/>
    </widget>
-   <widget class="QMenu" name="menuStatistics">
-    <property name="title">
-     <string>Statistics</string>
-    </property>
-    <addaction name="actionCapture_File_Properties"/>
-    <addaction name="actionResolved_Addresses"/>
-    <addaction name="actionProtocol_Hierarchy"/>
-    <addaction name="actionPacket_Lengths"/>
-    <addaction name="actionI_O_Graphs"/>
-    <addaction name="actionService_Response_Time"/>
-    <addaction name="separator"/>
-    <addaction name="actionDNS"/>
-    <addaction name="actionFlow_Graph"/>
-    <addaction name="actionCollected"/>
-    <addaction name="actionHTTP"/>
-    <addaction name="actionTCP_Stream_Graphs"/>
-    <addaction name="actionUDP_Multicast_Streams"/>
-    <addaction name="separator"/>
-    <addaction name="actionIP"/>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
@@ -1207,10 +1175,8 @@ QMenu::item:hover {
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
-   <addaction name="menuGo"/>
    <addaction name="menuCapture"/>
    <addaction name="menuAnalyze"/>
-   <addaction name="menuStatistics"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionOpen">
