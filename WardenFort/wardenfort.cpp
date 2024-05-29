@@ -27,6 +27,7 @@
 #include <QJsonArray>
 #include <QDebug>
 #include <QUrlQuery>
+#include <QMessageBox>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -62,6 +63,7 @@ WardenFort::WardenFort(QWidget* parent)
     connect(ui->searchBTN, &QPushButton::clicked, this, &WardenFort::performSearch);
     connect(ui->actionSave, &QAction::triggered, this, &WardenFort::saveDataToFile);
     connect(ui->actionStart, &QAction::triggered, this, &WardenFort::scanActiveLANAdapters);
+    connect(ui->actionCheck_Online, &QAction::triggered, this, &WardenFort::readCSV);
     connect(ui->actionStop, &QAction::triggered, this, &WardenFort::stopScanningActiveLANAdapters);
     connect(ui->actionRestart, &QAction::triggered, this, &WardenFort::restartScanningActiveLANAdapters);
 
@@ -1069,4 +1071,155 @@ void WardenFort::saveDataToFile() {
 
     file.close();
     qDebug() << "Data saved to" << filePath;
+}
+
+void WardenFort::readCSV()
+{
+    // Open the file dialog to select a CSV file
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open CSV File"), QDir::homePath(), tr("CSV Files (*.csv)"));
+
+    // Check if the user canceled file selection or if the file path is empty
+    if (filePath.isEmpty())
+    {
+        qDebug() << "File selection canceled or no file selected.";
+        return;
+    }
+
+    // Open the file
+    QFile file(filePath);
+
+    // Check if the file opening was successful
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Failed to open file:" << file.errorString();
+        return;
+    }
+
+    // Read the contents of the file
+    QTextStream in(&file);
+    while (!in.atEnd())
+    {
+        QString line = in.readLine(); // Read one line at a time
+
+        // Split the line into fields using commas as delimiters
+        QStringList fields = line.split(",", Qt::SkipEmptyParts);
+
+        // Check if there are enough fields in the line
+        if (fields.size() >= 2)
+        {
+            // Extract the second column (index 1) and remove surrounding double quotes if present
+            QString field = fields.at(1).trimmed();
+            if (field.startsWith('"') && field.endsWith('"'))
+            {
+                field = field.mid(1, field.length() - 2);
+            }
+
+            // Process the field as needed
+            qDebug() << field;
+            checkIACSV(field); // Start asynchronous check
+        }
+    }
+
+    // Close the file
+    file.close();
+}
+
+void WardenFort::putIntoCSV(const QByteArray& iaResponseData)
+{
+    // Parse JSON response data
+    QJsonParseError iaError;
+    QJsonDocument iaJsonDoc = QJsonDocument::fromJson(iaResponseData, &iaError);
+    if (iaError.error != QJsonParseError::NoError) {
+        qDebug() << "Error parsing JSON:" << iaError.errorString();
+        // Handle parsing error here
+        return;
+    }
+
+    // Extract relevant fields from JSON
+    QJsonObject iaDataObj = iaJsonDoc.object().value("data").toObject();
+    QString ipAddress = iaDataObj.value("ipAddress").toString();
+    QString isPublic = iaDataObj.value("isPublic").toBool() ? "true" : "false";
+    QString isWhitelisted = iaDataObj.value("isWhitelisted").toBool() ? "true" : "false";
+    QString abuseConfidenceScore = QString::number(iaDataObj.value("abuseConfidenceScore").toInt());
+    QString countryCode = iaDataObj.value("countryCode").toString();
+    QString isp = iaDataObj.value("isp").toString();
+    QString domain = iaDataObj.value("domain").toString();
+    QString isTor = iaDataObj.value("isTor").toBool() ? "true" : "false";
+    QString totalReports = QString::number(iaDataObj.value("totalReports").toInt());
+
+    // Write data to CSV
+    QFile file("multiple.csv");
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        qDebug() << "Failed to open file for writing";
+        return;
+    }
+
+    QTextStream fout(&file);
+
+    // Check if the file is empty
+    if (file.size() == 0) {
+        fout << "IP Address" << ","
+             << "Is Public" << ","
+             << "Is White Listed" << ","
+             << "Abuse Confidence Score" << ","
+             << "Country Code" << ","
+             << "ISP" << ","
+             << "Domain" << ","
+             << "Is Tor" << ","
+             << "Total Reports" << "\n";
+    }
+
+    fout << ipAddress << ","
+         << isPublic << ","
+         << isWhitelisted << ","
+         << abuseConfidenceScore << ","
+         << countryCode << ","
+         << isp << ","
+         << domain << ","
+         << isTor << ","
+         << totalReports << "\n";
+
+    file.close();
+}
+
+void WardenFort::checkIACSV(QString ip)
+{
+    // Create a QNetworkAccessManager instance
+    QNetworkAccessManager* manager = new QNetworkAccessManager(this);
+
+    // Connect the finished signal of the network reply to a lambda function
+    // Connect the finished signal of the QNetworkAccessManager to a lambda function for handling the response
+    connect(manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply* reply) {
+        if (reply->error() == QNetworkReply::NoError) {
+            qDebug() << "Request succeeded";
+            // Read response
+            QByteArray iaCheck = reply->readAll();
+            // Process and write to CSV
+            putIntoCSV(iaCheck);
+        } else {
+            qDebug() << "Request failed:" << reply->errorString();
+            // Notify the user or handle the error appropriately
+            QMessageBox::critical(this, "Error", "Failed to retrieve data from the server. Error: " + reply->errorString());
+        }
+        // Clean up
+        reply->deleteLater();
+    });
+
+    // Create a QNetworkRequest with the desired URL and headers
+    QNetworkRequest request(QUrl("https://api.abuseipdb.com/api/v2/check?ipAddress=" + ip));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Key", "94806f1bbd82cdd8b87b7ed5567d0204fe57accf05554e2a02fedd02e3074a6ef0fafd2630c3f1cf");
+
+    // Perform the network request
+    QNetworkReply *reply = manager->get(request);
+
+    // Check for errors in starting the request
+    if (reply == nullptr) {
+        qDebug() << "Failed to start the request.";
+        // Notify the user or handle the error appropriately
+        QMessageBox::critical(this, "Error", "Failed to start the request.");
+        // Clean up
+        delete reply;
+    }
+
 }
