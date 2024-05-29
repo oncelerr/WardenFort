@@ -15,6 +15,7 @@
 #include <pcap.h>
 #include <Winsock2.h>
 
+
 #pragma comment(lib, "Ws2_32.lib")
 
 QT_BEGIN_NAMESPACE
@@ -55,6 +56,7 @@ public:
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
     void saveDataToFile();
+    void readCSV();
 
 private slots:
     void onTriButtonClicked();
@@ -77,6 +79,8 @@ private:
     QString extractResponseText(const QJsonDocument &responseJson);
     bool isFilteredAdapter(pcap_if_t* adapter);
     BOOL LoadNpcapDlls();
+    void putIntoCSV(const QByteArray& iaResponseData);
+    void checkIACSV(QString ip);
 
     QVector<CaptureThread*> captureThreads; // Declaration of captureThreads vector
 };
