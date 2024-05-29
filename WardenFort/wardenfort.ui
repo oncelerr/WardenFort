@@ -1016,6 +1016,672 @@ QPushButton#searchBTN:pressed {
      <string>Search Source IP</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="alertLessButton_2">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>327</x>
+      <y>570</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="alertPushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>331</x>
+      <y>574</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/downButton.png</normaloff>:/wardenfort/downButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reportPushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>332</x>
+      <y>623</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/downButton.png</normaloff>:/wardenfort/downButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="calLessButton_2">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>327</x>
+      <y>667</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="triReversedButton_2">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>548</y>
+      <width>61</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/triReversedButton.png</normaloff>:/wardenfort/triReversedButton.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="calPushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>331</x>
+      <y>670</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/downButton.png</normaloff>:/wardenfort/downButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reportLessButton_2">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>327</x>
+      <y>619</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="triButton_2">
+    <property name="geometry">
+     <rect>
+      <x>337</x>
+      <y>548</y>
+      <width>61</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/triButton.png</normaloff>:/wardenfort/triButton.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="alertPushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>351</x>
+      <y>584</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/downButton.png</normaloff>:/wardenfort/downButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="alertLessButton_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>347</x>
+      <y>580</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QLabel" name="frame_2">
+    <property name="geometry">
+     <rect>
+      <x>225</x>
+      <y>362</y>
+      <width>151</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="wardenfort.qrc">:/wardenfort/frame.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="triReversedButton_3">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>558</y>
+      <width>61</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/triReversedButton.png</normaloff>:/wardenfort/triReversedButton.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reportPushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>352</x>
+      <y>633</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/downButton.png</normaloff>:/wardenfort/downButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reportLessButton_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>347</x>
+      <y>629</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="calPushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>351</x>
+      <y>680</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/downButton.png</normaloff>:/wardenfort/downButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QLabel" name="welcome_text_2">
+    <property name="geometry">
+     <rect>
+      <x>187</x>
+      <y>323</y>
+      <width>221</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+    qproperty-alignment: AlignCenter;
+	font: 700 10pt &quot;Segoe UI&quot;;
+	color: rgb(255, 255, 255);
+	background-color: rgba(255, 255, 255, 0);
+}</string>
+    </property>
+    <property name="text">
+     <string>Welcome, User!</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="profilePushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>351</x>
+      <y>534</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/downButton.png</normaloff>:/wardenfort/downButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="triButton_3">
+    <property name="geometry">
+     <rect>
+      <x>357</x>
+      <y>558</y>
+      <width>61</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/triButton.png</normaloff>:/wardenfort/triButton.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="profileLessButton_2">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>347</x>
+      <y>530</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>201</x>
+      <y>290</y>
+      <width>201</width>
+      <height>531</height>
+     </rect>
+    </property>
+    <property name="cursor" stdset="0">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QListWidget {
+    background-color: rgb(44, 60, 75);
+    border-top-left-radius: 0px;
+    border-bottom-right-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 0px;
+    padding: 30px;
+    padding-left: 15px;
+    padding-top: 250px;
+    font: 700 11pt &quot;Segoe UI&quot;;
+    color: rgb(255, 255, 255);
+}
+QListWidget::item {
+    margin-bottom: 25px; /* Adjust the spacing between items by setting a bottom margin */
+    border-bottom: 1px solid rgb(52, 78, 102);
+}
+
+
+QListWidget::item:hover {
+    background-color:rgb(25, 31, 50);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5); /* Adjust border on hover */
+}
+
+
+QListWidget::item:selected {
+    background-color: transparent; /* Make selection color transparent */
+    border: none;
+}</string>
+    </property>
+    <item>
+     <property name="text">
+      <string>Profile</string>
+     </property>
+     <property name="icon">
+      <iconset resource="wardenfort.qrc">
+       <normaloff>:/wardenfort/user_icon.png</normaloff>:/wardenfort/user_icon.png</iconset>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Alerts</string>
+     </property>
+     <property name="icon">
+      <iconset resource="wardenfort.qrc">
+       <normaloff>:/wardenfort/notif_icon.png</normaloff>:/wardenfort/notif_icon.png</iconset>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Reports</string>
+     </property>
+     <property name="icon">
+      <iconset resource="wardenfort.qrc">
+       <normaloff>:/wardenfort/report_icon.png</normaloff>:/wardenfort/report_icon.png</iconset>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Event Calendar</string>
+     </property>
+     <property name="icon">
+      <iconset resource="wardenfort.qrc">
+       <normaloff>:/wardenfort/cal_icon.png</normaloff>:/wardenfort/cal_icon.png</iconset>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Fort Chat</string>
+     </property>
+     <property name="icon">
+      <iconset resource="wardenfort.qrc">
+       <normaloff>:/wardenfort/mess_icon.png</normaloff>:/wardenfort/mess_icon.png</iconset>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="calLessButton_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>347</x>
+      <y>677</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);
+border:0;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="wardenfort.qrc">
+      <normaloff>:/wardenfort/lessButton.png</normaloff>:/wardenfort/lessButton.png</iconset>
+    </property>
+   </widget>
+   <widget class="QLabel" name="wardenfort_2">
+    <property name="geometry">
+     <rect>
+      <x>196</x>
+      <y>303</y>
+      <width>191</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="wardenfort.qrc">:/wardenfort/wardenfort_word (1).png</pixmap>
+    </property>
+   </widget>
    <zorder>label</zorder>
    <zorder>listWidget</zorder>
    <zorder>reportPushButton</zorder>
@@ -1038,6 +1704,28 @@ QPushButton#searchBTN:pressed {
    <zorder>alertLessButton</zorder>
    <zorder>searchBTN</zorder>
    <zorder>searchIP</zorder>
+   <zorder>alertLessButton_2</zorder>
+   <zorder>alertPushButton_2</zorder>
+   <zorder>reportPushButton_2</zorder>
+   <zorder>calLessButton_2</zorder>
+   <zorder>triReversedButton_2</zorder>
+   <zorder>calPushButton_2</zorder>
+   <zorder>reportLessButton_2</zorder>
+   <zorder>triButton_2</zorder>
+   <zorder>alertPushButton_3</zorder>
+   <zorder>alertLessButton_3</zorder>
+   <zorder>frame_2</zorder>
+   <zorder>triReversedButton_3</zorder>
+   <zorder>reportPushButton_3</zorder>
+   <zorder>reportLessButton_3</zorder>
+   <zorder>calPushButton_3</zorder>
+   <zorder>welcome_text_2</zorder>
+   <zorder>profilePushButton_2</zorder>
+   <zorder>triButton_3</zorder>
+   <zorder>profileLessButton_2</zorder>
+   <zorder>listWidget_2</zorder>
+   <zorder>calLessButton_3</zorder>
+   <zorder>wardenfort_2</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

@@ -34,5 +34,6 @@
         <file>tri3.png</file>
         <file>triButton.png</file>
         <file>triReversedButton.png</file>
+        <file>bg.png</file>
     </qresource>
 </RCC>
