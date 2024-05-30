@@ -26,6 +26,7 @@ SOURCES += \
     otp.cpp \
     passwordsec.cpp \
     reports.cpp \
+    reportswidget.cpp \
     signup.cpp \
     wardenfort.cpp
 
@@ -43,6 +44,7 @@ HEADERS += \
     otp.h \
     passwordsec.h \
     reports.h \
+    reportswidget.h \
     signup.h \
     wardenfort.h
 
@@ -61,6 +63,7 @@ FORMS += \
     otp.ui \
     passwordsec.ui \
     reports.ui \
+    reportswidget.ui \
     signup.ui \
     wardenfort.ui
 
