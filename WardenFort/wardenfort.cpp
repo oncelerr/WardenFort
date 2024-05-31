@@ -20,6 +20,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QSqlRecord>
 
 #include <QCoreApplication>
 #include <QNetworkAccessManager>
@@ -55,7 +56,15 @@ int portScanningDetected = 0;
 int DOSDetected = 0;
 int lastFoundRow = -1;
 
+QString userName;
+
 bool stopRequested = false;
+
+// Get the current date and time
+QDateTime currentDateTime = QDateTime::currentDateTime();
+
+// Convert the QDateTime object to a string with the desired format
+QString currentDateTimeString = currentDateTime.toString("yyyy-MM-dd hh:mm:ss");
 
 WardenFort::WardenFort(QWidget* parent)
     : QMainWindow(parent)
@@ -125,7 +134,11 @@ QTableWidget* WardenFort::getTableWidget() {
 }
 
 void WardenFort::setWelcomeText(const QString& text) {
-    ui->welcome_text->setText(text);
+    QString modifiedText = text; // Make a copy of the original text
+    modifiedText.remove("Welcome, ");
+    modifiedText.remove("!");
+    ui->welcome_text->setText(modifiedText);
+    userName = modifiedText; // Assign the modified text to userName
 }
 
 // Define TCP header flags
@@ -809,11 +822,17 @@ void WardenFort::saveDataToFile() {
                 occurrenceCount[sourceIP] = 1;
             }
 
-            // Insert data into SQLite database using the existing database connection
+            // Splitting the timestamp into date and time components
+            QStringList dateTimeParts = rowData[0].split(' ');
+            QString date = dateTimeParts[0];
+            QString time = dateTimeParts[1];
+
+            // Prepare the SQL query to insert into the database
             QSqlQuery query(QSqlDatabase::database()); // Use the existing database connection
-            query.prepare("INSERT INTO packets (timestamp, sourceIP, destinationIP, sourcePORT, destinationPORT, flags, capLEN, protocol, info, occurrence) "
-                          "VALUES (:timestamp, :sourceIP, :destinationIP, :sourcePORT, :destinationPORT, :flags, :capLEN, :protocol, :info, :occurrence)");
-            query.bindValue(":timestamp", rowData[0]);
+            query.prepare("INSERT INTO packets (date, time, sourceIP, destinationIP, sourcePORT, destinationPORT, flags, capLEN, protocol, info, occurrence) "
+                          "VALUES (:date, :time, :sourceIP, :destinationIP, :sourcePORT, :destinationPORT, :flags, :capLEN, :protocol, :info, :occurrence)");
+            query.bindValue(":date", date);
+            query.bindValue(":time", time);
             query.bindValue(":sourceIP", rowData[1]);
             query.bindValue(":destinationIP", rowData[2]);
             query.bindValue(":sourcePORT", rowData[3]);
@@ -823,6 +842,8 @@ void WardenFort::saveDataToFile() {
             query.bindValue(":protocol", rowData[7]);
             query.bindValue(":info", rowData[8]);
             query.bindValue(":occurrence", occurrenceCount[sourceIP]);
+
+            // Execute the query
             if (!query.exec()) {
                 qDebug() << "Error inserting data into database:" << query.lastError().text();
             }
@@ -847,6 +868,7 @@ void WardenFort::saveDataToFile() {
 
 void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &filePath) {
     // Define your printable template using HTML and CSS
+    // Replace the placeholder in the HTML template with the current date and time
     QString htmlTemplate = R"(
 <html>
     <head>
@@ -863,9 +885,6 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
                 padding: 10px;
                 text-align: left;
                 box-sizing: border-box;
-            }
-            .form-table tr{
-                text-align: center;
             }
             .signature {
                 margin-top: 40px;
@@ -889,7 +908,7 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
 
         <table class="form-table">
             <tr>
-                <th colspan="2">Incident Details</th>
+                <th colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000;">Incident Details</th>
             </tr>
             <tr>
                 <td>
@@ -899,15 +918,15 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
                     <label for="location">Location:</label>
                 </td>
             </tr>
-            <tr>
-                <th colspan="2">Incident Overview</th>
+            <tr >
+                <th colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000;">Incident Overview</th>
             </tr>
             <tr>
                 <td>
                     <label for="incident-type">Incident Type(s):</label>
                 </td>
                 <td>
-
+                    <label for="incident-type">incident</label>
                 </td>
             </tr>
             <tr>
@@ -916,7 +935,7 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="text-align: center; font-weight: bold; height: 50px;"></td>
+                <td colspan="2" style="text-align: center; font-weight: bold; height: 100px; border: 1px solid #000;">asdassadasdsadsadsadasasdasasdsdaasdasdasdasdasdas das asda sd  sdasadas adas asd asdas das as asas dasd asd asdas asasd asda sda s dsa asd asd sad </td>
             </tr>
             <tr>
                 <td style="border: 0px; font-weight:  bold;"></td>
@@ -937,6 +956,9 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
                     <label for="root-cause-analysis"></label>
                 </td>
             </tr>
+            <tr>
+
+            </tr>
         </table>
 
         <div class="signature">
@@ -944,8 +966,48 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
             Name with printed signature
         </div>
     </body>
-    </html>
-    )";
+</html>
+)";
+
+    QStringList dateTimeParts = currentDateTimeString.split(' ');
+    QString date = dateTimeParts[0];
+    QString time = dateTimeParts[1];
+
+
+
+    htmlTemplate.replace("Date and Time of Incident:", "Date and Time of Incident: " + currentDateTimeString);
+    htmlTemplate.replace("Date of Report:", "Date of Report: " + currentDateTimeString);
+
+    // Prepare the SQL query to select data from the database based on the date
+    QSqlQuery selectQuery(QSqlDatabase::database()); // Use the existing database connection
+    selectQuery.prepare("SELECT * FROM packets WHERE date = :date");
+    selectQuery.bindValue(":date", date);
+
+    // Execute the select query
+    if (!selectQuery.exec()) {
+        qDebug() << "Error selecting data from database:" << selectQuery.lastError().text();
+        // Handle the error
+    } else {
+        QStringList mergedData; // String list to hold merged data
+        while (selectQuery.next()) {
+            QSqlRecord record = selectQuery.record();
+            QString info = record.value(9).toString(); // Assuming column 9 contains the 'info' data
+            info.remove("Threat detected:"); // Remove "Threat Detected:" from the data
+
+            // Check if the data is already present in the merged list
+            if (!mergedData.contains(info)) {
+                mergedData.append(info);
+            }
+        }
+
+        // Join the merged data with a separator
+        QString dataFromDatabase = mergedData.join(", ");
+
+        // Replace the placeholder in the HTML template with the fetched data
+        htmlTemplate.replace("incident", dataFromDatabase);
+    }
+
+    htmlTemplate.replace("Reported By:", "Reported By: " + userName);
 
     // Create a QTextDocument and set the HTML content
     QTextDocument document;
