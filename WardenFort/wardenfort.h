@@ -43,7 +43,6 @@ public:
     void setWelcomeText(const QString& text);
     void toggleButtons();
     void handleScrollBarValueChange(int value);
-    void onRowClicked(QTableWidgetItem *item);
     void checkAbuseIP(const QString &ipAddress);
     void onNetworkReply(QNetworkReply *reply);
     void onNetworkError(QNetworkReply::NetworkError code);
@@ -51,6 +50,8 @@ public:
     void checkGreyNoise(const QString &ipAddress);
     void checkIPQualityScore(const QString &ipAddress);
     void performSearch();
+    void createPDFWithTemplate(const QString &fileName, const QString &filePath);
+    void print();
 
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
