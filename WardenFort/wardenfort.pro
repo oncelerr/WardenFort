@@ -1,4 +1,9 @@
 QT       += core gui
+QT       += printsupport
+QT       += charts
+QT       += core gui printsupport
+QT       += network
+QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -11,6 +16,8 @@ CONFIG += c++17
 SOURCES += \
     accountsettings.cpp \
     animatedlabel.cpp \
+    calendarnotifications.cpp\
+    notificationwidget.cpp\
     enter.cpp \
     forgotpass.cpp \
     login.cpp \
@@ -18,11 +25,17 @@ SOURCES += \
     main.cpp \
     otp.cpp \
     passwordsec.cpp \
+    reports.cpp \
+    reportswidget.cpp \
     signup.cpp \
     wardenfort.cpp
 
+
+
 HEADERS += \
     accountsettings.h \
+    calendarnotifications.h\
+    notificationwidget.h\
     animatedlabel.h \
     enter.h \
     forgotpass.h \
@@ -30,11 +43,17 @@ HEADERS += \
     loginsession.h \
     otp.h \
     passwordsec.h \
+    reports.h \
+    reportswidget.h \
     signup.h \
     wardenfort.h
 
+
+
 FORMS += \
     accountsettings.ui \
+    calendarnotifications.ui\
+    notificationwidget.ui\
     dialog.ui \
     enter.ui \
     forgotpass.ui \
@@ -43,13 +62,14 @@ FORMS += \
     newdb.ui \
     otp.ui \
     passwordsec.ui \
+    reports.ui \
+    reportswidget.ui \
     signup.ui \
     wardenfort.ui
 
-QT += charts
-QT += core gui printsupport
-QT += network
-QT += sql
+
+
+
 
 INCLUDEPATH += C:\npcap\Include
 LIBS += -LC:\npcap\Lib\x64 -lwpcap
@@ -61,6 +81,10 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+
+
 RESOURCES += \
+    CalendarNotifications.qrc \
+    CalendarNotifications.qrc \
     img.qrc \
     wardenfort.qrc
