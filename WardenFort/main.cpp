@@ -5,8 +5,6 @@
 #include <QDebug>
 #include "login.h"
 #include "wardenfort.h"
-#include "calendarnotifications.h"
-#include "notificationwidget.h"
 #include "reports.h"
 #include <QSqlError>
 
@@ -15,7 +13,7 @@ int main(int argc, char* argv[])
     QApplication a(argc, argv);
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("wardenfort.db");
+    db.setDatabaseName("C:/Users/admin/Documents/GitHub/WardenFort/WardenFort/wardenfort.db");
 
     if (!db.open()) {
         qWarning() << "Failed to open database:" << db.lastError().text();
@@ -28,11 +26,10 @@ int main(int argc, char* argv[])
     //login.show();
     //reports reports;
     //reports.show();
-    CalendarNotifications calendarnotifications;
-    calendarnotifications.show();
+
     
-        //WardenFort wardenfort;
-        //wardenfort.show();
+       WardenFort wardenfort;
+      wardenfort.show();
     
 
     return a.exec();

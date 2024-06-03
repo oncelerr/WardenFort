@@ -2,7 +2,9 @@
 #define REPORTSWIDGET_H
 
 #include <QWidget>
-
+#include <QFileDialog>
+#include <QPainter>
+#include <QPrinter>
 namespace Ui {
 class reportsWidget;
 }
@@ -15,15 +17,19 @@ public:
     explicit reportsWidget(QWidget *parent = nullptr);
     ~reportsWidget();
 
-
     void setDate(const QString &date);
-    void setID(const QString &text);
+    void setID(const QString &time);
+    void setIncidentTypes(const QString &types);
 
 private:
     Ui::reportsWidget *ui;
+    void createPDFWithTemplate(const QString &fileName, const QString &filePath, const QString &reportedDate);
+    void print();
 
-signals:
-    void buttonClicked();
+    QString reportedDate;
+    QString incidentTypes;
+
 };
+
 
 #endif // REPORTSWIDGET_H

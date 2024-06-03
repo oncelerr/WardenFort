@@ -448,26 +448,6 @@ border:0;</string>
      <pixmap resource="wardenfort.qrc">:/wardenfort/bg.png</pixmap>
     </property>
    </widget>
-   <widget class="QListWidget" name="notificationList_2">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>70</y>
-      <width>761</width>
-      <height>391</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: transparent;
-</string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
@@ -492,13 +472,13 @@ color: white;</string>
      <string>GENERATE REPORTS</string>
     </property>
    </widget>
-   <widget class="QListWidget" name="notificationList_3">
+   <widget class="QListWidget" name="widgetList">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>70</y>
-      <width>761</width>
-      <height>391</height>
+      <x>40</x>
+      <y>80</y>
+      <width>751</width>
+      <height>381</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -512,10 +492,38 @@ color: white;</string>
      <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
    </widget>
-   <zorder>notificationList_2</zorder>
-   <zorder>label_4</zorder>
-   <zorder>label_5</zorder>
-   <zorder>notificationList_3</zorder>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>60</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white; background-color: transparent;</string>
+    </property>
+    <property name="text">
+     <string>Report ID</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>60</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white; background-color: transparent;</string>
+    </property>
+    <property name="text">
+     <string>Date</string>
+    </property>
+   </widget>
   </widget>
   <zorder>listWidget_2</zorder>
   <zorder>profilePushButton</zorder>

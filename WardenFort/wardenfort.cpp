@@ -12,12 +12,10 @@
 #include <pcap.h>
 #include <tchar.h>
 #include <QDebug>
-#include "accountsettings.h"
-#include "passwordsec.h"
-#include "login.h"
 #include "loginsession.h"
 #include <QFileDialog>
-
+#include <QPrinter>
+#include <QPainter>
 #include <QCoreApplication>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -28,6 +26,9 @@
 #include <QDebug>
 #include <QUrlQuery>
 #include <QMessageBox>
+#include <QSqlQuery>
+#include <QSqlError>
+
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -1041,36 +1042,247 @@ void WardenFort::saveDataToFile() {
     const int rowCount = ui->tableWidget->rowCount();
     const int columnCount = ui->tableWidget->columnCount();
 
-    // Write table headers
+    // Write table headers to CSV file
     for (int col = 0; col < columnCount; ++col) {
         out << ui->tableWidget->horizontalHeaderItem(col)->text();
-        if (col < columnCount - 1) {
-            out << ","; // Use comma as delimiter
-        }
+        out << ","; // Use comma as delimiter
     }
-    out << "\n";
+    out << "Occurrence\n"; // Add the new Occurrence column header
 
-    // Write table data
+    QMap<QString, QStringList> mergedData;
+    QMap<QString, int> occurrenceCount;
+
+    // Collect and merge table data
     for (int row = 0; row < rowCount; ++row) {
         QTableWidgetItem *infoItem = ui->tableWidget->item(row, 8); // Column 8 is the information column
         if (infoItem && infoItem->text() != "No Information") {
-            if(infoItem->text() != "Protocol Anomaly Detected."){
+            QString sourceIP = ui->tableWidget->item(row, 1)->text(); // Column 1 is "Source IP"
+            QStringList rowData;
+            for (int col = 0; col < columnCount; ++col) {
+                QTableWidgetItem *item = ui->tableWidget->item(row, col);
+                rowData << (item ? item->text() : "");
+            }
+            if (mergedData.contains(sourceIP)) {
+                QStringList &existingData = mergedData[sourceIP];
                 for (int col = 0; col < columnCount; ++col) {
-                    QTableWidgetItem *item = ui->tableWidget->item(row, col);
-                    if (item) {
-                        out << item->text();
-                    }
-                    if (col < columnCount - 1) {
-                        out << ","; // Use comma as delimiter
+                    if (!existingData[col].contains(rowData[col]) && !rowData[col].isEmpty()) {
+                        existingData[col] += "; " + rowData[col];
                     }
                 }
-                out << "\n";
+                occurrenceCount[sourceIP]++;
+            } else {
+                mergedData[sourceIP] = rowData;
+                occurrenceCount[sourceIP] = 1;
             }
+
+            // Splitting the timestamp into date and time components
+            QStringList dateTimeParts = rowData[0].split(' ');
+            QString date = dateTimeParts[0];
+            QString time = dateTimeParts[1];
+
+            // Prepare the SQL query to insert into the database
+            QSqlQuery query(QSqlDatabase::database()); // Use the existing database connection
+            query.prepare("INSERT INTO packets (date, time, sourceIP, destinationIP, sourcePORT, destinationPORT, flags, capLEN, protocol, info, occurrence) "
+                          "VALUES (:date, :time, :sourceIP, :destinationIP, :sourcePORT, :destinationPORT, :flags, :capLEN, :protocol, :info, :occurrence)");
+            query.bindValue(":date", date);
+            query.bindValue(":time", time);
+            query.bindValue(":sourceIP", rowData[1]);
+            query.bindValue(":destinationIP", rowData[2]);
+            query.bindValue(":sourcePORT", rowData[3]);
+            query.bindValue(":destinationPORT", rowData[4]);
+            query.bindValue(":flags", rowData[5]);
+            query.bindValue(":capLEN", rowData[6]);
+            query.bindValue(":protocol", rowData[7]);
+            query.bindValue(":info", rowData[8]);
+            query.bindValue(":occurrence", occurrenceCount[sourceIP]);
+
+            // Execute the query
+            if (!query.exec()) {
+                qDebug() << "Error inserting data into database:" << query.lastError().text();
+            }
+
+
         }
+    }
+    // Prepare the SQL query to insert into the reports table
+    QSqlQuery queryReports(QSqlDatabase::database()); // Use the existing database connection
+    queryReports.prepare("INSERT INTO reports (datetime, reportBy) VALUES (:datetime, :reportBy)");
+    queryReports.bindValue(":datetime", QDateTime::currentDateTime().toString(Qt::ISODate)); // Current date and time
+    queryReports.bindValue(":reportBy", ui->welcome_text->text()); // Assuming userLabel is the user label
+
+    // Execute the query for reports table
+    if (!queryReports.exec()) {
+        qDebug() << "Error inserting data into reports table:" << queryReports.lastError().text();
+    }
+
+    // Write merged data to CSV file
+    QMapIterator<QString, QStringList> it(mergedData);
+    while (it.hasNext()) {
+        it.next();
+        QStringList rowData = it.value();
+        for (int col = 0; col < columnCount; ++col) {
+            out << rowData[col];
+            out << ","; // Use comma as delimiter
+        }
+        out << occurrenceCount[it.key()] << "\n"; // Write the occurrence count
     }
 
     file.close();
     qDebug() << "Data saved to" << filePath;
+}
+
+void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &filePath) {
+    // Define your printable template using HTML and CSS
+    QString htmlTemplate = R"(
+<html>
+    <head>
+        <style>
+            .form-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+                box-sizing: border-box;
+                text-align: center;
+            }
+            .form-table th, .form-table td {
+                border: 1px solid #000;
+                padding: 10px;
+                text-align: left;
+                box-sizing: border-box;
+            }
+            .form-table tr{
+                text-align: center;
+            }
+            .signature {
+                margin-top: 40px;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header"></div>
+
+        <table class="form-table">
+            <tr>
+                <td style="border: 0px; font-weight:  bold;">Reported By:</td>
+                <td style="border: 0px; font-weight:  bold;">Date of Report:</td>
+            </tr>
+            <tr>
+                <td style="border: 0px; font-weight:  bold;">Reported to:</td>
+                <td style="border: 0px;"></td>
+            </tr>
+        </table>
+
+        <table class="form-table">
+            <tr>
+                <th colspan="2">Incident Details</th>
+            </tr>
+            <tr>
+                <td>
+                    <label for="date-time-incident">Date and Time of Incident:</label>
+                </td>
+                <td>
+                    <label for="location">Location:</label>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2">Incident Overview</th>
+            </tr>
+            <tr>
+                <td>
+                    <label for="incident-type">Incident Type(s):</label>
+                </td>
+                <td>
+
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000;">
+                    <label for="description-incident">Description of Incident</label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center; font-weight: bold; height: 50px;"></td>
+            </tr>
+            <tr>
+                <td style="border: 0px; font-weight:  bold;"></td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="impact-assessment" style="font-weight: bold; text-align: center;">Impact Assessment:</label>
+                </td>
+                <td>
+                    <label for="root-cause-analysis" style="font-weight: bold; text-align: center;">Root Cause Analysis:</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="impact-assessment"></label>
+                </td>
+                <td>
+                    <label for="root-cause-analysis"></label>
+                </td>
+            </tr>
+        </table>
+
+        <div class="signature">
+            _______________________________________<br>
+            Name with printed signature
+        </div>
+    </body>
+    </html>
+    )";
+
+    // Create a QTextDocument and set the HTML content
+    QTextDocument document;
+    document.setHtml(htmlTemplate);
+
+    // Create a printer and set properties
+    QPrinter printer(QPrinter::PrinterResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(filePath + "/" + fileName + ".pdf"); // Set the output file path and name
+    printer.setPageSize(QPageSize::Letter);
+
+    // Create a painter
+    QPainter painter(&printer);
+    painter.begin(&printer);
+
+    // Calculate the position and size of the image
+    QImage image("C:\\Users\\Admin\\Downloads\\Untitled Design.png");
+    if (!image.isNull()) {
+        // Resize image if needed (convert inches to pixels based on printer resolution)
+        double dpiX = printer.resolution(); // DPI of the printer
+        double dpiY = printer.resolution();
+        int paperWidth = printer.pageRect(QPrinter::DevicePixel).width();
+        int paperHeight = printer.pageRect(QPrinter::DevicePixel).height();
+        int imgWidth = paperWidth; // Full width of the paper
+        int imgHeight = (imgWidth * image.height()) / image.width(); // Maintain aspect ratio
+
+        int xOffset = (paperWidth - imgWidth) / 2;
+        QRect imageRect(xOffset, 0, imgWidth, imgHeight);
+        painter.drawImage(imageRect, image);
+        painter.translate(0, imgHeight); // Move the origin down by the height of the image
+    }
+
+    // Set document width to the width of the printer page
+    document.setPageSize(QSizeF(printer.pageRect(QPrinter::DevicePixel).size()));
+
+    // Render the QTextDocument to the painter
+    document.drawContents(&painter, QRectF(0, 0, printer.pageRect(QPrinter::DevicePixel).width(), printer.pageRect(QPrinter::DevicePixel).height()));
+
+    // Cleanup
+    painter.end();
+}
+
+void WardenFort::print() {
+    // Get the filename and destination file location from the user
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save PDF", "", "PDF Files (*.pdf)");
+    QString filePath = QFileInfo(fileName).path(); // Extract the directory path
+
+    if (!fileName.isEmpty()) {
+        // Create the PDF with the template
+        createPDFWithTemplate(QFileInfo(fileName).baseName(), filePath);
+    }
 }
 
 void WardenFort::readCSV()

@@ -81,7 +81,8 @@ private:
     BOOL LoadNpcapDlls();
     void putIntoCSV(const QByteArray& iaResponseData);
     void checkIACSV(QString ip);
-
+    void print();
+    void createPDFWithTemplate(const QString &fileName, const QString &filePath);
     QVector<CaptureThread*> captureThreads; // Declaration of captureThreads vector
 };
 
