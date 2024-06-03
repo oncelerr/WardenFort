@@ -32,7 +32,7 @@ public:
     WardenFort(QWidget* parent = nullptr);
     ~WardenFort();
 
-    void settrafficAnomalies(const QString& text);
+    void settrafficAnomalies(int text);
     void setcriticalAnomalies(const QString& text);
     void setOverallAlert(const QString& text);
     void setLabelText1(const QString& text);
@@ -56,6 +56,7 @@ public:
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
     void saveDataToFile();
+    QString getLocalIpAddress();
 
 public slots:
     void showDoSPopup();
@@ -80,6 +81,7 @@ private:
     void hideSpecifiedButtons();
     void sendRequestToChatGPT(const QString &inputText);
     QString extractResponseText(const QJsonDocument &responseJson);
+
     bool isFilteredAdapter(pcap_if_t* adapter);
     BOOL LoadNpcapDlls();
 

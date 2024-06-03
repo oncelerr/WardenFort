@@ -21,9 +21,13 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <unordered_map>
+#include <QMap>
 
 #include <QCoreApplication>
 #include <QNetworkAccessManager>
+#include <QHostInfo>
+#include <QNetworkInterface>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QJsonDocument>
@@ -41,7 +45,14 @@
 #include <QDebug>
 #include <QImage>
 
+#include <unordered_map>
+
+// Ensure linkage with ws2_32.lib
 #pragma comment(lib, "Ws2_32.lib")
+
+#ifndef ICMP_ECHO
+#define ICMP_ECHO 8
+#endif
 
 void showDoSPopup();
 
@@ -55,6 +66,12 @@ int k = 0;
 int portScanningDetected = 0;
 int DOSDetected = 0;
 int lastFoundRow = -1;
+
+std::unordered_map<QString, int> connectionCount;
+std::unordered_map<QString, int> failedLoginCount;
+const int threshold = 100; // Example threshold value
+const int maxFailedAttempts = 5; // Example maximum failed attempts
+const int unusualPort = 12345;
 
 QString userName;
 
@@ -116,8 +133,8 @@ WardenFort::~WardenFort()
 }
 
 
-void WardenFort::settrafficAnomalies(const QString& text) {
-    ui->trafficAnomalies->setText(text);
+void WardenFort::settrafficAnomalies(int text) {
+    ui->trafficAnomalies->setText(QString::number(text));
 }
 
 void WardenFort::setcriticalAnomalies(const QString& text) {
@@ -169,6 +186,23 @@ typedef struct ip_header {
     ip_address daddr; // Destination address
     u_int op_pad;     // Option + Padding
 } ip_header;
+
+struct icmphdr {
+    u_char type;    // ICMP message type
+    u_char code;    // Error code
+    u_short checksum;   // Checksum for ICMP Header and data
+    union {
+        struct {
+            u_short id;
+            u_short sequence;
+        } echo;         // Echo datagram
+        u_long gateway; // Gateway address
+        struct {
+            u_short __unused;
+            u_short mtu;
+        } frag;        // Path MTU discovery
+    } un;
+};
 
 #define IP_RF 0x8000        // Reserved fragment flag
 #define IP_DF 0x4000        // Don't fragment flag
@@ -296,6 +330,21 @@ bool WardenFort::isFilteredAdapter(pcap_if_t* adapter)
     return false;
 }
 
+bool isFailedLoginAttempt(const u_char* packet) {
+    // Implement this function based on your packet analysis logic
+    return false;
+}
+
+bool containsKnownExploitSignature(const u_char* packet) {
+    // Implement this function based on your packet analysis logic
+    return false;
+}
+
+bool isKnownMaliciousIP(const QString& ip) {
+    // Implement this function based on your threat intelligence data
+    return false;
+}
+
 void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
     struct tm ltime;
     char timestr[16];
@@ -361,29 +410,186 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
         if (tcpHeader->th_flags & TH_SYN) {
             backgroundColor = QColor(44, 75, 66); // lightgreen Established connection (SYN packet)
         } else if (tcpHeader->th_flags & TH_ACK) {
-            backgroundColor = QColor(44, 75, 50); //darkgreen ACK packet
+            backgroundColor = QColor(44, 75, 50); // darkgreen ACK packet
         } else if (tcpHeader->th_flags & TH_FIN) {
-            backgroundColor = QColor(55, 75, 44); //green FIN packet
+            backgroundColor = QColor(55, 75, 44); // green FIN packet
         } else {
-            backgroundColor = QColor(55, 75, 44); //green Other TCP packets
+            backgroundColor = QColor(55, 75, 44); // green Other TCP packets
         }
 
         // Add threat detection for TCP packets
         if ((tcpHeader->th_flags & TH_SYN) && (tcpHeader->th_flags & TH_ACK)) {
             info = "Threat detected: Possible TCP SYN-ACK scan";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
         } else if (tcpHeader->th_flags & TH_RST) {
             info = "Threat detected: TCP Reset (RST) Attack";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if (tcpHeader->th_flags & TH_FIN) {
+            info = "Threat detected: TCP FIN Scan";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if (tcpHeader->th_flags & (TH_SYN | TH_FIN)) {
+            info = "Threat detected: TCP Xmas Scan";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if ((tcpHeader->th_flags & (TH_SYN | TH_RST | TH_ACK)) == 0) {
+            info = "Threat detected: TCP Null Scan";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if ((tcpHeader->th_flags & TH_PUSH) && (tcpHeader->th_flags & TH_URG)) {
+            info = "Threat detected: TCP Push and Urgent Flag Set";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if (tcpHeader->th_flags & TH_URG) {
+            info = "Threat detected: TCP Urgent Flag Set";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
         }
+
+        // Check for DoS attacks
+        if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
+            info = "Threat detected: Possible SYN Flood";
+            j++;
+            k = i + j;
+            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+        if (connectionCount[sourceIp] > threshold) {
+            info = "Threat detected: Potential DoS Attack from " + sourceIp;
+            j++;
+            k = i + j;
+            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+
+        // Check for malware communication
+        if (isKnownMaliciousIP(destIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
+            j++;
+            k = i + j;
+            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+        if (dport == unusualPort) {
+            info = "Threat detected: Communication over unusual port " + QString::number(dport);
+            j++;
+            k = i + j;
+            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+
+        // Check for unauthorized access attempts
+        if (isFailedLoginAttempt(packet)) {
+            failedLoginCount[sourceIp]++;
+            if (failedLoginCount[sourceIp] > maxFailedAttempts) {
+                info = "Threat detected: Possible Brute Force Attack from " + sourceIp;
+                j++;
+                k = i + j;
+                wardenFort->setcriticalAnomalies(QString::number(j));
+                wardenFort->setOverallAlert(QString::number(k));
+                backgroundColor = QColor(75, 44, 44); //red
+            }
+        }
+        if (containsKnownExploitSignature(packet)) {
+            info = "Threat detected: Known exploit attempt";
+            j++;
+            k = i + j;
+            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+
     } else if (protocol == "UDP") {
-        backgroundColor = QColor(45, 44, 75);  //blue UDP packets
+        backgroundColor = QColor(45, 44, 75);  // blue UDP packets
 
         // Add threat detection for UDP packets
         if (dport == 53) {
             info = "Threat detected: DNS Tunneling";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if (dport == 161 || sport == 161) {
+            info = "Threat detected: SNMP Traffic";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if (dport == 123 || sport == 123) {
+            info = "Threat detected: NTP Amplification Attack";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if (dport == 69) {
+            info = "Threat detected: TFTP Traffic";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if (dport == 1900) {
+            info = "Threat detected: SSDP Traffic";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if (dport == 137 || sport == 137) {
+            info = "Threat detected: NetBIOS Name Service (NBNS) Traffic";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        } else if (dport == 138 || sport == 138) {
+            info = "Threat detected: NetBIOS Datagram Service (NBDS) Traffic";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
         }
+        if (dport == 0) {
+            info = "Threat detected: Possible UDP Flood";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+        }
+
+    } else if (protocol == "ICMP") {
+        const struct icmphdr* icmpHeader = reinterpret_cast<const struct icmphdr*>(packet + sizeof(ip_header));
+        if (icmpHeader->type == ICMP_ECHO) {
+            info = "Threat detected: Possible ICMP Flood";
+            j++;
+            k = i + j;
+            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+
     } else {
-        backgroundColor = QColor(61, 62, 74);  //white Default color for other protocols
+        backgroundColor = QColor(61, 62, 74);  // white Default color for other protocols
     }
+
+
 
     if (protocol == "TCP" || protocol == "UDP"){
 
@@ -1007,7 +1213,9 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
         htmlTemplate.replace("incident", dataFromDatabase);
     }
 
+    //QString ipAddress = getLocalIpAddress();
     htmlTemplate.replace("Reported By:", "Reported By: " + userName);
+    //htmlTemplate.replace("Location:", "Location: " + ipAddress);
 
     // Create a QTextDocument and set the HTML content
     QTextDocument document;
@@ -1048,6 +1256,16 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
 
     // Cleanup
     painter.end();
+}
+
+QString getLocalIpAddress() {
+    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+        // Filter out loopback and IPv6 addresses
+        if (!address.isNull() && address != QHostAddress::LocalHost && address.protocol() == QAbstractSocket::IPv4Protocol) {
+            return address.toString();
+        }
+    }
+    return QString(); // Return an empty string if no valid IP address is found
 }
 
 void WardenFort::print() {
