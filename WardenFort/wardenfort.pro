@@ -13,6 +13,7 @@ SOURCES += \
     animatedlabel.cpp \
     enter.cpp \
     forgotpass.cpp \
+    globals.cpp \
     login.cpp \
     loginsession.cpp \
     main.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     animatedlabel.h \
     enter.h \
     forgotpass.h \
+    globals.h \
     login.h \
     loginsession.h \
     otp.h \

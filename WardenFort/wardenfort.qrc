@@ -1,38 +1,67 @@
 <RCC>
     <qresource prefix="/wardenfort">
-        <file>eye_closed.png</file>
-        <file>wfIcon.ico</file>
-        <file>frame.png</file>
-        <file>wardenfort_word (1).png</file>
-        <file>wardenfort 1.png</file>
-        <file>eye_open.png</file>
         <file>7-removebg-preview 1.png</file>
-        <file>pass_icon (4).png</file>
-        <file>pass_icon (11).png</file>
+        <file>a1.png</file>
+        <file>a2.png</file>
+        <file>bell.png</file>
+        <file>c1.png</file>
+        <file>cal_icon.png</file>
+        <file>calendar.png</file>
+        <file>chat (2).png</file>
+        <file>chat1.png</file>
+        <file>cyber (1).png</file>
+        <file>d1.png</file>
+        <file>dashboard.png</file>
         <file>dd1.png</file>
         <file>dd1_rotated.png</file>
-        <file>notif_icon.png</file>
-        <file>report_icon.png</file>
-        <file>user_icon.png</file>
-        <file>View_hide_lightsss.png</file>
-        <file>cal_icon.png</file>
-        <file>wave (1).png</file>
-        <file>wave (2).png</file>
-        <file>wave (3).png</file>
-        <file>cyber (1).png</file>
-        <file>Expand_down_light.png</file>
-        <file>logo (5).png</file>
-        <file>output-onlinepngtools.png</file>
-        <file>user_icon1.png</file>
-        <file>wardenfort (1) 2.png</file>
-        <file>wave.png</file>
         <file>dd2.png</file>
+        <file>dots.png</file>
         <file>downButton.png</file>
+        <file>Expand_down_light.png</file>
+        <file>eye_closed.png</file>
+        <file>eye_open.png</file>
+        <file>facetime-button.png</file>
+        <file>file.png</file>
+        <file>find.png</file>
+        <file>frame.png</file>
+        <file>gradient (2).png</file>
+        <file>happy.png</file>
         <file>lessButton.png</file>
+        <file>logo (5).png</file>
         <file>logo.png</file>
         <file>mess_icon.png</file>
+        <file>notif_icon.png</file>
+        <file>output-onlinepngtools.png</file>
+        <file>pass_icon (4).png</file>
+        <file>pass_icon (11).png</file>
+        <file>phone-call.png</file>
+        <file>photo.png</file>
+        <file>r1.png</file>
+        <file>report_icon.png</file>
+        <file>s1.png</file>
+        <file>search.png</file>
+        <file>send.png</file>
+        <file>settings.png</file>
         <file>tri3.png</file>
         <file>triButton.png</file>
         <file>triReversedButton.png</file>
+        <file>upload (1).png</file>
+        <file>upload.png</file>
+        <file>user (2).png</file>
+        <file>user_icon.png</file>
+        <file>user_icon1.png</file>
+        <file>View_hide_lightsss.png</file>
+        <file>wardenfort (1) 2.png</file>
+        <file>wardenfort 1.png</file>
+        <file>wardenfort_word (1).png</file>
+        <file>wave (1).png</file>
+        <file>wave (2).png</file>
+        <file>wave (3).png</file>
+        <file>wave.png</file>
+        <file>wf (2).png</file>
+        <file>wf_smol (1).png</file>
+        <file>wf_smol.png</file>
+        <file>p1.png</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>

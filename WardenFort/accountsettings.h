@@ -17,8 +17,10 @@ class accountSettings : public QMainWindow
 public:
     accountSettings(QWidget *parent = nullptr);
     ~accountSettings();
-    void toggleButtons();
-    void toggleButtonVisibility(QPushButton* buttonToHide, QPushButton* buttonToShow);
+    void gotoDash();
+    void changeEmail();
+    void setGenderComboBox(const QString &gender);
+    void changeUsername();
 
 private:
     Ui::accountSettings *ui;

@@ -13,6 +13,7 @@
 #include <tchar.h>
 #include <QDebug>
 #include "loginsession.h"
+#include "accountsettings.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTimer>
@@ -23,6 +24,7 @@
 #include <QSqlRecord>
 #include <unordered_map>
 #include <QMap>
+#include <QProgressDialog>
 
 #include <QCoreApplication>
 #include <QNetworkAccessManager>
@@ -69,7 +71,7 @@ int lastFoundRow = -1;
 
 std::unordered_map<QString, int> connectionCount;
 std::unordered_map<QString, int> failedLoginCount;
-const int threshold = 100; // Example threshold value
+const int threshold = 5; // Example threshold value
 const int maxFailedAttempts = 5; // Example maximum failed attempts
 const int unusualPort = 12345;
 
@@ -83,6 +85,32 @@ QDateTime currentDateTime = QDateTime::currentDateTime();
 // Convert the QDateTime object to a string with the desired format
 QString currentDateTimeString = currentDateTime.toString("yyyy-MM-dd hh:mm:ss");
 
+QSet<QString> maliciousIPs;
+
+QSet<QString> loadMaliciousIPs(const QString& filePath) {
+    QSet<QString> maliciousIPs;
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open file:" << filePath;
+        return maliciousIPs;
+    }
+
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (!line.isEmpty()) {
+            maliciousIPs.insert(line);
+        }
+    }
+
+    file.close();
+    return maliciousIPs;
+}
+
+bool isKnownMaliciousIP(const QString& ip) {
+    return maliciousIPs.contains(ip);
+}
+
 WardenFort::WardenFort(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::WardenFort)
@@ -91,40 +119,30 @@ WardenFort::WardenFort(QWidget* parent)
 
     networkManager = new QNetworkAccessManager(this);
     manager = new QNetworkAccessManager(this);
-
-    // Set initial width of listWidget to 201 and hide triReversedButton
-    ui->listWidget->setFixedWidth(201);
-    ui->triReversedButton->setVisible(false);
-
-    // Connect the clicked() signals of the buttons to their respective slots
-    connect(ui->triButton, &QPushButton::clicked, this, &WardenFort::onTriButtonClicked);
-    connect(ui->triReversedButton, &QPushButton::clicked, this, &WardenFort::onTriReversedButtonClicked);
-    connect(ui->profilePushButton, &QPushButton::clicked, this, &WardenFort::onProfilePushButtonClicked);
-    connect(ui->profileLessButton, &QPushButton::clicked, this, &WardenFort::onProfileLessButtonClicked);
     connect(ui->searchBTN, &QPushButton::clicked, this, &WardenFort::performSearch);
     connect(ui->actionSave, &QAction::triggered, this, &WardenFort::saveDataToFile);
     connect(ui->actionStart, &QAction::triggered, this, &WardenFort::scanActiveLANAdapters);
     connect(ui->actionStop, &QAction::triggered, this, &WardenFort::stopScanningActiveLANAdapters);
     connect(ui->actionRestart, &QAction::triggered, this, &WardenFort::restartScanningActiveLANAdapters);
     connect(ui->actionPrint, &QAction::triggered, this, &WardenFort::print);
+    connect(ui->profButton_2, &QPushButton::clicked, this, &WardenFort::gotoProf);
 
     connect(this, &WardenFort::dosAttackDetected, this, &WardenFort::showDoSPopup);
-
-    hideSpecifiedButtons();
 
     ui->tableWidget->setColumnWidth(0, 120);
     ui->tableWidget->setColumnWidth(1, 100);
     ui->tableWidget->setColumnWidth(2, 100);
     ui->tableWidget->setColumnWidth(3, 50);
     ui->tableWidget->setColumnWidth(4, 50);
-    ui->tableWidget->setColumnWidth(6, 30);
-    ui->tableWidget->setColumnWidth(7, 30);
-    ui->tableWidget->setColumnWidth(8, 250);
+    ui->tableWidget->setColumnWidth(6, 40);
+    ui->tableWidget->setColumnWidth(7, 40);
+    ui->tableWidget->setColumnWidth(8, 350);
+
+    maliciousIPs = loadMaliciousIPs("D:/Projects/maliciousIP/malicious-ip/full-aa.txt");
 
     loginsession* log = new loginsession;
     QString Name = log->username;
 
-    ui->welcome_text->setText(Name);
 }
 
 WardenFort::~WardenFort()
@@ -154,7 +172,6 @@ void WardenFort::setWelcomeText(const QString& text) {
     QString modifiedText = text; // Make a copy of the original text
     modifiedText.remove("Welcome, ");
     modifiedText.remove("!");
-    ui->welcome_text->setText(modifiedText);
     userName = modifiedText; // Assign the modified text to userName
 }
 
@@ -330,18 +347,12 @@ bool WardenFort::isFilteredAdapter(pcap_if_t* adapter)
     return false;
 }
 
-bool isFailedLoginAttempt(const u_char* packet) {
-    // Implement this function based on your packet analysis logic
-    return false;
-}
-
 bool containsKnownExploitSignature(const u_char* packet) {
-    // Implement this function based on your packet analysis logic
-    return false;
-}
-
-bool isKnownMaliciousIP(const QString& ip) {
-    // Implement this function based on your threat intelligence data
+    const char* packetData = reinterpret_cast<const char*>(packet);
+    if (strstr(packetData, "VIRUS") != nullptr) {
+        qDebug() << "FOUND";
+        return true;
+    }
     return false;
 }
 
@@ -378,7 +389,6 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     packetInfo += "Packet length: " + QString::number(pkthdr->len) + " bytes\n";
     packetInfo += "Captured length: " + QString::number(pkthdr->caplen) + " bytes\n";
 
-    const ip_header* ipHeader = reinterpret_cast<const ip_header*>(packet);
     const struct my_tcphdr* tcpHeader = reinterpret_cast<const struct my_tcphdr*>(packet + sizeof(ip_header));
 
     QString sourceIp = QString("%1.%2.%3.%4")
@@ -419,60 +429,50 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
 
         // Add threat detection for TCP packets
         if ((tcpHeader->th_flags & TH_SYN) && (tcpHeader->th_flags & TH_ACK)) {
-            info = "Threat detected: Possible TCP SYN-ACK scan";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "Possible TCP SYN-ACK scan";
         } else if (tcpHeader->th_flags & TH_RST) {
-            info = "Threat detected: TCP Reset (RST) Attack";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "TCP Reset (RST) Attack";
         } else if (tcpHeader->th_flags & TH_FIN) {
-            info = "Threat detected: TCP FIN Scan";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "TCP FIN Scan";
         } else if (tcpHeader->th_flags & (TH_SYN | TH_FIN)) {
-            info = "Threat detected: TCP Xmas Scan";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "TCP Xmas Scan";
         } else if ((tcpHeader->th_flags & (TH_SYN | TH_RST | TH_ACK)) == 0) {
-            info = "Threat detected: TCP Null Scan";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "TCP Null Scan";
         } else if ((tcpHeader->th_flags & TH_PUSH) && (tcpHeader->th_flags & TH_URG)) {
-            info = "Threat detected: TCP Push and Urgent Flag Set";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "TCP Push and Urgent Flag Set";
         } else if (tcpHeader->th_flags & TH_URG) {
-            info = "Threat detected: TCP Urgent Flag Set";
+            info = "TCP Urgent Flag Set";
+        }
+        // Check for malware communication
+        if (isKnownMaliciousIP(destIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
             i++;
             k = i + j;
             wardenFort->settrafficAnomalies(i);
             wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+        if (isKnownMaliciousIP(sourceIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
         }
 
         // Check for DoS attacks
         if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
             info = "Threat detected: Possible SYN Flood";
-            j++;
+            i++;
             k = i + j;
-            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->settrafficAnomalies(i);
             wardenFort->setOverallAlert(QString::number(k));
             backgroundColor = QColor(75, 44, 44); //red
         }
         if (connectionCount[sourceIp] > threshold) {
             info = "Threat detected: Potential DoS Attack from " + sourceIp;
+
             j++;
             k = i + j;
             wardenFort->setcriticalAnomalies(QString::number(j));
@@ -480,36 +480,15 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
             backgroundColor = QColor(75, 44, 44); //red
         }
 
-        // Check for malware communication
-        if (isKnownMaliciousIP(destIp)) {
-            info = "Threat detected: Communication with known malicious IP " + destIp;
-            j++;
-            k = i + j;
-            wardenFort->setcriticalAnomalies(QString::number(j));
-            wardenFort->setOverallAlert(QString::number(k));
-            backgroundColor = QColor(75, 44, 44); //red
-        }
         if (dport == unusualPort) {
             info = "Threat detected: Communication over unusual port " + QString::number(dport);
-            j++;
+            i++;
             k = i + j;
-            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->settrafficAnomalies(i);
             wardenFort->setOverallAlert(QString::number(k));
             backgroundColor = QColor(75, 44, 44); //red
         }
 
-        // Check for unauthorized access attempts
-        if (isFailedLoginAttempt(packet)) {
-            failedLoginCount[sourceIp]++;
-            if (failedLoginCount[sourceIp] > maxFailedAttempts) {
-                info = "Threat detected: Possible Brute Force Attack from " + sourceIp;
-                j++;
-                k = i + j;
-                wardenFort->setcriticalAnomalies(QString::number(j));
-                wardenFort->setOverallAlert(QString::number(k));
-                backgroundColor = QColor(75, 44, 44); //red
-            }
-        }
         if (containsKnownExploitSignature(packet)) {
             info = "Threat detected: Known exploit attempt";
             j++;
@@ -524,56 +503,40 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
 
         // Add threat detection for UDP packets
         if (dport == 53) {
-            info = "Threat detected: DNS Tunneling";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "DNS Tunneling";
         } else if (dport == 161 || sport == 161) {
-            info = "Threat detected: SNMP Traffic";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "SNMP Traffic";
         } else if (dport == 123 || sport == 123) {
-            info = "Threat detected: NTP Amplification Attack";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "NTP Amplification Attack";
         } else if (dport == 69) {
-            info = "Threat detected: TFTP Traffic";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "TFTP Traffic";
         } else if (dport == 1900) {
-            info = "Threat detected: SSDP Traffic";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "SSDP Traffic";
         } else if (dport == 137 || sport == 137) {
-            info = "Threat detected: NetBIOS Name Service (NBNS) Traffic";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "NetBIOS Name Service (NBNS) Traffic";
         } else if (dport == 138 || sport == 138) {
-            info = "Threat detected: NetBIOS Datagram Service (NBDS) Traffic";
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
+            info = "NetBIOS Datagram Service (NBDS) Traffic";
         }
         if (dport == 0) {
             info = "Threat detected: Possible UDP Flood";
+        }
+        // Check for malware communication
+        if (isKnownMaliciousIP(destIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
             i++;
             k = i + j;
             wardenFort->settrafficAnomalies(i);
             wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
         }
-
+        if (isKnownMaliciousIP(sourceIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
     } else if (protocol == "ICMP") {
         const struct icmphdr* icmpHeader = reinterpret_cast<const struct icmphdr*>(packet + sizeof(ip_header));
         if (icmpHeader->type == ICMP_ECHO) {
@@ -588,8 +551,6 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     } else {
         backgroundColor = QColor(61, 62, 74);  // white Default color for other protocols
     }
-
-
 
     if (protocol == "TCP" || protocol == "UDP"){
 
@@ -741,7 +702,7 @@ void WardenFort::toggleButtonVisibility(QPushButton* buttonToHide, QPushButton* 
     buttonToShow->setVisible(true);
 }
 
-void WardenFort::onTriButtonClicked()
+/*void WardenFort::onTriButtonClicked()
 {
     // Adjust the width of the QListWidget based on its current width
     if (ui->listWidget->width() == 201) {
@@ -826,7 +787,7 @@ void WardenFort::hideSpecifiedButtons() {
     ui->alertLessButton->setVisible(false);
     ui->reportLessButton->setVisible(false);
     ui->calLessButton->setVisible(false);
-}
+}*/
 
 void WardenFort::checkAbuseIP(const QString &ipAddress)
 {
@@ -1005,8 +966,26 @@ void WardenFort::saveDataToFile() {
     QMap<QString, QStringList> mergedData;
     QMap<QString, int> occurrenceCount;
 
+    // Create a progress dialog
+    QProgressDialog progressDialog(tr("Saving data..."), tr("Cancel"), 0, rowCount, this);
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setMinimumDuration(0);
+    progressDialog.setValue(0);
+
+    progressDialog.setStyleSheet(
+        "QLabel { color : white; }"
+        "QProgressBar { color : white; }"
+        "QPushButton { color : white; }"
+        );
+
     // Collect and merge table data
     for (int row = 0; row < rowCount; ++row) {
+        // Check if the user has canceled the operation
+        if (progressDialog.wasCanceled()) {
+            file.close();
+            return;
+        }
+
         QTableWidgetItem *infoItem = ui->tableWidget->item(row, 8); // Column 8 is the information column
         if (infoItem && infoItem->text() != "No Information") {
             QString sourceIP = ui->tableWidget->item(row, 1)->text(); // Column 1 is "Source IP"
@@ -1054,6 +1033,9 @@ void WardenFort::saveDataToFile() {
                 qDebug() << "Error inserting data into database:" << query.lastError().text();
             }
         }
+
+        // Update the progress dialog
+        progressDialog.setValue(row + 1);
     }
 
     // Write merged data to CSV file
@@ -1141,7 +1123,7 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="text-align: center; font-weight: bold; height: 100px; border: 1px solid #000;">asdassadasdsadsadsadasasdasasdsdaasdasdasdasdasdas das asda sd  sdasadas adas asd asdas das as asas dasd asd asdas asasd asda sda s dsa asd asd sad </td>
+                <td colspan="2" style="text-align: center; font-weight: bold; height: 100px; border: 1px solid #000;">These network threats and anomalies represent various types of malicious or abnormal activities. SSDP Traffic and DNS Tunneling can be exploited for DDoS amplification and data exfiltration, respectively. TCP scans, including FIN, SYN-ACK, and Null Scans, are reconnaissance techniques used to identify open ports and vulnerabilities. SYN Floods and TCP Reset (RST) Attacks are DoS strategies aiming to overwhelm or disrupt services. The TCP Urgent Flag Set can manipulate traffic priority, while NetBIOS Datagram Service (NBDS) Traffic, though typically used in LAN communication, can be exploited for information leakage or attack amplification. Each of these activities signals potential security risks that require attention.</td>
             </tr>
             <tr>
                 <td style="border: 0px; font-weight:  bold;"></td>
@@ -1235,10 +1217,10 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
     QImage image("C:\\Users\\Admin\\Downloads\\Untitled Design.png");
     if (!image.isNull()) {
         // Resize image if needed (convert inches to pixels based on printer resolution)
-        double dpiX = printer.resolution(); // DPI of the printer
-        double dpiY = printer.resolution();
+        //double dpiX = printer.resolution(); // DPI of the printer
+        //double dpiY = printer.resolution();
         int paperWidth = printer.pageRect(QPrinter::DevicePixel).width();
-        int paperHeight = printer.pageRect(QPrinter::DevicePixel).height();
+        //int paperHeight = printer.pageRect(QPrinter::DevicePixel).height();
         int imgWidth = paperWidth; // Full width of the paper
         int imgHeight = (imgWidth * image.height()) / image.width(); // Maintain aspect ratio
 
@@ -1277,4 +1259,10 @@ void WardenFort::print() {
         // Create the PDF with the template
         createPDFWithTemplate(QFileInfo(fileName).baseName(), filePath);
     }
+}
+
+void WardenFort::gotoProf(){
+    accountSettings *prof = new accountSettings;
+    prof->show();
+    this->hide();
 }

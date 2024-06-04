@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
     qDebug() << "Database connected successfully";
 
-    //login login;
+    login login;
     //login.show();
 
     WardenFort wardenfort;
