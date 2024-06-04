@@ -18,16 +18,25 @@ public:
     void setDate(const QString &date);
     void setTime(const QString &time);
     void setText(const QString &text);
+    void setDetails(const QString &details);
     void setImportant(bool important);
+
+signals:
+    void sizeChanged(); // Signal to notify when the size changes
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
 
+private slots:
+    void onExpandButtonClicked();
+
 private:
     Ui::NotificationWidget *ui;
+    bool isImportant;
+    bool detailsVisible;
 
-signals:
-    void buttonClicked();
+    void applyTextColor();
+
 };
 
 #endif // NOTIFICATIONWIDGET_H

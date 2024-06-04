@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CalendarNotifications</string>
+   <string>WardenFort</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: #191F32;</string>

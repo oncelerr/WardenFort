@@ -13,9 +13,9 @@ CalendarNotifications::CalendarNotifications(QWidget *parent)
     addNotification("2024-01-05", "3:15 AM", "SEVERE DATA BREACH EXPOSED", true);
     addNotification("2024-01-05", "3:13 PM", "DATA RETRIEVED", false);
     addNotification("2024-01-06", "4:00 PM", "NEW SECURITY FOR DATA", false);
-    addNotification("2024-01-07", "", "HAPPY BIRTHDAY JAE HYUNG!", false);
+    addNotification("2024-01-07", "1:30 PM", "Meeting for all department will be held at Seminar room A and B", false);
     addNotification("2024-01-07", "9:00 AM", "SCHEDULED MEETING", false);
-    addNotification("2024-01-08", "10:00 AM", "Meeting for all department will be held at Seminar room A and B", false);
+    addNotification("2024-01-08", "10:00 AM", "HAPPY BIRTHDAY JAE HYUNG!", false);
 
     updateNotifications();
 
