@@ -2,6 +2,7 @@
 #include "ui_reportswidget.h"
 #include <QMouseEvent>
 #include <QDebug>
+#include <QNetworkInterface>
 
 reportsWidget::reportsWidget(QWidget *parent)
     : QWidget(parent)
@@ -25,7 +26,18 @@ void reportsWidget::setID(const QString &id) {
     ui->idLabel->setText(id);
 }
 
+void reportsWidget::setDateTime(const QString &time){
+    reportedDateTime = time;
+}
+
+void reportsWidget::setReportBy(const QString &by) {
+    reportedBy = by;
+}
+
 void reportsWidget::createPDFWithTemplate(const QString &fileName, const QString &filePath, const QString &reportedDate) {
+    // Get the IP address of the computer
+    QString ipAddress = getLocalIpAddress();
+
     // Define your printable template using HTML and CSS
     QString htmlTemplate = R"(
 <html>
@@ -58,9 +70,8 @@ void reportsWidget::createPDFWithTemplate(const QString &fileName, const QString
 
         <table class="form-table">
             <tr>
-                <td style="border: 0px; font-weight:  bold;">Reported By: </td>
-                <td style="border: 0px; font-weight: bold;">Date of Report: %1</td>
-
+                <td style="border: 0px; font-weight:  bold;">Reported By: %1</td>
+                <td style="border: 0px; font-weight: bold;">Date of Report: %2</td>
             </tr>
             <tr>
                 <td style="border: 0px; font-weight:  bold;">Reported to:</td>
@@ -70,14 +81,14 @@ void reportsWidget::createPDFWithTemplate(const QString &fileName, const QString
 
         <table class="form-table">
             <tr>
-                <th colspan="2">Incident Details</th>
+                <th colspan="2" style="text-align: center;">Incident Details</th>
             </tr>
             <tr>
                 <td>
-                    <label for="date-time-incident">Date and Time of Incident:</label>
+                    <label for="date-time-incident">Date and Time of Incident: %5</label>
                 </td>
                 <td>
-                    <label for="location">Location:</label>
+                    <label for="location">Location: %3</label>
                 </td>
             </tr>
             <tr>
@@ -88,7 +99,7 @@ void reportsWidget::createPDFWithTemplate(const QString &fileName, const QString
                     <label for="incident-type">Incident Type(s):</label>
                 </td>
                 <td>
-                    <label for="incident-type-text">%2</label>
+                    <label for="incident-type-text">%4</label>
                 </td>
             </tr>
             <tr>
@@ -125,9 +136,9 @@ void reportsWidget::createPDFWithTemplate(const QString &fileName, const QString
             Name with printed signature
         </div>
     </body>
-    </html>
-    )";
-    QString htmlContent = htmlTemplate.arg(reportedDate).arg(incidentTypes);
+</html>
+)";
+    QString htmlContent = htmlTemplate.arg(reportedBy).arg(reportedDate).arg(ipAddress).arg(incidentTypes).arg(reportedDateTime);
     // Create a QTextDocument and set the HTML content
     QTextDocument document;
     document.setHtml(htmlContent); // Use htmlContent instead of htmlTemplate
@@ -170,6 +181,23 @@ void reportsWidget::createPDFWithTemplate(const QString &fileName, const QString
     painter.end();
 }
 
+QString reportsWidget::getLocalIpAddress() {
+    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+    QString ipAddress;
+
+    // Use the first non-local IPv4 address found
+    for (const QHostAddress &address : ipAddressesList) {
+        if (address != QHostAddress::LocalHost && address.toIPv4Address()) {
+            ipAddress = address.toString();
+            break;
+        }
+    }
+    // If no non-local IPv4 address is found, use the loopback address
+    if (ipAddress.isEmpty())
+        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
+    return ipAddress;
+}
+
 void reportsWidget::print() {
     // Get the filename and destination file location from the user
     QString fileName = QFileDialog::getSaveFileName(nullptr, "Save PDF", "", "PDF Files (*.pdf)");
@@ -183,7 +211,8 @@ void reportsWidget::print() {
         createPDFWithTemplate(QFileInfo(fileName).baseName(), filePath, reportedDate);
     }
 }
+
 void reportsWidget::setIncidentTypes(const QString &types) {
-   incidentTypes = types;
+    incidentTypes = types;
     qDebug() << incidentTypes;
 }

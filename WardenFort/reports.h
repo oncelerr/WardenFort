@@ -23,8 +23,10 @@ public:
 
     // Function to add a reportsWidget instance
     void addReportsWidget(const QString &date, const QString &id, const QStringList &incidentTypes);
-     QMap<QString, QStringList> getUniqueDatesAndIncidentTypes();
+    QMap<QString, QStringList> getUniqueDatesAndIncidentTypes();
     void addReportsWidgetsForUniqueDates();
+    void addReportsWidget(const QString &reportID, const QString &date, const QStringList &incidentTypes, const QString &reportBy, const QDateTime &datetime);
+    void getReportIDFromDate(const QString &date, const QStringList &incidentTypes);
 
 
 private:

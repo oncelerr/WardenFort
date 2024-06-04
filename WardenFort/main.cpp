@@ -24,12 +24,12 @@ int main(int argc, char* argv[])
 
     //login login;
     //login.show();
-    //reports reports;
-    //reports.show();
+    reports reports;
+    reports.show();
 
     
-       WardenFort wardenfort;
-      wardenfort.show();
+       //WardenFort wardenfort;
+      //wardenfort.show();
     
 
     return a.exec();

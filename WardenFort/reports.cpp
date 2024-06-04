@@ -33,21 +33,45 @@
         for (auto it = uniqueDatesAndIncidentTypes.begin(); it != uniqueDatesAndIncidentTypes.end(); ++it) {
             const QString &date = it.key();
             const QStringList &incidentTypes = it.value();
-
-            // Add a report widget for the current date with a random ID
-            QString randomId = QString::number(QRandomGenerator::global()->generate() % 10000);
-            addReportsWidget(randomId, date, incidentTypes);
+            getReportIDFromDate(date, incidentTypes);
         }
     }
 
-    void reports::addReportsWidget(const QString &date, const QString &id, const QStringList &incidentTypes) {
+    void reports::getReportIDFromDate(const QString &date, const QStringList &incidentTypes) {
+        QSqlQuery query(QSqlDatabase::database());
+        query.prepare("SELECT reportID, reportBY, date, time FROM reports WHERE date = :date");
+        query.bindValue(":date", date);
+        if (!query.exec()) {
+            qDebug() << "Error retrieving reportID from database:" << query.lastError().text();
+            // Return -1 to indicate error
+        }
+        if (query.next()) {
+            QString reportID = QString::number(query.value(0).toInt());
+            QString reportBy = query.value(1).toString(); // Get reportBy
+            QString reportDate = query.value(2).toString(); // Get reportDate
+            QString reportTime = query.value(3).toString(); // Get reportTime
+            QDateTime datetime = QDateTime::fromString(reportDate + " " + reportTime, "yyyy-MM-dd hh:mm:ss"); // Assuming datetime is in this format
+            addReportsWidget(reportID, date, incidentTypes, reportBy, datetime);
+        } else {
+            qDebug() << "No reportID found for date:" << date;
+        }
+    }
+
+
+
+    void reports::addReportsWidget(const QString &reportID, const QString &date, const QStringList &incidentTypes, const QString &reportBy, const QDateTime &datetime) {
         // Create a new reportsWidget instance
         reportsWidget *newWidget = new reportsWidget(this);
 
+        // Convert QDateTime to string representation
+        QString datetimeString = datetime.toString(Qt::ISODate); // Customize the format as needed
+
         // Set properties of the new widget
-        newWidget->setDate(id);
-        newWidget->setID(date);
-        newWidget->setIncidentTypes(incidentTypes.join(", ")); // Set the incident types
+        newWidget->setDate(date);
+        newWidget->setID(reportID);
+        newWidget->setIncidentTypes(incidentTypes.join(", "));
+        newWidget->setReportBy(reportBy); // Set reportBy
+        newWidget->setDateTime(datetimeString); // Set datetime as string
 
         // Get the size hint of the reportsWidget
         QSize sizeHint = newWidget->sizeHint();
@@ -59,6 +83,8 @@
         // Set the size hint of the QListWidgetItem to match the size hint of the reportsWidget
         item->setSizeHint(sizeHint);
     }
+
+
 
 
     QMap<QString, QStringList> reports::getUniqueDatesAndIncidentTypes() {
