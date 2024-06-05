@@ -53,6 +53,7 @@ public:
     void createPDFWithTemplate(const QString &fileName, const QString &filePath);
     void print();
     void gotoProf();
+    void gotoNotif();
 
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);

@@ -11,12 +11,14 @@ CONFIG += c++17
 SOURCES += \
     accountsettings.cpp \
     animatedlabel.cpp \
+    database.cpp \
     enter.cpp \
     forgotpass.cpp \
     globals.cpp \
     login.cpp \
     loginsession.cpp \
     main.cpp \
+    notification.cpp \
     otp.cpp \
     passwordsec.cpp \
     signup.cpp \
@@ -25,11 +27,13 @@ SOURCES += \
 HEADERS += \
     accountsettings.h \
     animatedlabel.h \
+    database.h \
     enter.h \
     forgotpass.h \
     globals.h \
     login.h \
     loginsession.h \
+    notification.h \
     otp.h \
     passwordsec.h \
     signup.h \
@@ -43,6 +47,7 @@ FORMS += \
     form.ui \
     login.ui \
     newdb.ui \
+    notification.ui \
     otp.ui \
     passwordsec.ui \
     signup.ui \

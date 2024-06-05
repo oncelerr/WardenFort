@@ -14,6 +14,9 @@
 #include <QDebug>
 #include "loginsession.h"
 #include "accountsettings.h"
+#include "notification.h"
+#include "globals.h"
+#include "database.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTimer>
@@ -126,6 +129,7 @@ WardenFort::WardenFort(QWidget* parent)
     connect(ui->actionRestart, &QAction::triggered, this, &WardenFort::restartScanningActiveLANAdapters);
     connect(ui->actionPrint, &QAction::triggered, this, &WardenFort::print);
     connect(ui->profButton_2, &QPushButton::clicked, this, &WardenFort::gotoProf);
+    connect(ui->alertButton_2, &QPushButton::clicked, this, &WardenFort::gotoNotif);
 
     connect(this, &WardenFort::dosAttackDetected, this, &WardenFort::showDoSPopup);
 
@@ -356,6 +360,11 @@ bool containsKnownExploitSignature(const u_char* packet) {
     return false;
 }
 
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QVariant>
+
+// Define packetHandler function
 void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
     struct tm ltime;
     char timestr[16];
@@ -570,6 +579,33 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
         // Set background color for the entire row
         for (int col = 0; col < tableWidget->columnCount(); ++col) {
             tableWidget->item(row, col)->setBackground(backgroundColor);
+        }
+
+        // Save to database if threat detected
+        if (info.startsWith("Threat detected:")) {
+            QSqlDatabase db = Database::getConnection();
+            if (db.isOpen()) {
+                QSqlQuery query(db);
+                query.prepare("INSERT INTO packets (user_id, date, time, sourceIP, destinationIP, sourcePORT, destinationPORT, flags, capLEN, protocol, info) "
+                              "VALUES (:user_id, :date, :time, :sourceIP, :destinationIP, :sourcePORT, :destinationPORT, :flags, :capLEN, :protocol, :info)");
+                query.bindValue(":user_id", loggedInUser.userId);
+                query.bindValue(":date", QDateTime::currentDateTime().toString("yyyy-MM-dd"));
+                query.bindValue(":time", QDateTime::currentDateTime().toString("HH:mm:ss"));
+                query.bindValue(":sourceIP", sourceIp);
+                query.bindValue(":destinationIP", destIp);
+                query.bindValue(":sourcePORT", QString::number(sport));
+                query.bindValue(":destinationPORT", QString::number(dport));
+                query.bindValue(":flags", flags);
+                query.bindValue(":capLEN", QString::number(pkthdr->caplen));
+                query.bindValue(":protocol", protocol);
+                query.bindValue(":info", info);
+
+                if (!query.exec()) {
+                    qDebug() << "Error inserting into database:" << query.lastError().text();
+                }
+            } else {
+                qDebug() << "Database not open!";
+            }
         }
     }
 }
@@ -1006,32 +1042,6 @@ void WardenFort::saveDataToFile() {
                 mergedData[sourceIP] = rowData;
                 occurrenceCount[sourceIP] = 1;
             }
-
-            // Splitting the timestamp into date and time components
-            QStringList dateTimeParts = rowData[0].split(' ');
-            QString date = dateTimeParts[0];
-            QString time = dateTimeParts[1];
-
-            // Prepare the SQL query to insert into the database
-            QSqlQuery query(QSqlDatabase::database()); // Use the existing database connection
-            query.prepare("INSERT INTO packets (date, time, sourceIP, destinationIP, sourcePORT, destinationPORT, flags, capLEN, protocol, info, occurrence) "
-                          "VALUES (:date, :time, :sourceIP, :destinationIP, :sourcePORT, :destinationPORT, :flags, :capLEN, :protocol, :info, :occurrence)");
-            query.bindValue(":date", date);
-            query.bindValue(":time", time);
-            query.bindValue(":sourceIP", rowData[1]);
-            query.bindValue(":destinationIP", rowData[2]);
-            query.bindValue(":sourcePORT", rowData[3]);
-            query.bindValue(":destinationPORT", rowData[4]);
-            query.bindValue(":flags", rowData[5]);
-            query.bindValue(":capLEN", rowData[6]);
-            query.bindValue(":protocol", rowData[7]);
-            query.bindValue(":info", rowData[8]);
-            query.bindValue(":occurrence", occurrenceCount[sourceIP]);
-
-            // Execute the query
-            if (!query.exec()) {
-                qDebug() << "Error inserting data into database:" << query.lastError().text();
-            }
         }
 
         // Update the progress dialog
@@ -1264,5 +1274,10 @@ void WardenFort::print() {
 void WardenFort::gotoProf(){
     accountSettings *prof = new accountSettings;
     prof->show();
+    this->hide();
+}
+void WardenFort::gotoNotif(){
+    notification *notif = new notification;
+    notif->show();
     this->hide();
 }

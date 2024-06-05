@@ -14,7 +14,7 @@ accountSettings::accountSettings(QWidget *parent)
     , ui(new Ui::accountSettings)
 {
     ui->setupUi(this);
-    connect(ui->dashButton_2, &QPushButton::clicked, this, &accountSettings::gotoDash);
+    connect(ui->dashButton_3, &QPushButton::clicked, this, &accountSettings::gotoDash);
     connect(ui->pushButton_2, &QPushButton::clicked, this, &accountSettings::changeEmail);
     connect(ui->pushButton_3, &QPushButton::clicked, this, &accountSettings::changeUsername);
 
