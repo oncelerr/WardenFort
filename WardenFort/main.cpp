@@ -7,6 +7,8 @@
 #include "wardenfort.h"
 #include "reports.h"
 #include "database.h"
+#include "calendarnotifications.h"
+#include "calendar.h"
 #include <QSqlError>
 
 int main(int argc, char* argv[])
@@ -24,10 +26,16 @@ int main(int argc, char* argv[])
 
     qDebug() << "Database connected successfully";
 
-    login login;
-    login.show();
-    reports reports;
+    //login login;
+    //login.show();
+    //reports reports;
     //reports.show();
+
+
+    //CalendarNotifications calendarnotifications;
+    //calendarnotifications.show();
+    //Calendar calendar;
+    //calendar.show();
 
     WardenFort wardenfort;
     //wardenfort.show();
