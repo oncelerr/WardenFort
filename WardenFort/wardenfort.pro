@@ -94,8 +94,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 
 RESOURCES += \
-    CalendarNotifications.qrc \
-    CalendarNotifications.qrc \
-    images.qrc \
-    img.qrc \
     wardenfort.qrc

@@ -206,8 +206,6 @@ void login::on_loginButton_clicked()
     QString hashedPassword = QString(passwordHash.toHex());
 
     QSqlDatabase db = Database::getConnection();
-
-    // Query the database to check if the entered credentials are valid
     QSqlQuery query(db);
     query.prepare("SELECT * FROM user_db WHERE username = :username AND passwd = :password");
     query.bindValue(":username", username);
@@ -301,7 +299,8 @@ void login::openAlertNotif() {
 
     QString userName;
 
-    QSqlQuery query;
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
     query.prepare("SELECT username FROM user_db WHERE email = :email");
     query.bindValue(":email", userEmail);
 
@@ -339,7 +338,8 @@ void login::openEnterWindow() {
 
 void login::on_forgot_pass_clicked() // Implementation of on_forgot_pass_clicked
 {
-    QSqlQuery query;
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
     query.prepare("SELECT username FROM user_db WHERE email = :useremail");
     query.bindValue(":useremail", userEmail);
 

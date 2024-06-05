@@ -1,5 +1,6 @@
 #include "signup.h"
 #include "ui_signup.h"
+#include "database.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QMessageBox>
@@ -44,10 +45,11 @@ void signup::onCreateButtonClicked()
     }
 
     // Check if username already exists in the database
-    QSqlQuery checkUsernameQuery;
-    checkUsernameQuery.prepare("SELECT * FROM user_db WHERE username = :username");
-    checkUsernameQuery.bindValue(":username", username);
-    if (checkUsernameQuery.exec() && checkUsernameQuery.next()) {
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM user_db WHERE username = :username");
+    query.bindValue(":username", username);
+    if (query.exec() && query.next()) {
         QMessageBox::critical(this, "Error", "Username already exists. Please choose a different username.");
         return;
     }
@@ -58,16 +60,16 @@ void signup::onCreateButtonClicked()
 
     // Convert the hashed password to a hex string
     // Insert data into the database
-    QSqlQuery query;
-    query.prepare("INSERT INTO user_db (firstName, lastName, username, email, passwd) "
+    QSqlQuery query1(db);
+    query1.prepare("INSERT INTO user_db (firstName, lastName, username, email, passwd) "
                   "VALUES (:first_name, :last_name, :username, :email, :password)");
-    query.bindValue(":first_name", firstName);
-    query.bindValue(":last_name", lastName);
-    query.bindValue(":username", username);
-    query.bindValue(":email", email);
-    query.bindValue(":password", password); // Store hashed password
+    query1.bindValue(":first_name", firstName);
+    query1.bindValue(":last_name", lastName);
+    query1.bindValue(":username", username);
+    query1.bindValue(":email", email);
+    query1.bindValue(":password", password); // Store hashed password
 
-    if (query.exec()) {
+    if (query1.exec()) {
         QMessageBox::information(this, "Success", "Signup successful!");
     }else {
         QMessageBox errorMessageBox(QMessageBox::Critical, "Error", "Signup failed!", QMessageBox::Ok, this);
