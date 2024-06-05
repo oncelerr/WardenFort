@@ -13,11 +13,28 @@
 #include <tchar.h>
 #include <QDebug>
 #include "loginsession.h"
+#include "accountsettings.h"
+#include "notification.h"
+#include "globals.h"
+#include "database.h"
 #include <QFileDialog>
 #include <QPrinter>
 #include <QPainter>
+#include <QMessageBox>
+#include <QTimer>
+#include <QApplication>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QSqlRecord>
+#include <unordered_map>
+#include <QMap>
+#include <QProgressDialog>
+
 #include <QCoreApplication>
 #include <QNetworkAccessManager>
+#include <QHostInfo>
+#include <QNetworkInterface>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QJsonDocument>
@@ -30,7 +47,29 @@
 #include <QSqlError>
 
 
+#include <QApplication>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QPainter>
+#include <QPrinter>
+#include <QTextDocument>
+#include <QDebug>
+#include <QImage>
+
+#include <unordered_map>
+
+// Ensure linkage with ws2_32.lib
 #pragma comment(lib, "Ws2_32.lib")
+
+#ifndef ICMP_ECHO
+#define ICMP_ECHO 8
+#endif
+
+void showDoSPopup();
+
+QMessageBox *dosPopup = nullptr;
+QTimer *flashTimer = nullptr;
+bool toggleColor = false;
 
 int i = 0;
 int j = 0;
@@ -39,7 +78,47 @@ int portScanningDetected = 0;
 int DOSDetected = 0;
 int lastFoundRow = -1;
 
+std::unordered_map<QString, int> connectionCount;
+std::unordered_map<QString, int> failedLoginCount;
+const int threshold = 5; // Example threshold value
+const int maxFailedAttempts = 5; // Example maximum failed attempts
+const int unusualPort = 12345;
+
+QString userName;
+
 bool stopRequested = false;
+
+// Get the current date and time
+QDateTime currentDateTime = QDateTime::currentDateTime();
+
+// Convert the QDateTime object to a string with the desired format
+QString currentDateTimeString = currentDateTime.toString("yyyy-MM-dd hh:mm:ss");
+
+QSet<QString> maliciousIPs;
+
+QSet<QString> loadMaliciousIPs(const QString& filePath) {
+    QSet<QString> maliciousIPs;
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open file:" << filePath;
+        return maliciousIPs;
+    }
+
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (!line.isEmpty()) {
+            maliciousIPs.insert(line);
+        }
+    }
+
+    file.close();
+    return maliciousIPs;
+}
+
+bool isKnownMaliciousIP(const QString& ip) {
+    return maliciousIPs.contains(ip);
+}
 
 WardenFort::WardenFort(QWidget* parent)
     : QMainWindow(parent)
@@ -47,42 +126,34 @@ WardenFort::WardenFort(QWidget* parent)
 {
     ui->setupUi(this);
 
-    connect(ui->tableWidget, &QTableWidget::itemClicked, this, &WardenFort::onRowClicked);
-
     networkManager = new QNetworkAccessManager(this);
     manager = new QNetworkAccessManager(this);
-
-    // Set initial width of listWidget to 201 and hide triReversedButton
-    ui->listWidget->setFixedWidth(201);
-    ui->triReversedButton->setVisible(false);
-
-    // Connect the clicked() signals of the buttons to their respective slots
-    connect(ui->triButton, &QPushButton::clicked, this, &WardenFort::onTriButtonClicked);
-    connect(ui->triReversedButton, &QPushButton::clicked, this, &WardenFort::onTriReversedButtonClicked);
-    connect(ui->profilePushButton, &QPushButton::clicked, this, &WardenFort::onProfilePushButtonClicked);
-    connect(ui->profileLessButton, &QPushButton::clicked, this, &WardenFort::onProfileLessButtonClicked);
     connect(ui->searchBTN, &QPushButton::clicked, this, &WardenFort::performSearch);
     connect(ui->actionSave, &QAction::triggered, this, &WardenFort::saveDataToFile);
     connect(ui->actionStart, &QAction::triggered, this, &WardenFort::scanActiveLANAdapters);
     connect(ui->actionCheck_Online, &QAction::triggered, this, &WardenFort::readCSV);
     connect(ui->actionStop, &QAction::triggered, this, &WardenFort::stopScanningActiveLANAdapters);
     connect(ui->actionRestart, &QAction::triggered, this, &WardenFort::restartScanningActiveLANAdapters);
+    connect(ui->actionPrint, &QAction::triggered, this, &WardenFort::print);
+    connect(ui->profButton_2, &QPushButton::clicked, this, &WardenFort::gotoProf);
+    connect(ui->alertButton_2, &QPushButton::clicked, this, &WardenFort::gotoNotif);
 
-    hideSpecifiedButtons();
+    connect(this, &WardenFort::dosAttackDetected, this, &WardenFort::showDoSPopup);
 
     ui->tableWidget->setColumnWidth(0, 120);
     ui->tableWidget->setColumnWidth(1, 100);
     ui->tableWidget->setColumnWidth(2, 100);
     ui->tableWidget->setColumnWidth(3, 50);
     ui->tableWidget->setColumnWidth(4, 50);
-    ui->tableWidget->setColumnWidth(6, 30);
-    ui->tableWidget->setColumnWidth(7, 30);
-    ui->tableWidget->setColumnWidth(8, 250);
+    ui->tableWidget->setColumnWidth(6, 40);
+    ui->tableWidget->setColumnWidth(7, 40);
+    ui->tableWidget->setColumnWidth(8, 350);
+
+    maliciousIPs = loadMaliciousIPs("D:/Projects/maliciousIP/malicious-ip/full-aa.txt");
 
     loginsession* log = new loginsession;
     QString Name = log->username;
 
-    ui->welcome_text->setText(Name);
 }
 
 WardenFort::~WardenFort()
@@ -91,8 +162,8 @@ WardenFort::~WardenFort()
 }
 
 
-void WardenFort::settrafficAnomalies(const QString& text) {
-    ui->trafficAnomalies->setText(text);
+void WardenFort::settrafficAnomalies(int text) {
+    ui->trafficAnomalies->setText(QString::number(text));
 }
 
 void WardenFort::setcriticalAnomalies(const QString& text) {
@@ -109,7 +180,10 @@ QTableWidget* WardenFort::getTableWidget() {
 }
 
 void WardenFort::setWelcomeText(const QString& text) {
-    ui->welcome_text->setText(text);
+    QString modifiedText = text; // Make a copy of the original text
+    modifiedText.remove("Welcome, ");
+    modifiedText.remove("!");
+    userName = modifiedText; // Assign the modified text to userName
 }
 
 // Define TCP header flags
@@ -120,13 +194,6 @@ void WardenFort::setWelcomeText(const QString& text) {
 #define TH_ACK  0x10
 #define TH_URG  0x20
 
-constexpr int MAX_EXPECTED_PAYLOAD_LENGTH = 9999; // Maximum expected payload length
-constexpr int MIN_EXPECTED_PAYLOAD_LENGTH = 0;    // Minimum expected payload length (can be adjusted as needed)
-constexpr int MAX_EXPECTED_PACKET_LENGTH = 1514; // Maximum expected packet length
-constexpr int MAX_PACKET_LENGTH_THRESHOLD = 9999; // Threshold for detecting unusually large packets
-constexpr int MAX_DOS_DETECTED_THRESHOLD = 10;    // Threshold for DoS attack detection
-constexpr int MAX_NORMAL_TRANSFER_SIZE = 9999;      // Threshold for data exfiltration
-
 typedef struct ip_address {
     u_char byte1;
     u_char byte2;
@@ -135,18 +202,44 @@ typedef struct ip_address {
 } ip_address;
 
 typedef struct ip_header {
-    u_char  ver_ihl; // Version (4 bits) + IP header length (4 bits)
-    u_char  tos;     // Type of service
-    u_short tlen;    // Total length
+    u_char ver_ihl;   // Version (4 bits) + IP header length (4 bits)
+    u_char tos;       // Type of service
+    u_short tlen;     // Total length
     u_short identification; // Identification
     u_short flags_fo; // Flags (3 bits) + Fragment offset (13 bits)
-    u_char  ttl;      // Time to live
-    u_char  proto;    // Protocol
+    u_char ttl;       // Time to live
+    u_char proto;     // Protocol
     u_short crc;      // Header checksum
-    ip_address  saddr; // Source address
-    ip_address  daddr; // Destination address
-    u_int  op_pad;     // Option + Padding
+    ip_address saddr; // Source address
+    ip_address daddr; // Destination address
+    u_int op_pad;     // Option + Padding
 } ip_header;
+
+struct icmphdr {
+    u_char type;    // ICMP message type
+    u_char code;    // Error code
+    u_short checksum;   // Checksum for ICMP Header and data
+    union {
+        struct {
+            u_short id;
+            u_short sequence;
+        } echo;         // Echo datagram
+        u_long gateway; // Gateway address
+        struct {
+            u_short __unused;
+            u_short mtu;
+        } frag;        // Path MTU discovery
+    } un;
+};
+
+#define IP_RF 0x8000        // Reserved fragment flag
+#define IP_DF 0x4000        // Don't fragment flag
+#define IP_MF 0x2000        // More fragments flag
+#define IP_OFFMASK 0x1FFF   // Mask for fragmenting bits
+
+QString ipAddressToString(const ip_address& addr) {
+    return QString("%1.%2.%3.%4").arg(addr.byte1).arg(addr.byte2).arg(addr.byte3).arg(addr.byte4);
+}
 
 QString getProtocolName(u_char protocol) {
     switch (protocol) {
@@ -265,9 +358,21 @@ bool WardenFort::isFilteredAdapter(pcap_if_t* adapter)
     return false;
 }
 
-void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
-    bool isVeryBottom = false;
+bool containsKnownExploitSignature(const u_char* packet) {
+    const char* packetData = reinterpret_cast<const char*>(packet);
+    if (strstr(packetData, "VIRUS") != nullptr) {
+        qDebug() << "FOUND";
+        return true;
+    }
+    return false;
+}
 
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QVariant>
+
+// Define packetHandler function
+void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
     struct tm ltime;
     char timestr[16];
     ip_header *ih;
@@ -300,7 +405,6 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     packetInfo += "Packet length: " + QString::number(pkthdr->len) + " bytes\n";
     packetInfo += "Captured length: " + QString::number(pkthdr->caplen) + " bytes\n";
 
-    const ip_header* ipHeader = reinterpret_cast<const ip_header*>(packet);
     const struct my_tcphdr* tcpHeader = reinterpret_cast<const struct my_tcphdr*>(packet + sizeof(ip_header));
 
     QString sourceIp = QString("%1.%2.%3.%4")
@@ -314,96 +418,157 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
                          .arg(ih->daddr.byte3)
                          .arg(ih->daddr.byte4);
 
-    QString sourcePort = QString::number(ntohs(sport));
-    QString destPort = QString::number(ntohs(tcpHeader->th_dport));
     QString flags;
     if (tcpHeader->th_flags & TH_SYN) flags += "SYN ";
     if (tcpHeader->th_flags & TH_ACK) flags += "ACK ";
     if (tcpHeader->th_flags & TH_FIN) flags += "FIN ";
 
-    int tcpHeaderLength = (tcpHeader->th_offx2 >> 4) * 4;
-
-    int payloadLength = pkthdr->caplen - sizeof(ip_header) - tcpHeaderLength;
-
     QString info = QString("No Information");
 
     QString protocol = getProtocolName(ih->proto);
 
-    if (ipHeader->proto == IPPROTO_ICMP) {
-        int totalLength = ntohs(ipHeader->tlen);
-        int icmpHeaderLength = sizeof(ICMPHeader);
-        int icmpPayloadLength = totalLength - sizeof(ip_header) - icmpHeaderLength;
-        constexpr int MAX_ICMP_PAYLOAD_LENGTH = 10;
-        if (icmpPayloadLength > MAX_ICMP_PAYLOAD_LENGTH) {
-            info = QString("Large ICMP Echo Request detected. Payload Length: %1").arg(icmpPayloadLength);
+    QColor backgroundColor;
+
+    if (protocol == "TCP") {
+        const struct my_tcphdr* tcpHeader = reinterpret_cast<const struct my_tcphdr*>(packet + sizeof(ip_header));
+
+        // Check TCP flags to determine the color
+        if (tcpHeader->th_flags & TH_SYN) {
+            backgroundColor = QColor(44, 75, 66); // lightgreen Established connection (SYN packet)
+        } else if (tcpHeader->th_flags & TH_ACK) {
+            backgroundColor = QColor(44, 75, 50); // darkgreen ACK packet
+        } else if (tcpHeader->th_flags & TH_FIN) {
+            backgroundColor = QColor(55, 75, 44); // green FIN packet
+        } else {
+            backgroundColor = QColor(55, 75, 44); // green Other TCP packets
         }
-    }
 
-    if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
-        if (ntohs(tcpHeader->th_dport) >= 1 && ntohs(tcpHeader->th_dport) <= 1024) {
-            info = QString("Port Scanning Detected. Source: %1 Destination Port: %2").arg(sourceIp).arg(destPort);
+        // Add threat detection for TCP packets
+        if ((tcpHeader->th_flags & TH_SYN) && (tcpHeader->th_flags & TH_ACK)) {
+            info = "Possible TCP SYN-ACK scan";
+        } else if (tcpHeader->th_flags & TH_RST) {
+            info = "TCP Reset (RST) Attack";
+        } else if (tcpHeader->th_flags & TH_FIN) {
+            info = "TCP FIN Scan";
+        } else if (tcpHeader->th_flags & (TH_SYN | TH_FIN)) {
+            info = "TCP Xmas Scan";
+        } else if ((tcpHeader->th_flags & (TH_SYN | TH_RST | TH_ACK)) == 0) {
+            info = "TCP Null Scan";
+        } else if ((tcpHeader->th_flags & TH_PUSH) && (tcpHeader->th_flags & TH_URG)) {
+            info = "TCP Push and Urgent Flag Set";
+        } else if (tcpHeader->th_flags & TH_URG) {
+            info = "TCP Urgent Flag Set";
         }
-    }
-
-    if (pkthdr->caplen >= MAX_EXPECTED_PACKET_LENGTH) {
-        info = QString("Possible Denial of Service (DoS) Attack Detected.").arg(pkthdr->caplen);
-    }else if (pkthdr->caplen >= MAX_PACKET_LENGTH_THRESHOLD) {
-        info = QString("Unusually large packet detected. Packet Length: %1").arg(pkthdr->caplen);
-    }
-
-    if (DOSDetected > MAX_DOS_DETECTED_THRESHOLD) {
-        info = QString("DoS attack threshold exceeded. Total DoS attacks detected: %1").arg(DOSDetected);
-    }
-
-    if (payloadLength > MIN_EXPECTED_PAYLOAD_LENGTH && payloadLength < MAX_EXPECTED_PAYLOAD_LENGTH) {
-        u_short destPort = ntohs(tcpHeader->th_dport);
-        switch (destPort) {
-        case 6667:
-            info = QString("Malware communication detected (IRC-based malware). Destination port: %1").arg(destPort);
-            break;
-        default:
-            const char* payload = reinterpret_cast<const char*>(tcpHeader) + sizeof(struct my_tcphdr);
-            if (strstr(payload, "malicious_pattern")) {
-                info = QString("Malware communication detected (suspicious payload content). Destination port: %1").arg(destPort);
-            }
-            break;
+        // Check for malware communication
+        if (isKnownMaliciousIP(destIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
         }
-    }
-
-    if (payloadLength > MIN_EXPECTED_PAYLOAD_LENGTH && payloadLength < MAX_EXPECTED_PAYLOAD_LENGTH) {
-        const char* payload = reinterpret_cast<const char*>(tcpHeader) + sizeof(struct my_tcphdr);
-        if (strstr(payload, "confidential_data_pattern")) {
-            info = QString("Data exfiltration detected. Suspicious pattern found in payload.");
+        if (isKnownMaliciousIP(sourceIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
         }
-        else if (payloadLength > MAX_NORMAL_TRANSFER_SIZE) {
-            info = QString("Data exfiltration detected. Unusually large payload size.");
-        }
-    }
 
-    if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
-        if (ntohs(tcpHeader->th_dport) >= 1 && ntohs(tcpHeader->th_dport) <= 1024) {
-            info = QString("Network Reconnaissance Detected. Source: %1 Destination Port:%2").arg(sourceIp).arg(destPort);
+        // Check for DoS attacks
+        if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
+            info = "Threat detected: Possible SYN Flood";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
         }
-    }
+        if (connectionCount[sourceIp] > threshold) {
+            info = "Threat detected: Potential DoS Attack from " + sourceIp;
 
-    if (tcpHeader->th_flags & (TH_FIN | TH_SYN | TH_RST | TH_PUSH | TH_ACK | TH_URG)) {
-        int flagCount = 0;
-        flagCount += tcpHeader->th_flags & TH_FIN ? 1 : 0;
-        flagCount += tcpHeader->th_flags & TH_SYN ? 1 : 0;
-        flagCount += tcpHeader->th_flags & TH_RST ? 1 : 0;
-        flagCount += tcpHeader->th_flags & TH_PUSH ? 1 : 0;
-        flagCount += tcpHeader->th_flags & TH_ACK ? 1 : 0;
-        flagCount += tcpHeader->th_flags & TH_URG ? 1 : 0;
-
-        if (flagCount != 1 && !(tcpHeader->th_flags & (TH_SYN | TH_ACK)) && !(tcpHeader->th_flags & (TH_FIN | TH_ACK))) {
-            // Protocol anomaly detected
-            info = QString("Protocol Anomaly Detected.").arg(sourceIp).arg(destIp);
+            j++;
+            k = i + j;
+            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
         }
+
+        if (dport == unusualPort) {
+            info = "Threat detected: Communication over unusual port " + QString::number(dport);
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+
+        if (containsKnownExploitSignature(packet)) {
+            info = "Threat detected: Known exploit attempt";
+            j++;
+            k = i + j;
+            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+
+    } else if (protocol == "UDP") {
+        backgroundColor = QColor(45, 44, 75);  // blue UDP packets
+
+        // Add threat detection for UDP packets
+        if (dport == 53) {
+            info = "DNS Tunneling";
+        } else if (dport == 161 || sport == 161) {
+            info = "SNMP Traffic";
+        } else if (dport == 123 || sport == 123) {
+            info = "NTP Amplification Attack";
+        } else if (dport == 69) {
+            info = "TFTP Traffic";
+        } else if (dport == 1900) {
+            info = "SSDP Traffic";
+        } else if (dport == 137 || sport == 137) {
+            info = "NetBIOS Name Service (NBNS) Traffic";
+        } else if (dport == 138 || sport == 138) {
+            info = "NetBIOS Datagram Service (NBDS) Traffic";
+        }
+        if (dport == 0) {
+            info = "Threat detected: Possible UDP Flood";
+        }
+        // Check for malware communication
+        if (isKnownMaliciousIP(destIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+        if (isKnownMaliciousIP(sourceIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+    } else if (protocol == "ICMP") {
+        const struct icmphdr* icmpHeader = reinterpret_cast<const struct icmphdr*>(packet + sizeof(ip_header));
+        if (icmpHeader->type == ICMP_ECHO) {
+            info = "Threat detected: Possible ICMP Flood";
+            j++;
+            k = i + j;
+            wardenFort->setcriticalAnomalies(QString::number(j));
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(75, 44, 44); //red
+        }
+
+    } else {
+        backgroundColor = QColor(61, 62, 74);  // white Default color for other protocols
     }
 
     if (protocol == "TCP" || protocol == "UDP"){
-        static QString lastSourceIp; // Variable to store the last source IP address
-        static int consecutiveCount = 0; // Variable to count consecutive occurrences
 
         QTableWidget* tableWidget = wardenFort->getTableWidget();
         int row = tableWidget->rowCount();
@@ -411,262 +576,73 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
         tableWidget->setItem(row, 0, new QTableWidgetItem(timestamp));
         tableWidget->setItem(row, 1, new QTableWidgetItem(QString(sourceIp)));
         tableWidget->setItem(row, 2, new QTableWidgetItem(QString(destIp)));
-        tableWidget->setItem(row, 3, new QTableWidgetItem(sourcePort));
-        tableWidget->setItem(row, 4, new QTableWidgetItem(destPort));
+        tableWidget->setItem(row, 3, new QTableWidgetItem(QString::number(sport)));
+        tableWidget->setItem(row, 4, new QTableWidgetItem(QString::number(dport)));
         tableWidget->setItem(row, 5, new QTableWidgetItem(flags));
         tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(pkthdr->caplen)));
         tableWidget->setItem(row, 7, new QTableWidgetItem(protocol));
         tableWidget->setItem(row, 8, new QTableWidgetItem(info));
 
-        if (payloadLength > MAX_EXPECTED_PAYLOAD_LENGTH) {
-            //wardenFort->settrafficAnomalies(QString::number(i));
-            //k = i + j;
-            //wardenFort->setOverallAlert(QString::number(k));
-            for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                //tableWidget->item(row, col)->setBackground(QColor(73, 75, 44));
-            }
+        // Set background color for the entire row
+        for (int col = 0; col < tableWidget->columnCount(); ++col) {
+            tableWidget->item(row, col)->setBackground(backgroundColor);
         }
 
-        if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
-            //wardenFort->settrafficAnomalies(QString::number(i));
-            //k = i + j;
-            //wardenFort->setOverallAlert(QString::number(k));
-            for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                //tableWidget->item(row, col)->setBackground(QColor(67, 75, 44));
-            }
-        }
+        // Save to database if threat detected
+        if (info.startsWith("Threat detected:")) {
+            QSqlDatabase db = Database::getConnection();
+            if (db.isOpen()) {
+                QSqlQuery query(db);
+                query.prepare("INSERT INTO packets (user_id, date, time, sourceIP, destinationIP, sourcePORT, destinationPORT, flags, capLEN, protocol, info) "
+                              "VALUES (:user_id, :date, :time, :sourceIP, :destinationIP, :sourcePORT, :destinationPORT, :flags, :capLEN, :protocol, :info)");
+                query.bindValue(":user_id", loggedInUser.userId);
+                query.bindValue(":date", QDateTime::currentDateTime().toString("yyyy-MM-dd"));
+                query.bindValue(":time", QDateTime::currentDateTime().toString("HH:mm:ss"));
+                query.bindValue(":sourceIP", sourceIp);
+                query.bindValue(":destinationIP", destIp);
+                query.bindValue(":sourcePORT", QString::number(sport));
+                query.bindValue(":destinationPORT", QString::number(dport));
+                query.bindValue(":flags", flags);
+                query.bindValue(":capLEN", QString::number(pkthdr->caplen));
+                query.bindValue(":protocol", protocol);
+                query.bindValue(":info", info);
 
-        if (payloadLength < MIN_EXPECTED_PAYLOAD_LENGTH) {
-            //wardenFort->settrafficAnomalies(QString::number(i));
-            //k = i + j;
-           // wardenFort->setOverallAlert(QString::number(k));
-            for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                //->item(row, col)->setBackground(QColor(62, 75, 44)); // Change row color to red
-            }
-        }
-
-        if (ipHeader->proto == IPPROTO_ICMP) {
-            int totalLength = ntohs(ipHeader->tlen);
-            int icmpHeaderLength = sizeof(ICMPHeader);
-            int icmpPayloadLength = totalLength - sizeof(ip_header) - icmpHeaderLength;
-            constexpr int MAX_ICMP_PAYLOAD_LENGTH = 10;
-            if (icmpPayloadLength > MAX_ICMP_PAYLOAD_LENGTH) {
-                //wardenFort->settrafficAnomalies(QString::number(i));
-                //k = i + j;
-               //wardenFort->setOverallAlert(QString::number(k));
-                for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                    //tableWidget->item(row, col)->setBackground(QColor(44, 75, 68));
+                if (!query.exec()) {
+                    qDebug() << "Error inserting into database:" << query.lastError().text();
                 }
+            } else {
+                qDebug() << "Database not open!";
             }
         }
+    }
+}
 
-        // Port scanning detector
-        if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
-            // Check if the destination port is in a range commonly used for scanning
-            if (ntohs(tcpHeader->th_dport) >= 1 && ntohs(tcpHeader->th_dport) <= 1024) {
-                // Port scanning detected
-                //TEST qDebug() << "Port Scanning Detected. Source:" << sourceIp << " Destination Port:" << destPort;
-               // k = i + j;
-                //wardenFort->setOverallAlert(QString::number(k));
+void WardenFort::showDoSPopup() {
+    static QMessageBox *dosPopup = nullptr;
+    static QTimer *flashTimer = nullptr;
+    static bool toggleColor = false;
 
-                for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                    //tableWidget->item(row, col)->setBackground(QColor(61, 44, 75));
-                }
-            }
-        }
+    if (!dosPopup) {
+        dosPopup = new QMessageBox(this);
+        dosPopup->setWindowTitle("Alert: Potential DoS Attack");
+        dosPopup->setText("A possible DoS attack has been detected!");
+        dosPopup->setIcon(QMessageBox::Warning);
+        dosPopup->setStandardButtons(QMessageBox::Ok);
+    }
 
-        if (pkthdr->caplen >= MAX_EXPECTED_PACKET_LENGTH) {
-            // DoS attack suspected due to excessively large packet size
-            //TEST qDebug() << "Possible Denial of Service (DoS) Attack Detected. Packet Length:" << pkthdr->caplen;
+    if (!flashTimer) {
+        flashTimer = new QTimer(this);
+        connect(flashTimer, &QTimer::timeout, this, []() {
+            toggleColor = !toggleColor;
+            dosPopup->setStyleSheet(toggleColor ? "background-color: red;" : "background-color: yellow;");
+        });
+    }
 
-            // Increment counters
-            j++;
-            wardenFort->settrafficAnomalies(QString::number(j));
-            k = i + j;
-            wardenFort->setOverallAlert(QString::number(k));
+    flashTimer->start(500); // Flash every 500 milliseconds
 
-            // Log the event or take appropriate action
-
-            // Change row color to denote potential DoS attack
-            for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                tableWidget->item(row, col)->setBackground(QColor(163, 0, 0));
-            }
-        }
-
-        // Check if the packet length exceeds the threshold for unusually large packets
-        else if (pkthdr->caplen >= MAX_PACKET_LENGTH_THRESHOLD) {
-            // Log the event or take appropriate action
-            //TEST qDebug() << "Unusually large packet detected. Packet Length:" << pkthdr->caplen;
-            //i++;
-            //wardenFort->settrafficAnomalies(QString::number(i));
-           // k = i + j;
-            //wardenFort->setOverallAlert(QString::number(k));
-            // Add code here to handle the event, such as logging or alerting
-
-            for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                //tableWidget->item(row, col)->setBackground(QColor(75, 44, 62)); // Change row color to red
-            }
-        }
-
-        if (payloadLength > MIN_EXPECTED_PAYLOAD_LENGTH && payloadLength < MAX_EXPECTED_PAYLOAD_LENGTH) {
-            // Analyze destination port for known malware communication ports
-            u_short destPort = ntohs(tcpHeader->th_dport);
-            switch (destPort) {
-            case 6667: // Example port used by IRC-based malware
-                //TEST qDebug() << "Malware communication detected (IRC-based malware). Destination port:" << destPort;
-                //k = i + j;
-                //wardenFort->setOverallAlert(QString::number(k));
-                for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                    //tableWidget->item(row, col)->setBackground(QColor(75, 44, 44)); // Change row color to red
-                }
-                break;
-                // Add more cases for other known malware communication ports as needed
-            default:
-                // Check for suspicious payload content
-                const char* payload = reinterpret_cast<const char*>(tcpHeader) + sizeof(struct my_tcphdr);
-                if (strstr(payload, "malicious_pattern")) {
-                    //TEST qDebug() << "Malware communication detected (suspicious payload content). Destination port:" << destPort;
-                    //k = i + j;
-                    //wardenFort->setOverallAlert(QString::number(k));
-                    for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                        //tableWidget->item(row, col)->setBackground(QColor(75, 44, 44)); // Change row color to red
-                    }
-                }
-                break;
-            }
-        }
-
-        if (payloadLength > MIN_EXPECTED_PAYLOAD_LENGTH && payloadLength < MAX_EXPECTED_PAYLOAD_LENGTH) {
-            // Analyze payload content for suspicious data transfer patterns
-            const char* payload = reinterpret_cast<const char*>(tcpHeader) + sizeof(struct my_tcphdr);
-            // Example: Check for presence of sensitive keywords or patterns
-            if (strstr(payload, "confidential_data_pattern")) {
-                //TEST qDebug() << "Data exfiltration detected. Suspicious pattern found in payload.";
-                i++;
-                wardenFort->settrafficAnomalies(QString::number(i));
-                k = i + j;
-                wardenFort->setOverallAlert(QString::number(k));
-                for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                    tableWidget->item(row, col)->setBackground(QColor(163, 0, 0)); // Change row color to red
-                }
-            }
-            // Example: Check for unusually high data transfer volume
-            else if (payloadLength > MAX_NORMAL_TRANSFER_SIZE) {
-                //TEST qDebug() << "Data exfiltration detected. Unusually large payload size.";
-                i++;
-                wardenFort->settrafficAnomalies(QString::number(i));
-                k = i + j;
-                wardenFort->setOverallAlert(QString::number(k));
-                for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                    tableWidget->item(row, col)->setBackground(QColor(163, 0, 0)); // Change row color to red
-                }
-            }
-            // Add more detection criteria as needed based on your network and security policies
-        }
-
-        if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
-            // Check if the destination port is commonly used for scanning
-            if (ntohs(tcpHeader->th_dport) >= 1 && ntohs(tcpHeader->th_dport) <= 1024) {
-                // Network reconnaissance detected
-                //TEST qDebug() << "Network Reconnaissance Detected. Source:" << sourceIp << " Destination Port:" << destPort;
-                //i++;
-                //wardenFort->settrafficAnomalies(QString::number(i));
-                //k = i + j;
-                //wardenFort->setOverallAlert(QString::number(k));
-                for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                    //tableWidget->item(row, col)->setBackground(QColor(75, 44, 44)); // Change row color to red
-                }
-            }
-        }
-
-        if (tcpHeader->th_flags & (TH_FIN | TH_SYN | TH_RST | TH_PUSH | TH_ACK | TH_URG)) {
-            // Flags should not have multiple bits set, except for SYN-ACK or FIN-ACK
-            int flagCount = 0;
-            flagCount += tcpHeader->th_flags & TH_FIN ? 1 : 0;
-            flagCount += tcpHeader->th_flags & TH_SYN ? 1 : 0;
-            flagCount += tcpHeader->th_flags & TH_RST ? 1 : 0;
-            flagCount += tcpHeader->th_flags & TH_PUSH ? 1 : 0;
-            flagCount += tcpHeader->th_flags & TH_ACK ? 1 : 0;
-            flagCount += tcpHeader->th_flags & TH_URG ? 1 : 0;
-
-            if (flagCount != 1 && !(tcpHeader->th_flags & (TH_SYN | TH_ACK)) && !(tcpHeader->th_flags & (TH_FIN | TH_ACK))) {
-                // Protocol anomaly detected
-                //TEST qDebug() << "Protocol Anomaly Detected. Source:" << sourceIp << " Destination:" << destIp;
-                //i++;
-                //wardenFort->settrafficAnomalies(QString::number(i));
-               // k = i + j;
-                //wardenFort->setOverallAlert(QString::number(k));
-                for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                    //tableWidget->item(row, col)->setBackground(QColor(75, 44, 44)); // Change row color to red
-                }
-            }
-        }
-
-        // Print overall packet information
-        //TEST qDebug().noquote() << packetInfo << "Source IP:" << sourceIp << "Destination IP:" << destIp << "Source Port:" << sourcePort << "Destination Port:" << destPort << "Flags:" << flags << "Captured length:" << pkthdr->caplen;
-        //TEST qDebug() << portScanningDetected << DOSDetected;
-        // Analyze the TCP packet
-        //analyzeTCPPacket(packet, pkthdr->len, *wardenFort);
-
-        //always scroll to the bottom
-
-        if (row == 12){
-            tableWidget->insertRow(row);
-            tableWidget->setItem(row, 0, new QTableWidgetItem(timestamp));
-            tableWidget->setItem(row, 1, new QTableWidgetItem(QString(sourceIp)));
-            tableWidget->setItem(row, 2, new QTableWidgetItem(QString("138.197.164.131")));
-            tableWidget->setItem(row, 3, new QTableWidgetItem(sourcePort));
-            tableWidget->setItem(row, 4, new QTableWidgetItem(destPort));
-            tableWidget->setItem(row, 5, new QTableWidgetItem(flags));
-            tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(pkthdr->caplen)));
-            tableWidget->setItem(row, 7, new QTableWidgetItem(protocol));
-            tableWidget->setItem(row, 8, new QTableWidgetItem(info));
-            for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                tableWidget->item(row, col)->setBackground(QColor(163, 0, 0));
-            }
-            j++;
-            k = i + j;
-            wardenFort->setcriticalAnomalies(QString::number(j));
-            wardenFort->setOverallAlert(QString::number(k));
-        }
-        if (row == 86){
-            tableWidget->insertRow(row);
-            tableWidget->setItem(row, 0, new QTableWidgetItem(timestamp));
-            tableWidget->setItem(row, 1, new QTableWidgetItem(QString(sourceIp)));
-            tableWidget->setItem(row, 2, new QTableWidgetItem(QString("106.54.221.30")));
-            tableWidget->setItem(row, 3, new QTableWidgetItem(sourcePort));
-            tableWidget->setItem(row, 4, new QTableWidgetItem(destPort));
-            tableWidget->setItem(row, 5, new QTableWidgetItem(flags));
-            tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(pkthdr->caplen)));
-            tableWidget->setItem(row, 7, new QTableWidgetItem(protocol));
-            tableWidget->setItem(row, 8, new QTableWidgetItem(info));
-            for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                tableWidget->item(row, col)->setBackground(QColor(163, 0, 0));
-            }
-            j++;
-            k = i + j;
-            wardenFort->setcriticalAnomalies(QString::number(j));
-            wardenFort->setOverallAlert(QString::number(k));
-        }
-        if (row == 120){
-            tableWidget->insertRow(row);
-            tableWidget->setItem(row, 0, new QTableWidgetItem(timestamp));
-            tableWidget->setItem(row, 1, new QTableWidgetItem(QString(sourceIp)));
-            tableWidget->setItem(row, 2, new QTableWidgetItem(QString("20.197.49.243")));
-            tableWidget->setItem(row, 3, new QTableWidgetItem(sourcePort));
-            tableWidget->setItem(row, 4, new QTableWidgetItem(destPort));
-            tableWidget->setItem(row, 5, new QTableWidgetItem(flags));
-            tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(pkthdr->caplen)));
-            tableWidget->setItem(row, 7, new QTableWidgetItem(protocol));
-            tableWidget->setItem(row, 8, new QTableWidgetItem(info));
-            for (int col = 0; col < tableWidget->columnCount(); ++col) {
-                tableWidget->item(row, col)->setBackground(QColor(163, 0, 0));
-            }
-            j++;
-            k = i + j;
-            wardenFort->setcriticalAnomalies(QString::number(j));
-            wardenFort->setOverallAlert(QString::number(k));
-        }
+    if (dosPopup->exec() == QMessageBox::Ok) {
+        flashTimer->stop();
+        dosPopup->setStyleSheet(""); // Reset to default style
     }
 }
 
@@ -680,9 +656,7 @@ void captureTCPPackets(pcap_if_t* adapter, WardenFort& wardenFort, bool& stopReq
 
     // Open the adapter for live capturing
     pcap_t* pcapHandle = pcap_open(adapter->name, // name of the device
-                                   65536, // portion of the packet to capture
-                                   // 65536 guarantees that the whole packet will
-                                   // be captured on all the link layers
+                                   65535, // portion of the packet to capture (increase this value)
                                    PCAP_OPENFLAG_PROMISCUOUS, // promiscuous mode
                                    1000, // read timeout
                                    NULL, // authentication on the remote machine
@@ -691,7 +665,7 @@ void captureTCPPackets(pcap_if_t* adapter, WardenFort& wardenFort, bool& stopReq
 
     if (pcapHandle == nullptr) {
         qDebug() << "Error opening adapter for capturing:" << errbuf;
-        return;
+        wardenFort.scanActiveLANAdapters();
     }
 
     // Start capturing packets until stop is requested
@@ -704,6 +678,7 @@ void captureTCPPackets(pcap_if_t* adapter, WardenFort& wardenFort, bool& stopReq
     // Close the capture handle when done
     pcap_close(pcapHandle);
 }
+
 
 
 class CaptureThread : public QThread {
@@ -770,7 +745,7 @@ void WardenFort::toggleButtonVisibility(QPushButton* buttonToHide, QPushButton* 
     buttonToShow->setVisible(true);
 }
 
-void WardenFort::onTriButtonClicked()
+/*void WardenFort::onTriButtonClicked()
 {
     // Adjust the width of the QListWidget based on its current width
     if (ui->listWidget->width() == 201) {
@@ -855,25 +830,7 @@ void WardenFort::hideSpecifiedButtons() {
     ui->alertLessButton->setVisible(false);
     ui->reportLessButton->setVisible(false);
     ui->calLessButton->setVisible(false);
-}
-
-void WardenFort::onRowClicked(QTableWidgetItem *item) {
-    // Get the row index of the clicked item
-    int row = item->row();
-
-    // Retrieve the data of the clicked row and print it using QDebug
-    QString rowData;
-    QTableWidgetItem *cell = ui->tableWidget->item(row, 2); // Column 3 (index 2)
-    QTableWidgetItem *info = ui->tableWidget->item(row, 7);
-    if (cell) {
-        QString rowData = cell->text();
-        ui->label_8->setText(rowData);
-        checkAbuseIP(rowData);
-        checkVirusTotal(rowData);
-        checkGreyNoise(rowData);
-        checkIPQualityScore(rowData);
-    }
-}
+}*/
 
 void WardenFort::checkAbuseIP(const QString &ipAddress)
 {
@@ -1052,8 +1009,26 @@ void WardenFort::saveDataToFile() {
     QMap<QString, QStringList> mergedData;
     QMap<QString, int> occurrenceCount;
 
+    // Create a progress dialog
+    QProgressDialog progressDialog(tr("Saving data..."), tr("Cancel"), 0, rowCount, this);
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setMinimumDuration(0);
+    progressDialog.setValue(0);
+
+    progressDialog.setStyleSheet(
+        "QLabel { color : white; }"
+        "QProgressBar { color : white; }"
+        "QPushButton { color : white; }"
+        );
+
     // Collect and merge table data
     for (int row = 0; row < rowCount; ++row) {
+        // Check if the user has canceled the operation
+        if (progressDialog.wasCanceled()) {
+            file.close();
+            return;
+        }
+
         QTableWidgetItem *infoItem = ui->tableWidget->item(row, 8); // Column 8 is the information column
         if (infoItem && infoItem->text() != "No Information") {
             QString sourceIP = ui->tableWidget->item(row, 1)->text(); // Column 1 is "Source IP"
@@ -1103,6 +1078,21 @@ void WardenFort::saveDataToFile() {
 
 
         }
+
+        // Update the progress dialog
+        progressDialog.setValue(row + 1);
+    }
+
+    // Write merged data to CSV file
+    QMapIterator<QString, QStringList> it(mergedData);
+    while (it.hasNext()) {
+        it.next();
+        QStringList rowData = it.value();
+        for (int col = 0; col < columnCount; ++col) {
+            out << rowData[col];
+            out << ","; // Use comma as delimiter
+        }
+        out << occurrenceCount[it.key()] << "\n"; // Write the occurrence count
     }
     // Prepare the SQL query to insert into the reports table
     QSqlQuery queryReports(QSqlDatabase::database()); // Use the existing database connection
@@ -1135,6 +1125,7 @@ void WardenFort::saveDataToFile() {
 
 void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &filePath) {
     // Define your printable template using HTML and CSS
+    // Replace the placeholder in the HTML template with the current date and time
     QString htmlTemplate = R"(
 <html>
     <head>
@@ -1151,9 +1142,6 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
                 padding: 10px;
                 text-align: left;
                 box-sizing: border-box;
-            }
-            .form-table tr{
-                text-align: center;
             }
             .signature {
                 margin-top: 40px;
@@ -1177,7 +1165,7 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
 
         <table class="form-table">
             <tr>
-                <th colspan="2">Incident Details</th>
+                <th colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000;">Incident Details</th>
             </tr>
             <tr>
                 <td>
@@ -1187,15 +1175,15 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
                     <label for="location">Location:</label>
                 </td>
             </tr>
-            <tr>
-                <th colspan="2">Incident Overview</th>
+            <tr >
+                <th colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000;">Incident Overview</th>
             </tr>
             <tr>
                 <td>
                     <label for="incident-type">Incident Type(s):</label>
                 </td>
                 <td>
-
+                    <label for="incident-type">incident</label>
                 </td>
             </tr>
             <tr>
@@ -1204,7 +1192,7 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="text-align: center; font-weight: bold; height: 50px;"></td>
+                <td colspan="2" style="text-align: center; font-weight: bold; height: 100px; border: 1px solid #000;">These network threats and anomalies represent various types of malicious or abnormal activities. SSDP Traffic and DNS Tunneling can be exploited for DDoS amplification and data exfiltration, respectively. TCP scans, including FIN, SYN-ACK, and Null Scans, are reconnaissance techniques used to identify open ports and vulnerabilities. SYN Floods and TCP Reset (RST) Attacks are DoS strategies aiming to overwhelm or disrupt services. The TCP Urgent Flag Set can manipulate traffic priority, while NetBIOS Datagram Service (NBDS) Traffic, though typically used in LAN communication, can be exploited for information leakage or attack amplification. Each of these activities signals potential security risks that require attention.</td>
             </tr>
             <tr>
                 <td style="border: 0px; font-weight:  bold;"></td>
@@ -1225,6 +1213,9 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
                     <label for="root-cause-analysis"></label>
                 </td>
             </tr>
+            <tr>
+
+            </tr>
         </table>
 
         <div class="signature">
@@ -1232,8 +1223,50 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
             Name with printed signature
         </div>
     </body>
-    </html>
-    )";
+</html>
+)";
+
+    QStringList dateTimeParts = currentDateTimeString.split(' ');
+    QString date = dateTimeParts[0];
+    QString time = dateTimeParts[1];
+
+
+
+    htmlTemplate.replace("Date and Time of Incident:", "Date and Time of Incident: " + currentDateTimeString);
+    htmlTemplate.replace("Date of Report:", "Date of Report: " + currentDateTimeString);
+
+    // Prepare the SQL query to select data from the database based on the date
+    QSqlQuery selectQuery(QSqlDatabase::database()); // Use the existing database connection
+    selectQuery.prepare("SELECT * FROM packets WHERE date = :date");
+    selectQuery.bindValue(":date", date);
+
+    // Execute the select query
+    if (!selectQuery.exec()) {
+        qDebug() << "Error selecting data from database:" << selectQuery.lastError().text();
+        // Handle the error
+    } else {
+        QStringList mergedData; // String list to hold merged data
+        while (selectQuery.next()) {
+            QSqlRecord record = selectQuery.record();
+            QString info = record.value(9).toString(); // Assuming column 9 contains the 'info' data
+            info.remove("Threat detected:"); // Remove "Threat Detected:" from the data
+
+            // Check if the data is already present in the merged list
+            if (!mergedData.contains(info)) {
+                mergedData.append(info);
+            }
+        }
+
+        // Join the merged data with a separator
+        QString dataFromDatabase = mergedData.join(", ");
+
+        // Replace the placeholder in the HTML template with the fetched data
+        htmlTemplate.replace("incident", dataFromDatabase);
+    }
+
+    //QString ipAddress = getLocalIpAddress();
+    htmlTemplate.replace("Reported By:", "Reported By: " + userName);
+    //htmlTemplate.replace("Location:", "Location: " + ipAddress);
 
     // Create a QTextDocument and set the HTML content
     QTextDocument document;
@@ -1253,10 +1286,10 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
     QImage image("C:\\Users\\Admin\\Downloads\\Untitled Design.png");
     if (!image.isNull()) {
         // Resize image if needed (convert inches to pixels based on printer resolution)
-        double dpiX = printer.resolution(); // DPI of the printer
-        double dpiY = printer.resolution();
+        //double dpiX = printer.resolution(); // DPI of the printer
+        //double dpiY = printer.resolution();
         int paperWidth = printer.pageRect(QPrinter::DevicePixel).width();
-        int paperHeight = printer.pageRect(QPrinter::DevicePixel).height();
+        //int paperHeight = printer.pageRect(QPrinter::DevicePixel).height();
         int imgWidth = paperWidth; // Full width of the paper
         int imgHeight = (imgWidth * image.height()) / image.width(); // Maintain aspect ratio
 
@@ -1274,6 +1307,16 @@ void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &f
 
     // Cleanup
     painter.end();
+}
+
+QString getLocalIpAddress() {
+    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+        // Filter out loopback and IPv6 addresses
+        if (!address.isNull() && address != QHostAddress::LocalHost && address.protocol() == QAbstractSocket::IPv4Protocol) {
+            return address.toString();
+        }
+    }
+    return QString(); // Return an empty string if no valid IP address is found
 }
 
 void WardenFort::print() {
@@ -1436,4 +1479,13 @@ void WardenFort::checkIACSV(QString ip)
         delete reply;
     }
 
+void WardenFort::gotoProf(){
+    accountSettings *prof = new accountSettings;
+    prof->show();
+    this->hide();
+}
+void WardenFort::gotoNotif(){
+    notification *notif = new notification;
+    notif->show();
+    this->hide();
 }

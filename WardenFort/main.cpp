@@ -6,16 +6,18 @@
 #include "login.h"
 #include "wardenfort.h"
 #include "reports.h"
+#include "database.h"
 #include <QSqlError>
 
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("C:/Users/admin/Documents/GitHub/WardenFort/WardenFort/wardenfort.db");
+    // Main thread database connection
+    Database::initializeConnection();
+    QSqlDatabase db = Database::getConnection();
 
-    if (!db.open()) {
+    if (!db.isOpen()) {
         qWarning() << "Failed to open database:" << db.lastError().text();
         return 1;
     }
@@ -24,13 +26,11 @@ int main(int argc, char* argv[])
 
     //login login;
     //login.show();
-    reports reports;
-    reports.show();
+    //reports reports;
+    //reports.show();
 
-    
-       //WardenFort wardenfort;
-      //wardenfort.show();
-    
+    WardenFort wardenfort;
+    wardenfort.show();
 
     return a.exec();
 }

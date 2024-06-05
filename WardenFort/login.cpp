@@ -19,6 +19,7 @@
 #include "wardenfort.h"
 #include "loginsession.h"
 #include "wardenfort.h"
+#include "globals.h"
 
 QString userEmail;
 
@@ -196,7 +197,6 @@ login::~login()
 
 void login::on_loginButton_clicked()
 {
-    // Your existing login functionality
     QString username = ui->typeUN_box->text();
     QString password = ui->typePASS_box->text();
 
@@ -211,16 +211,22 @@ void login::on_loginButton_clicked()
     query.bindValue(":password", hashedPassword); // Compare with hashed password
 
     if (query.exec() && query.next()) {
-        // Credentials are valid, proceed with login
+        // Fill the loggedInUser struct with data from the database
+        loggedInUser.userId = query.value("user_id").toInt();
+        loggedInUser.username = query.value("username").toString();
+        loggedInUser.password = query.value("passwd").toString();
+        loggedInUser.firstName = query.value("firstName").toString();
+        loggedInUser.lastName = query.value("lastName").toString();
+        loggedInUser.gender = query.value("gender").toString();
+        loggedInUser.dateOfBirth = query.value("dateofbirth").toString();
+        loggedInUser.phoneNumber = query.value("phoneNumber").toString();
+        loggedInUser.profilePic = query.value("profilePic").toString();
+        loggedInUser.email = query.value("email").toString();
 
-        // Fetch user's email address from the database
-        userEmail = query.value("email").toString();
-
-        // Manipulate the email address to hide characters
-        QString hiddenEmail = userEmail;
+        // Hide the email characters for display purposes
+        QString hiddenEmail = loggedInUser.email;
         int atIndex = hiddenEmail.indexOf('@');
         if (atIndex > 1 && atIndex < hiddenEmail.length() - 1) {
-            // Hide characters between the first and last characters before '@'
             for (int i = 1; i < atIndex - 1; ++i) {
                 hiddenEmail[i] = '*';
             }
@@ -230,27 +236,23 @@ void login::on_loginButton_clicked()
         generateCode();
 
         // Send OTP to the email in the database
-        sendEmail(userEmail, m_generatedCode);
+        sendEmail(loggedInUser.email, m_generatedCode);
 
-        // Check if the otpWindow is already open
         if (!otpWindow) {
-            // If not, create an instance and show it
             otpWindow = new otp();
             otpWindow->show();
-            otpWindow->setText(userEmail, hiddenEmail);
-            otpWindow->setExpectedOTP(m_generatedCode); // Set the expected OTP in the otpWindow
+            otpWindow->setText(loggedInUser.email, hiddenEmail);
+            otpWindow->setExpectedOTP(m_generatedCode);
 
-            // Connect the successfulLogin signal from otpWindow to the openAlertNotif slot in login
             connect(otpWindow, &otp::successfulLogin, this, &login::openAlertNotif);
         }
 
-        // Close the login window
         this->close();
     } else {
-        // Invalid credentials, display an error message
         QMessageBox::warning(this, "Login Error", "Invalid username or password.");
     }
 }
+
 
 void login::resubMail(){
     generateCode();

@@ -1,6 +1,7 @@
 #include "signup.h"
 #include "ui_signup.h"
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QMessageBox>
 #include <QRegularExpression> // Include QRegularExpression header
 #include "login.h"
@@ -35,8 +36,25 @@ void signup::onCreateButtonClicked()
     QString email = ui->email_address->text();
     QString password = ui->password->text();
 
-    // Hash the password
-    QByteArray passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
+    // Validate email format using regular expression
+    QRegularExpression emailRegex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
+    if (!emailRegex.match(email).hasMatch()) {
+        QMessageBox::critical(this, "Error", "Invalid email address format.");
+        return;
+    }
+
+    // Check if username already exists in the database
+    QSqlQuery checkUsernameQuery;
+    checkUsernameQuery.prepare("SELECT * FROM user_db WHERE username = :username");
+    checkUsernameQuery.bindValue(":username", username);
+    if (checkUsernameQuery.exec() && checkUsernameQuery.next()) {
+        QMessageBox::critical(this, "Error", "Username already exists. Please choose a different username.");
+        return;
+    }
+
+    // Hash the password before storing it in the database
+    // You should use a secure hashing algorithm like bcrypt
+    // For demonstration purposes, let's assume we have a function called hashPassword
 
     // Convert the hashed password to a hex string
     QString hashedPassword = QString(passwordHash.toHex());
@@ -48,19 +66,13 @@ void signup::onCreateButtonClicked()
     query.bindValue(":last_name", lastName);
     query.bindValue(":username", username);
     query.bindValue(":email", email);
-    query.bindValue(":password", hashedPassword);
+    query.bindValue(":password", password); // Store hashed password
 
     if (query.exec()) {
-        QMessageBox successMessageBox(QMessageBox::Information, "Success", "Signup successful!", QMessageBox::Ok, this);
-        successMessageBox.setStyleSheet("background-color: white;");
-        successMessageBox.exec();
-
-        ui->first_name->clear();
-        ui->last_name->clear();
-        ui->username->clear();
-        ui->email_address->clear();
-        ui->password->clear();
-        ui->pass_rest->clear();
+        QMessageBox::information(this, "Success", "Signup successful!");
+    } else {
+        QMessageBox::critical(this, "Error", "Signup failed!");
+        qDebug() << "Signup query error:" << query.lastError().text();
     }
     else {
         QMessageBox errorMessageBox(QMessageBox::Critical, "Error", "Signup failed!", QMessageBox::Ok, this);

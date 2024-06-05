@@ -1,142 +1,137 @@
 #include "accountsettings.h"
 #include "ui_accountsettings.h"
+#include "wardenfort.h"
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QSqlQuery>
+#include <QSqlError>
+#include "globals.h"
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
 accountSettings::accountSettings(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::accountSettings)
 {
     ui->setupUi(this);
+    connect(ui->dashButton_3, &QPushButton::clicked, this, &accountSettings::gotoDash);
+    connect(ui->pushButton_2, &QPushButton::clicked, this, &accountSettings::changeEmail);
+    connect(ui->pushButton_3, &QPushButton::clicked, this, &accountSettings::changeUsername);
 
-    // Connect the clicked signal of dd buttons to the toggle function
-    connect(ui->dd1, &QPushButton::clicked, this, &accountSettings::toggleButtons);
-    connect(ui->dd2, &QPushButton::clicked, this, &accountSettings::toggleButtons);
-    connect(ui->dd3, &QPushButton::clicked, this, &accountSettings::toggleButtons);
-    connect(ui->dd4, &QPushButton::clicked, this, &accountSettings::toggleButtons);
-    connect(ui->dd5, &QPushButton::clicked, this, &accountSettings::toggleButtons);
-    connect(ui->dd6, &QPushButton::clicked, this, &accountSettings::toggleButtons);
-    connect(ui->dd7, &QPushButton::clicked, this, &accountSettings::toggleButtons);
-    connect(ui->dd8, &QPushButton::clicked, this, &accountSettings::toggleButtons);
+    // Set the placeholders with the logged-in user data
+    ui->lineEdit->setPlaceholderText(loggedInUser.firstName);
+    ui->lineEdit_2->setPlaceholderText(loggedInUser.lastName);
+    setGenderComboBox(loggedInUser.gender); // Assuming gender is already part of the comboBox items
+    ui->dateEdit->setDate(QDate::fromString(loggedInUser.dateOfBirth, "MM-dd-yyyy")); // Assuming dateOfBirth is in "yyyy-MM-dd" format
+    ui->lineEdit_3->setPlaceholderText(loggedInUser.email);
+    ui->lineEdit_4->setPlaceholderText(loggedInUser.username);
 
-    // Initially hide dd5 to dd8 buttons
-    ui->dd5->setVisible(false);
-    ui->dd6->setVisible(false);
-    ui->dd7->setVisible(false);
-    ui->dd8->setVisible(false);
-    ui->profileTab_2->setVisible(false);
-    ui->profileTab_3->setVisible(false);
-    ui->profileTab_4->setVisible(false);
-    ui->profileTab_5->setVisible(false);
-    ui->frame_2->setVisible(false);
-}
-
-void accountSettings::toggleButtonVisibility(QPushButton* buttonToHide, QPushButton* buttonToShow)
-{
-    buttonToHide->setVisible(false);
-    buttonToShow->setVisible(true);
-}
-
-void accountSettings::toggleButtons()
-{
-    int newY;
-    QPushButton* clickedButton = qobject_cast<QPushButton*>(sender());
-    if (!clickedButton)
-        return; // Safety check
-
-    if (clickedButton == ui->dd1) {
-        // Remove the border-top style
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; }");
-
-        toggleButtonVisibility(ui->dd1, ui->dd5);
-        //alerts tab
-        newY = ui->alertsTab->y() + 90;
-        ui->alertsTab->move(ui->alertsTab->x(), newY);
-        //reports tab
-        newY = ui->reportsTab->y() + 90;
-        ui->reportsTab->move(ui->reportsTab->x(), newY);
-        //calendarTab
-        newY = ui->calendarTab->y() + 90;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-
-        ui->profileTab_2->setVisible(true);
-        ui->frame_2->setVisible(true);
-    }
-
-    else if (clickedButton == ui->dd2) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; }");
-
-        toggleButtonVisibility(ui->dd2, ui->dd6);
-
-        //reports tab
-        newY = ui->reportsTab->y() + 65;
-        ui->reportsTab->move(ui->reportsTab->x(), newY);
-        //calendarTab
-        newY = ui->calendarTab->y() + 65;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_3->setVisible(true);
-        ui->frame_2->setVisible(true);
-    }
-    else if (clickedButton == ui->dd3) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; }");
-        toggleButtonVisibility(ui->dd3, ui->dd7);
-        //calendarTab
-        newY = ui->calendarTab->y() + 42;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_4->setVisible(true);
-        ui->frame_2->setVisible(true);
-    }
-    else if (clickedButton == ui->dd4) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; }");
-        toggleButtonVisibility(ui->dd4, ui->dd8);
-        ui->profileTab_5->setVisible(true);
-        ui->frame_2->setVisible(true);
-    }
-    else if (clickedButton == ui->dd5) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; border-top: 1px solid rgb(25, 31, 50);}");
-
-        toggleButtonVisibility(ui->dd5, ui->dd1);
-        //alerts tab
-        newY = ui->alertsTab->y() - 90;
-        ui->alertsTab->move(ui->alertsTab->x(), newY);
-        //reports tab
-        newY = ui->reportsTab->y() - 90;
-        ui->reportsTab->move(ui->reportsTab->x(), newY);
-        //calendarTab
-        newY = ui->calendarTab->y() - 90;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_2->setVisible(false);
-        ui->frame_2->setVisible(false);
-    }
-    else if (clickedButton == ui->dd6) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; border-top: 1px solid rgb(25, 31, 50);}");
-
-        toggleButtonVisibility(ui->dd6, ui->dd2);
-        //reports tab
-        newY = ui->reportsTab->y() - 65;
-        ui->reportsTab->move(ui->reportsTab->x(), newY);
-        //calendarTab
-        newY = ui->calendarTab->y() - 65;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_3->setVisible(false);
-        ui->frame_2->setVisible(false);
-    }
-    else if (clickedButton == ui->dd7) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; border-top: 1px solid rgb(25, 31, 50);}");
-        toggleButtonVisibility(ui->dd7, ui->dd3);
-        //calendarTab
-        newY = ui->calendarTab->y() - 42;
-        ui->calendarTab->move(ui->calendarTab->x(), newY);
-        ui->profileTab_4->setVisible(false);
-        ui->frame_2->setVisible(false);
-    }
-    else if (clickedButton == ui->dd8) {
-        ui->profileTab->setStyleSheet("QFrame#profileTab { background-color: rgba(44, 60, 75, 0); border-radius: 0px; border-top: 1px solid rgb(25, 31, 50);}");
-        toggleButtonVisibility(ui->dd8, ui->dd4);
-        ui->profileTab_5->setVisible(false);
-        ui->frame_2->setVisible(false);
-    }
+    // Optional: Set the current text directly if you want to show the values as entered text
+    ui->lineEdit->setText(loggedInUser.firstName);
+    ui->lineEdit_2->setText(loggedInUser.lastName);
+    ui->lineEdit_3->setText(loggedInUser.email);
+    ui->lineEdit_4->setText(loggedInUser.username);
 }
 
 accountSettings::~accountSettings()
 {
     delete ui;
+}
+
+void accountSettings::gotoDash(){
+    WardenFort *warden = new WardenFort;
+    warden->show();
+    this->hide();
+}
+
+void accountSettings::changeEmail() {
+    if (loggedInUser.userId != -1){
+        bool ok;
+
+        // Apply stylesheet to QInputDialog
+        QInputDialog dialog;
+        dialog.setStyleSheet("QInputDialog { color: white; background-color: #191F32; }"
+                             "QInputDialog QLineEdit { color: white; background-color: #191F32; }"
+                             "QInputDialog QPushButton { background-color: #01FDF5; color: black; border-radius: 15px; }");
+        dialog.setFixedSize(300, 150); // Set a fixed size for the dialog
+        QString newEmail = QInputDialog::getText(this, tr("Change Email"),
+                                                 tr("New Email:"), QLineEdit::Normal,
+                                                 "", &ok);
+
+        if (ok && !newEmail.isEmpty() && loggedInUser.userId != -1) {
+            // Validate the new email (basic validation)
+            QRegularExpression emailRegex("[\\w\\.]+@[\\w\\.]+\\.[\\w\\.]+");
+            QRegularExpressionMatch match = emailRegex.match(newEmail);
+            if (!match.hasMatch()) {
+                QMessageBox::warning(this, tr("Invalid Email"),
+                                     tr("The email address you entered is not valid. Please enter a valid email address."));
+                return;
+            }
+
+            // Update the email in the database
+            QSqlQuery query;
+            query.prepare("UPDATE user_db SET email = :email WHERE user_id = :user_id");
+            query.bindValue(":email", newEmail);
+            query.bindValue(":user_id", loggedInUser.userId);
+
+            if (query.exec()) {
+                QMessageBox emailChangedMsg;
+                emailChangedMsg.setStyleSheet("QMessageBox { color: white; }"); // Set font color to white
+                emailChangedMsg.information(this, tr("Email Changed"),
+                                            tr("Your email address has been successfully changed."));
+            } else {
+                QMessageBox emailFailedMsg;
+                emailFailedMsg.setStyleSheet("QMessageBox { color: white; }"); // Set font color to white
+                emailFailedMsg.critical(this, tr("Error"),
+                                        tr("Failed to change email: %1").arg(query.lastError().text()));
+            }
+        }
+    } else {
+        QMessageBox loginFirstMsg;
+        loginFirstMsg.setStyleSheet("QMessageBox { color: white; }"); // Set font color to white
+        loginFirstMsg.critical(this, tr("Error"),
+                               tr("You must logged in first"));
+    }
+}
+
+void accountSettings::changeUsername() {
+    if (loggedInUser.userId != -1){
+        bool ok;
+        QString newUsername = QInputDialog::getText(this, tr("Change Username"),
+                                                    tr("New Username:"), QLineEdit::Normal,
+                                                    "", &ok);
+        if (ok && !newUsername.isEmpty() && loggedInUser.userId != -1) {
+            // Validate the new username (basic validation)
+            if (newUsername.contains(QRegularExpression("[^a-zA-Z0-9_]"))) {
+                QMessageBox::warning(this, tr("Invalid Username"),
+                                     tr("The username can only contain letters, numbers, and underscores."));
+                return;
+            }
+
+            // Update the username in the database
+            QSqlQuery query;
+            query.prepare("UPDATE user_db SET username = :username WHERE user_id = :user_id");
+            query.bindValue(":username", newUsername);
+            query.bindValue(":user_id", loggedInUser.userId);
+
+            if (query.exec()) {
+                QMessageBox::information(this, tr("Username Changed"),
+                                         tr("Your username has been successfully changed."));
+            } else {
+                QMessageBox::critical(this, tr("Error"),
+                                      tr("Failed to change username: %1").arg(query.lastError().text()));
+            }
+        }
+    } else {
+        QMessageBox::critical(this, tr("Error"),
+                              tr("You must log in first"));
+    }
+}
+
+void accountSettings::setGenderComboBox(const QString &gender)
+{
+    int index = ui->comboBox->findText(gender);
+    if (index != -1) { // If the gender is found in the combo box items
+        ui->comboBox->setCurrentIndex(index);
+    }
 }

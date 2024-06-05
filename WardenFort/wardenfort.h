@@ -33,7 +33,7 @@ public:
     WardenFort(QWidget* parent = nullptr);
     ~WardenFort();
 
-    void settrafficAnomalies(const QString& text);
+    void settrafficAnomalies(int text);
     void setcriticalAnomalies(const QString& text);
     void setOverallAlert(const QString& text);
     void setLabelText1(const QString& text);
@@ -44,7 +44,6 @@ public:
     void setWelcomeText(const QString& text);
     void toggleButtons();
     void handleScrollBarValueChange(int value);
-    void onRowClicked(QTableWidgetItem *item);
     void checkAbuseIP(const QString &ipAddress);
     void onNetworkReply(QNetworkReply *reply);
     void onNetworkError(QNetworkReply::NetworkError code);
@@ -52,20 +51,25 @@ public:
     void checkGreyNoise(const QString &ipAddress);
     void checkIPQualityScore(const QString &ipAddress);
     void performSearch();
+    void createPDFWithTemplate(const QString &fileName, const QString &filePath);
+    void print();
+    void gotoProf();
+    void gotoNotif();
 
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
     void saveDataToFile();
     void readCSV();
+    QString getLocalIpAddress();
+
+public slots:
+    void showDoSPopup();
 
 private slots:
-    void onTriButtonClicked();
-    void onTriReversedButtonClicked();
-    void onProfilePushButtonClicked();
-    void onProfileLessButtonClicked();
 
 signals:
     void networkError(QNetworkReply::NetworkError error);
+    void dosAttackDetected();
 
 private:
     Ui::WardenFort* ui;
@@ -74,9 +78,9 @@ private:
     void on_passwordButton_released();
     void on_accountButton_released();
     void on_logoutButton_released();
-    void hideSpecifiedButtons();
     void sendRequestToChatGPT(const QString &inputText);
     QString extractResponseText(const QJsonDocument &responseJson);
+
     bool isFilteredAdapter(pcap_if_t* adapter);
     BOOL LoadNpcapDlls();
     void putIntoCSV(const QByteArray& iaResponseData);

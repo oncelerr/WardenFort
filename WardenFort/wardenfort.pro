@@ -18,11 +18,14 @@ SOURCES += \
     animatedlabel.cpp \
     calendarnotifications.cpp\
     notificationwidget.cpp\
+    database.cpp \
     enter.cpp \
     forgotpass.cpp \
+    globals.cpp \
     login.cpp \
     loginsession.cpp \
     main.cpp \
+    notification.cpp \
     otp.cpp \
     passwordsec.cpp \
     reports.cpp \
@@ -37,10 +40,13 @@ HEADERS += \
     calendarnotifications.h\
     notificationwidget.h\
     animatedlabel.h \
+    database.h \
     enter.h \
     forgotpass.h \
+    globals.h \
     login.h \
     loginsession.h \
+    notification.h \
     otp.h \
     passwordsec.h \
     reports.h \
@@ -60,6 +66,7 @@ FORMS += \
     form.ui \
     login.ui \
     newdb.ui \
+    notification.ui \
     otp.ui \
     passwordsec.ui \
     reports.ui \
