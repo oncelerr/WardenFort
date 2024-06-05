@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
     //login login;
     //login.show();
-    //reports reports;
+    reports reports;
     //reports.show();
 
 
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     //calendar.show();
 
     WardenFort wardenfort;
-    //wardenfort.show();
+    wardenfort.show();
 
     return a.exec();
 }

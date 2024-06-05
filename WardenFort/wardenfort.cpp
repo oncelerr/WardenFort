@@ -13,7 +13,10 @@
 #include <tchar.h>
 #include <QDebug>
 #include "loginsession.h"
-#include "accountsettings.h"
+#include "accountwidget.h" // Include accountWidget header
+#include <QVBoxLayout> // Include QVBoxLayout
+#include <QLayout>    // Include QLayout
+#include <QLayoutItem> // Include QLayoutItem
 #include "notification.h"
 #include "globals.h"
 #include "database.h"
@@ -126,6 +129,12 @@ WardenFort::WardenFort(QWidget* parent)
 {
     ui->setupUi(this);
 
+    if (!ui->frame_2->layout()) {
+        ui->frame_2->setLayout(new QVBoxLayout()); // Ensure frame_2 has a layout
+    }
+
+    ui->profButton_4->setVisible(false);
+
     networkManager = new QNetworkAccessManager(this);
     manager = new QNetworkAccessManager(this);
     connect(ui->searchBTN, &QPushButton::clicked, this, &WardenFort::performSearch);
@@ -135,6 +144,7 @@ WardenFort::WardenFort(QWidget* parent)
     connect(ui->actionStop, &QAction::triggered, this, &WardenFort::stopScanningActiveLANAdapters);
     connect(ui->actionRestart, &QAction::triggered, this, &WardenFort::restartScanningActiveLANAdapters);
     connect(ui->actionPrint, &QAction::triggered, this, &WardenFort::print);
+    connect(ui->dashButton_2, &QPushButton::clicked, this, &WardenFort::gotoDash);
     connect(ui->profButton_2, &QPushButton::clicked, this, &WardenFort::gotoProf);
     connect(ui->alertButton_2, &QPushButton::clicked, this, &WardenFort::gotoNotif);
 
@@ -1469,10 +1479,29 @@ void WardenFort::checkIACSV(QString ip)
 }
 
 void WardenFort::gotoProf(){
-    accountSettings *prof = new accountSettings;
-    prof->show();
-    this->hide();
+    if (!accountWidget) {
+        accountWidget = new class accountWidget(this);
+        ui->frame_2->layout()->addWidget(accountWidget); // Add accountWidget to the existing layout
+    }
+
+    ui->frame->setVisible(false); // Hide the dashboard frame
+    accountWidget->setVisible(true); // Show the account widget
+
+    ui->dashButton_3->setVisible(false);
+    ui->profButton_4->setVisible(true);
 }
+
+void WardenFort::gotoDash(){
+    ui->frame->setVisible(true);
+
+    ui->dashButton_3->setVisible(true);
+    ui->profButton_4->setVisible(false);
+
+    if (accountWidget) {
+        accountWidget->setVisible(false);
+    }
+}
+
 void WardenFort::gotoNotif(){
     notification *notif = new notification;
     notif->show();

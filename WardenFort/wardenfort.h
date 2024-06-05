@@ -15,6 +15,8 @@
 #include <pcap.h>
 #include <Winsock2.h>
 
+#include "accountwidget.h"
+
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -51,8 +53,9 @@ public:
     void checkGreyNoise(const QString &ipAddress);
     void checkIPQualityScore(const QString &ipAddress);
     void performSearch();
-    void gotoProf();
+
     void gotoNotif();
+    void gotoDash();
 
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
@@ -64,6 +67,7 @@ public slots:
     void showDoSPopup();
 
 private slots:
+    void gotoProf();
 
 signals:
     void networkError(QNetworkReply::NetworkError error);
@@ -86,6 +90,8 @@ private:
     void print();
     void createPDFWithTemplate(const QString &fileName, const QString &filePath);
     QVector<CaptureThread*> captureThreads; // Declaration of captureThreads vector
+
+    accountWidget *accountWidget;  // Add this line
 };
 
 #endif // WARDENFORT_H

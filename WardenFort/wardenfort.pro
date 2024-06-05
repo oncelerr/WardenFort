@@ -14,7 +14,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    accountsettings.cpp \
+    accountwidget.cpp \
     animatedlabel.cpp \
     calendarnotifications.cpp\
     notificationwidget.cpp\
@@ -37,7 +37,7 @@ SOURCES += \
 
 
 HEADERS += \
-    accountsettings.h \
+    accountwidget.h \
     calendarnotifications.h\
     notificationwidget.h\
     animatedlabel.h \
@@ -59,7 +59,7 @@ HEADERS += \
 
 
 FORMS += \
-    accountsettings.ui \
+    accountwidget.ui \
     calendarnotifications.ui\
     notificationwidget.ui\
     dialog.ui \

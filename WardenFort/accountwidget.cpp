@@ -1,5 +1,5 @@
-#include "accountsettings.h"
-#include "ui_accountsettings.h"
+#include "accountwidget.h"
+#include "ui_accountwidget.h"
 #include "wardenfort.h"
 #include <QInputDialog>
 #include <QMessageBox>
@@ -9,14 +9,13 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 
-accountSettings::accountSettings(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::accountSettings)
+accountWidget::accountWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::accountWidget)
 {
     ui->setupUi(this);
-    connect(ui->dashButton_3, &QPushButton::clicked, this, &accountSettings::gotoDash);
-    connect(ui->pushButton_2, &QPushButton::clicked, this, &accountSettings::changeEmail);
-    connect(ui->pushButton_3, &QPushButton::clicked, this, &accountSettings::changeUsername);
+    connect(ui->pushButton_2, &QPushButton::clicked, this, &accountWidget::changeEmail);
+    connect(ui->pushButton_3, &QPushButton::clicked, this, &accountWidget::changeUsername);
 
     // Set the placeholders with the logged-in user data
     ui->lineEdit->setPlaceholderText(loggedInUser.firstName);
@@ -33,18 +32,12 @@ accountSettings::accountSettings(QWidget *parent)
     ui->lineEdit_4->setText(loggedInUser.username);
 }
 
-accountSettings::~accountSettings()
+accountWidget::~accountWidget()
 {
     delete ui;
 }
 
-void accountSettings::gotoDash(){
-    WardenFort *warden = new WardenFort;
-    warden->show();
-    this->hide();
-}
-
-void accountSettings::changeEmail() {
+void accountWidget::changeEmail() {
     if (loggedInUser.userId != -1){
         bool ok;
 
@@ -94,7 +87,7 @@ void accountSettings::changeEmail() {
     }
 }
 
-void accountSettings::changeUsername() {
+void accountWidget::changeUsername() {
     if (loggedInUser.userId != -1){
         bool ok;
         QString newUsername = QInputDialog::getText(this, tr("Change Username"),
@@ -128,7 +121,7 @@ void accountSettings::changeUsername() {
     }
 }
 
-void accountSettings::setGenderComboBox(const QString &gender)
+void accountWidget::setGenderComboBox(const QString &gender)
 {
     int index = ui->comboBox->findText(gender);
     if (index != -1) { // If the gender is found in the combo box items
