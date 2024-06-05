@@ -21,6 +21,7 @@ SOURCES += \
     database.cpp \
     enter.cpp \
     forgotpass.cpp \
+    fortchat.cpp \
     globals.cpp \
     login.cpp \
     loginsession.cpp \
@@ -43,6 +44,7 @@ HEADERS += \
     database.h \
     enter.h \
     forgotpass.h \
+    fortchat.h \
     globals.h \
     login.h \
     loginsession.h \
@@ -64,6 +66,7 @@ FORMS += \
     enter.ui \
     forgotpass.ui \
     form.ui \
+    fortchat.ui \
     login.ui \
     newdb.ui \
     notification.ui \
@@ -93,5 +96,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     CalendarNotifications.qrc \
     CalendarNotifications.qrc \
+    images.qrc \
     img.qrc \
     wardenfort.qrc
