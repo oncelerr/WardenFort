@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "login.h"
 #include "wardenfort.h"
+#include "fortchat.h"
 #include "database.h"
 #include <QSqlError>
 
@@ -27,7 +28,10 @@ int main(int argc, char* argv[])
     //login.show();
 
     WardenFort wardenfort;
-    wardenfort.show();
+    //wardenfort.show();
+
+    FortChat fortchat;
+    fortchat.show();
     
     return a.exec();
 }
