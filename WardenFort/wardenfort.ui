@@ -557,6 +557,33 @@ border: 0px;</string>
        </size>
       </property>
      </widget>
+     <widget class="QPushButton" name="notifButton_4">
+      <property name="geometry">
+       <rect>
+        <x>-1</x>
+        <y>170</y>
+        <width>71</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgba(255, 255, 255, 0);
+border: 0px;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="wardenfort.qrc">
+        <normaloff>:/wardenfort/a2.png</normaloff>:/wardenfort/a2.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>70</width>
+        <height>60</height>
+       </size>
+      </property>
+     </widget>
     </widget>
     <zorder>alertButton</zorder>
     <zorder>dashButton</zorder>

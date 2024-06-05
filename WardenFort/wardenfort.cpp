@@ -17,7 +17,7 @@
 #include <QVBoxLayout> // Include QVBoxLayout
 #include <QLayout>    // Include QLayout
 #include <QLayoutItem> // Include QLayoutItem
-#include "notification.h"
+#include "notifwidget.h"
 #include "globals.h"
 #include "database.h"
 #include <QFileDialog>
@@ -124,9 +124,10 @@ bool isKnownMaliciousIP(const QString& ip) {
 }
 
 WardenFort::WardenFort(QWidget* parent)
-    : QMainWindow(parent)
-    , ui(new Ui::WardenFort)
-{
+    : QMainWindow(parent),
+    ui(new Ui::WardenFort),
+    accountWidget(nullptr),
+    notifWidget(nullptr) {
     ui->setupUi(this);
 
     if (!ui->frame_2->layout()) {
@@ -134,6 +135,7 @@ WardenFort::WardenFort(QWidget* parent)
     }
 
     ui->profButton_4->setVisible(false);
+    ui->notifButton_4->setVisible(false);
 
     networkManager = new QNetworkAccessManager(this);
     manager = new QNetworkAccessManager(this);
@@ -1478,10 +1480,14 @@ void WardenFort::checkIACSV(QString ip)
 
 }
 
-void WardenFort::gotoProf(){
+void WardenFort::gotoProf() {
     if (!accountWidget) {
         accountWidget = new class accountWidget(this);
         ui->frame_2->layout()->addWidget(accountWidget); // Add accountWidget to the existing layout
+    }
+
+    if (notifWidget) {
+        notifWidget->setVisible(false);
     }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
@@ -1489,21 +1495,38 @@ void WardenFort::gotoProf(){
 
     ui->dashButton_3->setVisible(false);
     ui->profButton_4->setVisible(true);
+    ui->notifButton_4->setVisible(false);
 }
 
-void WardenFort::gotoDash(){
+void WardenFort::gotoDash() {
+    if (accountWidget) {
+        accountWidget->setVisible(false);
+    }
+    if (notifWidget) {
+        notifWidget->setVisible(false);
+    }
+
     ui->frame->setVisible(true);
 
     ui->dashButton_3->setVisible(true);
     ui->profButton_4->setVisible(false);
+    ui->notifButton_4->setVisible(false);
+}
+
+void WardenFort::gotoNotif() {
+    if (!notifWidget) {
+        notifWidget = new class notifWidget(this);
+        ui->frame_2->layout()->addWidget(notifWidget); // Add notifWidget to the existing layout
+    }
 
     if (accountWidget) {
         accountWidget->setVisible(false);
     }
-}
 
-void WardenFort::gotoNotif(){
-    notification *notif = new notification;
-    notif->show();
-    this->hide();
+    ui->frame->setVisible(false);
+    notifWidget->setVisible(true);
+
+    ui->dashButton_3->setVisible(false);
+    ui->profButton_4->setVisible(false);
+    ui->notifButton_4->setVisible(true);
 }

@@ -16,6 +16,7 @@
 #include <Winsock2.h>
 
 #include "accountwidget.h"
+#include "notifwidget.h"
 
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -92,6 +93,7 @@ private:
     QVector<CaptureThread*> captureThreads; // Declaration of captureThreads vector
 
     accountWidget *accountWidget;  // Add this line
+    notifWidget *notifWidget;
 };
 
 #endif // WARDENFORT_H

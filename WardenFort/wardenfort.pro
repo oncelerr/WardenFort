@@ -26,7 +26,7 @@ SOURCES += \
     login.cpp \
     loginsession.cpp \
     main.cpp \
-    notification.cpp \
+    notifwidget.cpp \
     otp.cpp \
     passwordsec.cpp \
     reports.cpp \
@@ -48,7 +48,7 @@ HEADERS += \
     globals.h \
     login.h \
     loginsession.h \
-    notification.h \
+    notifwidget.h \
     otp.h \
     passwordsec.h \
     reports.h \
@@ -69,7 +69,7 @@ FORMS += \
     fortchat.ui \
     login.ui \
     newdb.ui \
-    notification.ui \
+    notifwidget.ui \
     otp.ui \
     passwordsec.ui \
     reports.ui \
