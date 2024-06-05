@@ -51,8 +51,6 @@ public:
     void checkGreyNoise(const QString &ipAddress);
     void checkIPQualityScore(const QString &ipAddress);
     void performSearch();
-    void createPDFWithTemplate(const QString &fileName, const QString &filePath);
-    void print();
     void gotoProf();
     void gotoNotif();
 

@@ -1099,24 +1099,11 @@ void WardenFort::saveDataToFile() {
     queryReports.prepare("INSERT INTO reports (date, time, reportBy) VALUES (:date, :time, :reportBy)");
     queryReports.bindValue(":date", QDate::currentDate().toString(Qt::ISODate)); // Current date
     queryReports.bindValue(":time", QTime::currentTime().toString(Qt::ISODate)); // Current time
-    queryReports.bindValue(":reportBy", ui->welcome_text->text()); // Assuming userLabel is the user label
+    queryReports.bindValue(":reportBy", loggedInUser.username); // Assuming userLabel is the user label
 
     // Execute the query for reports table
     if (!queryReports.exec()) {
         qDebug() << "Error inserting data into reports table:" << queryReports.lastError().text();
-    }
-
-
-    // Write merged data to CSV file
-    QMapIterator<QString, QStringList> it(mergedData);
-    while (it.hasNext()) {
-        it.next();
-        QStringList rowData = it.value();
-        for (int col = 0; col < columnCount; ++col) {
-            out << rowData[col];
-            out << ","; // Use comma as delimiter
-        }
-        out << occurrenceCount[it.key()] << "\n"; // Write the occurrence count
     }
 
     file.close();
@@ -1478,6 +1465,8 @@ void WardenFort::checkIACSV(QString ip)
         // Clean up
         delete reply;
     }
+
+}
 
 void WardenFort::gotoProf(){
     accountSettings *prof = new accountSettings;

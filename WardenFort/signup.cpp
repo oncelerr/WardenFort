@@ -57,7 +57,6 @@ void signup::onCreateButtonClicked()
     // For demonstration purposes, let's assume we have a function called hashPassword
 
     // Convert the hashed password to a hex string
-    QString hashedPassword = QString(passwordHash.toHex());
     // Insert data into the database
     QSqlQuery query;
     query.prepare("INSERT INTO user_db (firstName, lastName, username, email, passwd) "
@@ -70,11 +69,7 @@ void signup::onCreateButtonClicked()
 
     if (query.exec()) {
         QMessageBox::information(this, "Success", "Signup successful!");
-    } else {
-        QMessageBox::critical(this, "Error", "Signup failed!");
-        qDebug() << "Signup query error:" << query.lastError().text();
-    }
-    else {
+    }else {
         QMessageBox errorMessageBox(QMessageBox::Critical, "Error", "Signup failed!", QMessageBox::Ok, this);
         errorMessageBox.setStyleSheet("background-color: white;");
         errorMessageBox.exec();
