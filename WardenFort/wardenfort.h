@@ -15,6 +15,8 @@
 #include <pcap.h>
 #include <Winsock2.h>
 #include "passwordsecwidget.h"
+#include <unordered_map>
+
 #include "accountwidget.h"
 #include "notifwidget.h"
 #include "chatswidget.h"
@@ -101,6 +103,11 @@ private:
     notifWidget *notifWidget;
     chats *chatsWidget;
     reports *reportsWidget;
+    accountWidget *accountWidget;  // Add this line
+    notifWidget *notifWidget;
+    chats *chatsWidget;
+
+    void initializeDeviceIpFilter();
 };
 
 #endif // WARDENFORT_H

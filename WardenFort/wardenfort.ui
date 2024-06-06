@@ -503,87 +503,132 @@ border: 0px;</string>
        </size>
       </property>
      </widget>
-     <widget class="QPushButton" name="dashButton_3">
+     <widget class="QFrame" name="roundedBG">
       <property name="geometry">
        <rect>
-        <x>-2</x>
-        <y>111</y>
-        <width>71</width>
-        <height>41</height>
+        <x>-9</x>
+        <y>102</y>
+        <width>120</width>
+        <height>63</height>
        </rect>
       </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgba(255, 255, 255, 0);
-border: 0px;</string>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
       </property>
-      <property name="text">
-       <string/>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
       </property>
-      <property name="icon">
-       <iconset resource="wardenfort.qrc">
-        <normaloff>:/wardenfort/d1.png</normaloff>:/wardenfort/d1.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>70</width>
-        <height>60</height>
-       </size>
-      </property>
+      <widget class="QFrame" name="frame_5">
+       <property name="geometry">
+        <rect>
+         <x>13</x>
+         <y>9</y>
+         <width>120</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(25, 31, 50);
+border-top-left-radius: 20px;
+border-bottom-left-radius: 20px;</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame_7">
+       <property name="geometry">
+        <rect>
+         <x>39</x>
+         <y>-12</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(25, 31, 50);
+border-radius: 0px;</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QFrame" name="frame_11">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>21</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(44, 60, 75);
+border-bottom-right-radius: 10px;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_9">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>50</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(25, 31, 50);
+border-radius: 0px;</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QFrame" name="frame_10">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>21</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(44, 60, 75);
+border-top-right-radius: 10px;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </widget>
      </widget>
-     <widget class="QPushButton" name="profButton_4">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>510</y>
-        <width>71</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgba(255, 255, 255, 0);
-border: 0px;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset resource="wardenfort.qrc">
-        <normaloff>:/wardenfort/p1.png</normaloff>:/wardenfort/p1.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>70</width>
-        <height>60</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="notifButton_4">
-      <property name="geometry">
-       <rect>
-        <x>-1</x>
-        <y>170</y>
-        <width>71</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgba(255, 255, 255, 0);
-border: 0px;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset resource="wardenfort.qrc">
-        <normaloff>:/wardenfort/a2.png</normaloff>:/wardenfort/a2.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>70</width>
-        <height>60</height>
-       </size>
-      </property>
-     </widget>
+     <zorder>roundedBG</zorder>
+     <zorder>chatButton_2</zorder>
+     <zorder>alertButton_2</zorder>
+     <zorder>calendarButton_2</zorder>
+     <zorder>dashButton_2</zorder>
+     <zorder>settingsButton_3</zorder>
+     <zorder>reportButton_2</zorder>
+     <zorder>logoButton_2</zorder>
+     <zorder>profButton_2</zorder>
     </widget>
     <zorder>alertButton</zorder>
     <zorder>dashButton</zorder>
