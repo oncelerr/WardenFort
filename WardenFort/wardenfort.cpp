@@ -122,7 +122,7 @@ bool isKnownMaliciousIP(const QString& ip) {
 // Map to track consecutive appearances of each IP address
 std::unordered_map<QString, int> consecutiveAppearanceCount;
 QString lastSourceIp;
-
+QString localIpAddress;
 
 WardenFort::WardenFort(QWidget* parent)
     : QMainWindow(parent)

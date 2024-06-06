@@ -89,10 +89,7 @@ private:
     notifWidget *notifWidget;
     chats *chatsWidget;
 
-    QString getLocalIpAddress();
     void initializeDeviceIpFilter();
-
-    QString localIpAddress;
 };
 
 #endif // WARDENFORT_H
