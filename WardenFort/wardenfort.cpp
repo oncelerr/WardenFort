@@ -437,24 +437,13 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
     QString timestamp = QString(buffer);
 
-    QString sourceIp = QString("%1.%2.%3.%4")
-                           .arg(ih->saddr.byte1)
-                           .arg(ih->saddr.byte2)
-                           .arg(ih->saddr.byte3)
-                           .arg(ih->saddr.byte4);
-    QString destIp = QString("%1.%2.%3.%4")
-                         .arg(ih->daddr.byte1)
-                         .arg(ih->daddr.byte2)
-                         .arg(ih->daddr.byte3)
-                         .arg(ih->daddr.byte4);
+    QString packetInfo = "Timestamp: " + timestamp + "\n";
+    packetInfo += "Packet length: " + QString::number(pkthdr->len) + " bytes\n";
+    packetInfo += "Captured length: " + QString::number(pkthdr->caplen) + " bytes\n";
 
-    QString protocol = getProtocolName(ih->proto);
-    QString info = "No Information";
+    const ip_header* ipHeader = reinterpret_cast<const ip_header*>(packet);
+    const struct my_tcphdr* tcpHeader = reinterpret_cast<const struct my_tcphdr*>(packet + sizeof(ip_header));
 
-    QColor backgroundColor;
-
-    if (protocol == "TCP") {
-        const struct my_tcphdr* tcpHeader = reinterpret_cast<const struct my_tcphdr*>(packet + sizeof(ip_header));
 
     QString sourceIp = QString("%1.%2.%3.%4")
                            .arg(ih->saddr.byte1)
@@ -472,13 +461,90 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     if (tcpHeader->th_flags & TH_ACK) flags += "ACK ";
     if (tcpHeader->th_flags & TH_FIN) flags += "FIN ";
 
-    QString info = QString("No Information");
-
     QString protocol = getProtocolName(ih->proto);
+    QString info = "No Information";
 
     QColor backgroundColor;
 
-    if (protocol == "UDP") {
+    if (protocol == "TCP") {
+        const struct my_tcphdr* tcpHeader = reinterpret_cast<const struct my_tcphdr*>(packet + sizeof(ip_header));
+
+        // Check TCP flags to determine the color
+        if (tcpHeader->th_flags & TH_SYN) {
+            backgroundColor = QColor(44, 75, 66); // lightgreen Established connection (SYN packet)
+        } else if (tcpHeader->th_flags & TH_ACK) {
+            backgroundColor = QColor(44, 75, 50); // darkgreen ACK packet
+        } else if (tcpHeader->th_flags & TH_FIN) {
+            backgroundColor = QColor(55, 75, 44); // green FIN packet
+        } else {
+            backgroundColor = QColor(55, 75, 44); // green Other TCP packets
+        }
+
+        // Add threat detection for TCP packets
+        if ((tcpHeader->th_flags & TH_SYN) && (tcpHeader->th_flags & TH_ACK)) {
+            info = "Possible TCP SYN-ACK scan";
+        } else if (tcpHeader->th_flags & TH_RST) {
+            info = "TCP Reset (RST) Attack";
+        } else if (tcpHeader->th_flags & TH_FIN) {
+            info = "TCP FIN Scan";
+        } else if (tcpHeader->th_flags & (TH_SYN | TH_FIN)) {
+            info = "TCP Xmas Scan";
+        } else if ((tcpHeader->th_flags & (TH_SYN | TH_RST | TH_ACK)) == 0) {
+            info = "TCP Null Scan";
+        } else if ((tcpHeader->th_flags & TH_PUSH) && (tcpHeader->th_flags & TH_URG)) {
+            info = "TCP Push and Urgent Flag Set";
+        } else if (tcpHeader->th_flags & TH_URG) {
+            info = "TCP Urgent Flag Set";
+        }
+        // Check for malware communication
+        if (isKnownMaliciousIP(destIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(153, 0, 0); //red
+        }
+        if (isKnownMaliciousIP(sourceIp)) {
+            info = "Threat detected: Communication with known malicious IP " + destIp;
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(153, 0, 0); //red
+        }
+
+        // Check for DoS attacks
+        if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
+            info = "Possible SYN Flood";
+            i++;
+            k = i + j;
+            wardenFort->settrafficAnomalies(i);
+            wardenFort->setOverallAlert(QString::number(k));
+            backgroundColor = QColor(153, 0, 0); //red
+        }
+
+        // New logic to detect potential DoS attacks
+        // Check if the source IP matches the local IP
+        if (sourceIp != localIpAddress) {
+            // If the source IP is not the local IP, proceed with DoS detection
+            if (sourceIp == lastSourceIp) {
+                consecutiveAppearanceCount[sourceIp]++;
+            } else {
+                consecutiveAppearanceCount[lastSourceIp] = 0;
+            }
+            lastSourceIp = sourceIp;
+
+            if (consecutiveAppearanceCount[sourceIp] >= 8) {
+                info = "Threat detected: Potential DoS Attack from " + sourceIp;
+                j++;
+                k = i + j;
+                wardenFort->setcriticalAnomalies(QString::number(j));
+                wardenFort->setOverallAlert(QString::number(k));
+                backgroundColor = QColor(153, 0, 0); //red
+            }
+        }
+    } else if (protocol == "UDP") {
         backgroundColor = QColor(45, 44, 75);  // blue UDP packets
 
         // Add threat detection for UDP packets
@@ -580,7 +646,7 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
         }
     }
     }
-}
+
 
 void WardenFort::showDoSPopup() {
     static QMessageBox *dosPopup = nullptr;
