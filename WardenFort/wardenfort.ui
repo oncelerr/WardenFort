@@ -385,8 +385,8 @@ border: 0px;</string>
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>:/wardenfort/C:/Users/Admin/Downloads/dashboard.png</normaloff>:/wardenfort/C:/Users/Admin/Downloads/dashboard.png</iconset>
+       <iconset resource="wardenfort.qrc">
+        <normaloff>:/wardenfort/dashboard.png</normaloff>:/wardenfort/dashboard.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -503,18 +503,17 @@ border: 0px;</string>
        </size>
       </property>
      </widget>
-    </widget>
-    <widget class="QPushButton" name="settingsButton_4">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>110</y>
-       <width>71</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgba(255, 255, 255, 0);
+     <widget class="QPushButton" name="dashButton_3">
+      <property name="geometry">
+       <rect>
+        <x>-2</x>
+        <y>111</y>
+        <width>71</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgba(255, 255, 255, 0);
 border: 0px;</string>
      </property>
      <property name="text">
@@ -671,34 +670,6 @@ border-top-right-radius: 10px;</string>
     <zorder>logoButton</zorder>
     <zorder>profButton</zorder>
     <zorder>widget_2</zorder>
-    <zorder>settingsButton_4</zorder>
-   </widget>
-   <widget class="QPushButton" name="settingsButton_2">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>90</y>
-      <width>71</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(255, 255, 255, 0);
-border: 0px;</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="wardenfort.qrc">
-      <normaloff>:/wardenfort/d1.png</normaloff>:/wardenfort/d1.png</iconset>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>70</width>
-      <height>60</height>
-     </size>
-    </property>
    </widget>
    <widget class="QFrame" name="frame">
     <property name="enabled">
@@ -706,7 +677,7 @@ border: 0px;</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>51</x>
       <y>0</y>
       <width>1041</width>
       <height>571</height>
@@ -1259,6 +1230,25 @@ border-radius: 10px;
      </column>
     </widget>
    </widget>
+   <widget class="QFrame" name="frame_2">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>0</y>
+      <width>1041</width>
+      <height>541</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
+   <zorder>frame_2</zorder>
+   <zorder>widget</zorder>
+   <zorder>frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -1375,6 +1365,7 @@ QMenu::item:hover {
     <addaction name="actionRestart"/>
     <addaction name="separator"/>
     <addaction name="menuCapture_Filters"/>
+    <addaction name="actionCheck_Online"/>
    </widget>
    <widget class="QMenu" name="menuAnalyze">
     <property name="title">
@@ -1713,6 +1704,11 @@ QMenu::item:hover {
   <action name="actionTCP">
    <property name="text">
     <string>TCP</string>
+   </property>
+  </action>
+  <action name="actionCheck_Online">
+   <property name="text">
+    <string>Check Online</string>
    </property>
   </action>
  </widget>

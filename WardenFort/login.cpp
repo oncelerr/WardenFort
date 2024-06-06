@@ -20,15 +20,16 @@
 #include "loginsession.h"
 #include "wardenfort.h"
 #include "globals.h"
+#include "database.h"
 
 QString userEmail;
 
 // Gmail SMTP server settings
 const QString SmtpServerAddress = "smtp.gmail.com";
 const int SmtpServerPort = 465; // Port 465 for SSL
-const QString SmtpUsername = "heyaoican@gmail.com"; // Your Gmail email address
+const QString SmtpUsername = "wardenfort.afp@gmail.com"; // Your Gmail email address
 const QString SmtpName = "WardenFort";
-const QString SmtpPassword = "noay rbpe mnbb meku"; // Your Gmail app password
+const QString SmtpPassword = "dlac nvob epnu zzuq"; // Your Gmail app password
 
 // Function to generate a 6-digit code
 void login::generateCode() {
@@ -200,10 +201,15 @@ void login::on_loginButton_clicked()
     QString username = ui->typeUN_box->text();
     QString password = ui->typePASS_box->text();
 
-    QSqlQuery query;
+    // Hash the input password using SHA-256
+    QByteArray passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
+    QString hashedPassword = QString(passwordHash.toHex());
+
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
     query.prepare("SELECT * FROM user_db WHERE username = :username AND passwd = :password");
     query.bindValue(":username", username);
-    query.bindValue(":password", password);
+    query.bindValue(":password", password); // Compare with hashed password
 
     if (query.exec() && query.next()) {
         // Fill the loggedInUser struct with data from the database
@@ -293,7 +299,8 @@ void login::openAlertNotif() {
 
     QString userName;
 
-    QSqlQuery query;
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
     query.prepare("SELECT username FROM user_db WHERE email = :email");
     query.bindValue(":email", userEmail);
 
@@ -331,7 +338,8 @@ void login::openEnterWindow() {
 
 void login::on_forgot_pass_clicked() // Implementation of on_forgot_pass_clicked
 {
-    QSqlQuery query;
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
     query.prepare("SELECT username FROM user_db WHERE email = :useremail");
     query.bindValue(":useremail", userEmail);
 

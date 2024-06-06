@@ -16,6 +16,11 @@
 #include <Winsock2.h>
 #include <unordered_map>
 
+#include "accountwidget.h"
+#include "notifwidget.h"
+#include "chatswidget.h"
+
+
 #pragma comment(lib, "Ws2_32.lib")
 
 QT_BEGIN_NAMESPACE
@@ -51,14 +56,15 @@ public:
     void checkGreyNoise(const QString &ipAddress);
     void checkIPQualityScore(const QString &ipAddress);
     void performSearch();
-    void createPDFWithTemplate(const QString &fileName, const QString &filePath);
-    void print();
-    void gotoProf();
+
     void gotoNotif();
+    void gotoDash();
+    void gotoChats();
 
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
     void saveDataToFile();
+    void readCSV();
     QString getLocalIpAddress();
     void readCSV();
 
@@ -66,6 +72,7 @@ public slots:
     void showDoSPopup();
 
 private slots:
+    void gotoProf();
 
 signals:
     void networkError(QNetworkReply::NetworkError error);
@@ -83,7 +90,10 @@ private:
 
     bool isFilteredAdapter(pcap_if_t* adapter);
     BOOL LoadNpcapDlls();
-
+    void putIntoCSV(const QByteArray& iaResponseData);
+    void checkIACSV(QString ip);
+    void print();
+    void createPDFWithTemplate(const QString &fileName, const QString &filePath);
     QVector<CaptureThread*> captureThreads; // Declaration of captureThreads vector
     accountWidget *accountWidget;  // Add this line
     notifWidget *notifWidget;

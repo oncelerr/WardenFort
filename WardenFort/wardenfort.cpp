@@ -13,11 +13,16 @@
 #include <tchar.h>
 #include <QDebug>
 #include "loginsession.h"
-#include "accountsettings.h"
-#include "notification.h"
+#include "accountwidget.h" // Include accountWidget header
+#include <QVBoxLayout> // Include QVBoxLayout
+#include <QLayout>    // Include QLayout
+#include <QLayoutItem> // Include QLayoutItem
+#include "notifwidget.h"
 #include "globals.h"
 #include "database.h"
 #include <QFileDialog>
+#include <QPrinter>
+#include <QPainter>
 #include <QMessageBox>
 #include <QTimer>
 #include <QApplication>
@@ -125,9 +130,11 @@ QString lastSourceIp;
 QString localIpAddress;
 
 WardenFort::WardenFort(QWidget* parent)
-    : QMainWindow(parent)
-    , ui(new Ui::WardenFort)
-{
+    : QMainWindow(parent),
+    ui(new Ui::WardenFort),
+    accountWidget(nullptr),
+    notifWidget(nullptr),
+    chatsWidget(nullptr){
     ui->setupUi(this);
 
     if (!ui->frame_2->layout()) {
@@ -139,11 +146,14 @@ WardenFort::WardenFort(QWidget* parent)
     connect(ui->searchBTN, &QPushButton::clicked, this, &WardenFort::performSearch);
     connect(ui->actionSave, &QAction::triggered, this, &WardenFort::saveDataToFile);
     connect(ui->actionStart, &QAction::triggered, this, &WardenFort::scanActiveLANAdapters);
+    connect(ui->actionCheck_Online, &QAction::triggered, this, &WardenFort::readCSV);
     connect(ui->actionStop, &QAction::triggered, this, &WardenFort::stopScanningActiveLANAdapters);
     connect(ui->actionRestart, &QAction::triggered, this, &WardenFort::restartScanningActiveLANAdapters);
     connect(ui->actionPrint, &QAction::triggered, this, &WardenFort::print);
+    connect(ui->dashButton_2, &QPushButton::clicked, this, &WardenFort::gotoDash);
     connect(ui->profButton_2, &QPushButton::clicked, this, &WardenFort::gotoProf);
     connect(ui->alertButton_2, &QPushButton::clicked, this, &WardenFort::gotoNotif);
+    connect(ui->chatButton_2, &QPushButton::clicked, this, &WardenFort::gotoChats);
 
     connect(this, &WardenFort::dosAttackDetected, this, &WardenFort::showDoSPopup);
 
@@ -514,7 +524,7 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
 
         // Check for DoS attacks
         if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
-            info = "Threat detected: Possible SYN Flood";
+            info = "Possible SYN Flood";
             i++;
             k = i + j;
             wardenFort->settrafficAnomalies(i);
@@ -1078,6 +1088,34 @@ void WardenFort::saveDataToFile() {
                 mergedData[sourceIP] = rowData;
                 occurrenceCount[sourceIP] = 1;
             }
+
+            // Splitting the timestamp into date and time components
+            QStringList dateTimeParts = rowData[0].split(' ');
+            QString date = dateTimeParts[0];
+            QString time = dateTimeParts[1];
+
+            // Prepare the SQL query to insert into the database
+            QSqlQuery query(QSqlDatabase::database()); // Use the existing database connection
+            query.prepare("INSERT INTO packets (date, time, sourceIP, destinationIP, sourcePORT, destinationPORT, flags, capLEN, protocol, info, occurrence) "
+                          "VALUES (:date, :time, :sourceIP, :destinationIP, :sourcePORT, :destinationPORT, :flags, :capLEN, :protocol, :info, :occurrence)");
+            query.bindValue(":date", date);
+            query.bindValue(":time", time);
+            query.bindValue(":sourceIP", rowData[1]);
+            query.bindValue(":destinationIP", rowData[2]);
+            query.bindValue(":sourcePORT", rowData[3]);
+            query.bindValue(":destinationPORT", rowData[4]);
+            query.bindValue(":flags", rowData[5]);
+            query.bindValue(":capLEN", rowData[6]);
+            query.bindValue(":protocol", rowData[7]);
+            query.bindValue(":info", rowData[8]);
+            query.bindValue(":occurrence", occurrenceCount[sourceIP]);
+
+            // Execute the query
+            if (!query.exec()) {
+                qDebug() << "Error inserting data into database:" << query.lastError().text();
+            }
+
+
         }
 
         // Update the progress dialog
@@ -1094,6 +1132,17 @@ void WardenFort::saveDataToFile() {
             out << ","; // Use comma as delimiter
         }
         out << occurrenceCount[it.key()] << "\n"; // Write the occurrence count
+    }
+    // Prepare the SQL query to insert into the reports table
+    QSqlQuery queryReports(QSqlDatabase::database()); // Use the existing database connection
+    queryReports.prepare("INSERT INTO reports (date, time, reportBy) VALUES (:date, :time, :reportBy)");
+    queryReports.bindValue(":date", QDate::currentDate().toString(Qt::ISODate)); // Current date
+    queryReports.bindValue(":time", QTime::currentTime().toString(Qt::ISODate)); // Current time
+    queryReports.bindValue(":reportBy", loggedInUser.username); // Assuming userLabel is the user label
+
+    // Execute the query for reports table
+    if (!queryReports.exec()) {
+        qDebug() << "Error inserting data into reports table:" << queryReports.lastError().text();
     }
 
     file.close();
@@ -1307,15 +1356,56 @@ void WardenFort::print() {
     }
 }
 
-void WardenFort::gotoProf(){
-    accountSettings *prof = new accountSettings;
-    prof->show();
-    this->hide();
+void WardenFort::readCSV()
+{
+    // Open the file dialog to select a CSV file
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open CSV File"), QDir::homePath(), tr("CSV Files (*.csv)"));
+
+    // Check if the user canceled file selection or if the file path is empty
+    if (filePath.isEmpty())
+    {
+        qDebug() << "File selection canceled or no file selected.";
+        return;
+    }
+
+    // Open the file
+    QFile file(filePath);
+
+    // Check if the file opening was successful
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Failed to open file:" << file.errorString();
+        return;
+    }
+
+    // Read the contents of the file
+    QTextStream in(&file);
+    while (!in.atEnd())
+    {
+        QString line = in.readLine(); // Read one line at a time
+
+        // Split the line into fields using commas as delimiters
+        QStringList fields = line.split(",", Qt::SkipEmptyParts);
+
+        // Check if there are enough fields in the line
+        if (fields.size() >= 2)
+        {
+            // Extract the second column (index 1) and remove surrounding double quotes if present
+            QString field = fields.at(1).trimmed();
+            if (field.startsWith('"') && field.endsWith('"'))
+            {
+                field = field.mid(1, field.length() - 2);
+            }
+
+            // Process the field as needed
+            qDebug() << field;
+            checkIACSV(field); // Start asynchronous check
+        }
+    }
+
+    // Close the file
+    file.close();
 }
-void WardenFort::gotoNotif(){
-    notification *notif = new notification;
-    notif->show();
-    this->hide();
 
 void WardenFort::putIntoCSV(const QByteArray& iaResponseData)
 {
