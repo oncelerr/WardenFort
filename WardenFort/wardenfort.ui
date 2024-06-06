@@ -1140,6 +1140,9 @@ color: rgb(255, 255, 255);</string>
        <height>361</height>
       </rect>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="styleSheet">
       <string notr="true">QHeaderView::section
  {background-color: #191F32;
