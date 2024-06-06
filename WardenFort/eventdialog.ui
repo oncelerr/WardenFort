@@ -14,7 +14,7 @@
    <string>Add Event</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgba(44, 60, 75, 0.6); 
+   <string notr="true">background-color: rgba(44, 60, 75, 0.5);
 </string>
   </property>
   <widget class="QLineEdit" name="eventTitleLineEdit">

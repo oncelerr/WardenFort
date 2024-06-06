@@ -5,6 +5,9 @@
 #include <QMap>
 #include <QVector>
 #include <QDate>
+#include <QComboBox>
+#include <QPainter>
+#include <QPaintEvent>
 
 class CustomCalendarWidget : public QCalendarWidget
 {
@@ -15,12 +18,14 @@ public:
 
 private slots:
     void addEvent(const QDate &date);
+    void updateYear(int yearIndex);
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
+    void paintCell(QPainter *painter, const QRect &rect, QDate date) const override; // Match the base class signature
 
 private:
     QMap<QDate, QVector<QString>> events; // Store events
+    QComboBox *yearComboBox; // Dropdown for year selection
 };
 
 #endif // CUSTOMCALENDARWIDGET_H
