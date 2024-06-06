@@ -17,6 +17,7 @@
 
 #include "accountwidget.h"
 #include "notifwidget.h"
+#include "chatswidget.h"
 
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -57,6 +58,7 @@ public:
 
     void gotoNotif();
     void gotoDash();
+    void gotoChats();
 
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
@@ -94,6 +96,7 @@ private:
 
     accountWidget *accountWidget;  // Add this line
     notifWidget *notifWidget;
+    chats *chatsWidget;
 };
 
 #endif // WARDENFORT_H

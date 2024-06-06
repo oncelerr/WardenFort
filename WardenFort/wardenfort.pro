@@ -17,11 +17,11 @@ SOURCES += \
     accountwidget.cpp \
     animatedlabel.cpp \
     calendarnotifications.cpp\
+    chatswidget.cpp \
     notificationwidget.cpp\
     database.cpp \
     enter.cpp \
     forgotpass.cpp \
-    fortchat.cpp \
     globals.cpp \
     login.cpp \
     loginsession.cpp \
@@ -39,12 +39,12 @@ SOURCES += \
 HEADERS += \
     accountwidget.h \
     calendarnotifications.h\
+    chatswidget.h \
     notificationwidget.h\
     animatedlabel.h \
     database.h \
     enter.h \
     forgotpass.h \
-    fortchat.h \
     globals.h \
     login.h \
     loginsession.h \
@@ -61,12 +61,12 @@ HEADERS += \
 FORMS += \
     accountwidget.ui \
     calendarnotifications.ui\
+    chatswidget.ui \
     notificationwidget.ui\
     dialog.ui \
     enter.ui \
     forgotpass.ui \
     form.ui \
-    fortchat.ui \
     login.ui \
     newdb.ui \
     notifwidget.ui \

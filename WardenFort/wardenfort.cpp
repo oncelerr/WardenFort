@@ -127,7 +127,8 @@ WardenFort::WardenFort(QWidget* parent)
     : QMainWindow(parent),
     ui(new Ui::WardenFort),
     accountWidget(nullptr),
-    notifWidget(nullptr) {
+    notifWidget(nullptr),
+    chatsWidget(nullptr){
     ui->setupUi(this);
 
     if (!ui->frame_2->layout()) {
@@ -149,6 +150,7 @@ WardenFort::WardenFort(QWidget* parent)
     connect(ui->dashButton_2, &QPushButton::clicked, this, &WardenFort::gotoDash);
     connect(ui->profButton_2, &QPushButton::clicked, this, &WardenFort::gotoProf);
     connect(ui->alertButton_2, &QPushButton::clicked, this, &WardenFort::gotoNotif);
+    connect(ui->chatButton_2, &QPushButton::clicked, this, &WardenFort::gotoChats);
 
     connect(this, &WardenFort::dosAttackDetected, this, &WardenFort::showDoSPopup);
 
@@ -491,7 +493,7 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
 
         // Check for DoS attacks
         if (tcpHeader->th_flags & TH_SYN && !(tcpHeader->th_flags & TH_ACK)) {
-            info = "Threat detected: Possible SYN Flood";
+            info = "Possible SYN Flood";
             i++;
             k = i + j;
             wardenFort->settrafficAnomalies(i);
@@ -1489,6 +1491,9 @@ void WardenFort::gotoProf() {
     if (notifWidget) {
         notifWidget->setVisible(false);
     }
+    if (chatsWidget) {
+        chatsWidget->setVisible(false);
+    }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
     accountWidget->setVisible(true); // Show the account widget
@@ -1504,6 +1509,9 @@ void WardenFort::gotoDash() {
     }
     if (notifWidget) {
         notifWidget->setVisible(false);
+    }
+    if (chatsWidget) {
+        chatsWidget->setVisible(false);
     }
 
     ui->frame->setVisible(true);
@@ -1522,6 +1530,9 @@ void WardenFort::gotoNotif() {
     if (accountWidget) {
         accountWidget->setVisible(false);
     }
+    if (chatsWidget) {
+        chatsWidget->setVisible(false);
+    }
 
     ui->frame->setVisible(false);
     notifWidget->setVisible(true);
@@ -1529,4 +1540,25 @@ void WardenFort::gotoNotif() {
     ui->dashButton_3->setVisible(false);
     ui->profButton_4->setVisible(false);
     ui->notifButton_4->setVisible(true);
+}
+
+void WardenFort::gotoChats() {
+    if (!chatsWidget) {
+        chatsWidget = new class chats(this);
+        ui->frame_2->layout()->addWidget(chatsWidget); // Add chatsWidget to the existing layout
+    }
+
+    if (accountWidget) {
+        accountWidget->setVisible(false);
+    }
+    if (notifWidget) {
+        notifWidget->setVisible(false);
+    }
+
+    ui->frame->setVisible(false); // Hide the dashboard frame
+    chatsWidget->setVisible(true); // Show the chats widget
+
+    ui->dashButton_3->setVisible(false);
+    ui->profButton_4->setVisible(false);
+    ui->notifButton_4->setVisible(false);
 }

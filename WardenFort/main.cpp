@@ -6,7 +6,6 @@
 #include "login.h"
 #include "wardenfort.h"
 #include "reports.h"
-#include "fortchat.h"
 #include "database.h"
 #include "calendarnotifications.h"
 #include "calendar.h"
