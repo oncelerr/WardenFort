@@ -28,7 +28,7 @@ SOURCES += \
     main.cpp \
     notifwidget.cpp \
     otp.cpp \
-    passwordsec.cpp \
+    passwordsecwidget.cpp \
     reports.cpp \
     reportswidget.cpp \
     signup.cpp \
@@ -50,7 +50,7 @@ HEADERS += \
     loginsession.h \
     notifwidget.h \
     otp.h \
-    passwordsec.h \
+    passwordsecwidget.h \
     reports.h \
     reportswidget.h \
     signup.h \
@@ -71,7 +71,7 @@ FORMS += \
     newdb.ui \
     notifwidget.ui \
     otp.ui \
-    passwordsec.ui \
+    passwordsecwidget.ui \
     reports.ui \
     reportswidget.ui \
     signup.ui \

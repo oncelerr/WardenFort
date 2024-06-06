@@ -13,8 +13,6 @@ reports::reports(QWidget *parent)
 {
     ui->setupUi(this);
     addReportsWidgetsForUniqueDates();
-
-
 }
 
 reports::~reports()
@@ -83,6 +81,7 @@ void reports::addReportsWidget(const QString &reportID, const QString &date, con
 
     // Set the size hint of the QListWidgetItem to match the size hint of the reportsWidget
     item->setSizeHint(sizeHint);
+     qDebug() << "added widget";
 }
 
 

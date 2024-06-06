@@ -1,6 +1,5 @@
 #ifndef PASSWORDSEC_H
 #define PASSWORDSEC_H
-
 #include <QMainWindow>
 #include <QPushButton>
 

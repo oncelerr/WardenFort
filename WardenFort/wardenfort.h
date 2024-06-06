@@ -14,10 +14,11 @@
 #include <QJsonArray>
 #include <pcap.h>
 #include <Winsock2.h>
-
+#include "passwordsecwidget.h"
 #include "accountwidget.h"
 #include "notifwidget.h"
 #include "chatswidget.h"
+#include "reports.h"
 
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -59,6 +60,8 @@ public:
     void gotoNotif();
     void gotoDash();
     void gotoChats();
+    void gotoPasswd();
+    void gotoReports();
 
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
@@ -93,10 +96,11 @@ private:
     void print();
     void createPDFWithTemplate(const QString &fileName, const QString &filePath);
     QVector<CaptureThread*> captureThreads; // Declaration of captureThreads vector
-
+    passwordSecWidget *passwordWidget;
     accountWidget *accountWidget;  // Add this line
     notifWidget *notifWidget;
     chats *chatsWidget;
+    reports *reportsWidget;
 };
 
 #endif // WARDENFORT_H

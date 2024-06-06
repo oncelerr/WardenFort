@@ -395,7 +395,7 @@ border: 0px;</string>
        </size>
       </property>
      </widget>
-     <widget class="QPushButton" name="settingsButton_3">
+     <widget class="QPushButton" name="settingsButton_2">
       <property name="geometry">
        <rect>
         <x>11</x>

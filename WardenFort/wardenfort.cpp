@@ -49,7 +49,6 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
-
 #include <QApplication>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -126,9 +125,11 @@ bool isKnownMaliciousIP(const QString& ip) {
 WardenFort::WardenFort(QWidget* parent)
     : QMainWindow(parent),
     ui(new Ui::WardenFort),
+    passwordWidget(nullptr),
     accountWidget(nullptr),
     notifWidget(nullptr),
-    chatsWidget(nullptr){
+    chatsWidget(nullptr),
+    reportsWidget(nullptr){
     ui->setupUi(this);
 
     if (!ui->frame_2->layout()) {
@@ -151,6 +152,8 @@ WardenFort::WardenFort(QWidget* parent)
     connect(ui->profButton_2, &QPushButton::clicked, this, &WardenFort::gotoProf);
     connect(ui->alertButton_2, &QPushButton::clicked, this, &WardenFort::gotoNotif);
     connect(ui->chatButton_2, &QPushButton::clicked, this, &WardenFort::gotoChats);
+    connect(ui->reportButton_2, &QPushButton::clicked, this, &WardenFort::gotoReports);
+    connect(ui->settingsButton_2, &QPushButton::clicked, this, &WardenFort::gotoPasswd);
 
     connect(this, &WardenFort::dosAttackDetected, this, &WardenFort::showDoSPopup);
 
@@ -167,7 +170,6 @@ WardenFort::WardenFort(QWidget* parent)
 
     loginsession* log = new loginsession;
     QString Name = log->username;
-
 }
 
 WardenFort::~WardenFort()
@@ -1069,27 +1071,6 @@ void WardenFort::saveDataToFile() {
             QString date = dateTimeParts[0];
             QString time = dateTimeParts[1];
 
-            // Prepare the SQL query to insert into the database
-            QSqlQuery query(QSqlDatabase::database()); // Use the existing database connection
-            query.prepare("INSERT INTO packets (date, time, sourceIP, destinationIP, sourcePORT, destinationPORT, flags, capLEN, protocol, info, occurrence) "
-                          "VALUES (:date, :time, :sourceIP, :destinationIP, :sourcePORT, :destinationPORT, :flags, :capLEN, :protocol, :info, :occurrence)");
-            query.bindValue(":date", date);
-            query.bindValue(":time", time);
-            query.bindValue(":sourceIP", rowData[1]);
-            query.bindValue(":destinationIP", rowData[2]);
-            query.bindValue(":sourcePORT", rowData[3]);
-            query.bindValue(":destinationPORT", rowData[4]);
-            query.bindValue(":flags", rowData[5]);
-            query.bindValue(":capLEN", rowData[6]);
-            query.bindValue(":protocol", rowData[7]);
-            query.bindValue(":info", rowData[8]);
-            query.bindValue(":occurrence", occurrenceCount[sourceIP]);
-
-            // Execute the query
-            if (!query.exec()) {
-                qDebug() << "Error inserting data into database:" << query.lastError().text();
-            }
-
 
         }
 
@@ -1109,15 +1090,16 @@ void WardenFort::saveDataToFile() {
         out << occurrenceCount[it.key()] << "\n"; // Write the occurrence count
     }
     // Prepare the SQL query to insert into the reports table
-    QSqlQuery queryReports(QSqlDatabase::database()); // Use the existing database connection
-    queryReports.prepare("INSERT INTO reports (date, time, reportBy) VALUES (:date, :time, :reportBy)");
-    queryReports.bindValue(":date", QDate::currentDate().toString(Qt::ISODate)); // Current date
-    queryReports.bindValue(":time", QTime::currentTime().toString(Qt::ISODate)); // Current time
-    queryReports.bindValue(":reportBy", loggedInUser.username); // Assuming userLabel is the user label
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO reports (date, time, reportBy) VALUES (:date, :time, :reportBy)");
+    query.bindValue(":date", QDate::currentDate().toString(Qt::ISODate)); // Current date
+    query.bindValue(":time", QTime::currentTime().toString(Qt::ISODate)); // Current time
+    query.bindValue(":reportBy", loggedInUser.username); // Assuming userLabel is the user label
 
     // Execute the query for reports table
-    if (!queryReports.exec()) {
-        qDebug() << "Error inserting data into reports table:" << queryReports.lastError().text();
+    if (!query.exec()) {
+        qDebug() << "Error inserting data into reports table:" << query.lastError().text();
     }
 
     file.close();
@@ -1533,6 +1515,12 @@ void WardenFort::gotoNotif() {
     if (chatsWidget) {
         chatsWidget->setVisible(false);
     }
+    if (reportsWidget) {
+        reportsWidget->setVisible(false);
+    }
+    if (passwordWidget) {
+        passwordWidget->setVisible(false);
+    }
 
     ui->frame->setVisible(false);
     notifWidget->setVisible(true);
@@ -1554,9 +1542,65 @@ void WardenFort::gotoChats() {
     if (notifWidget) {
         notifWidget->setVisible(false);
     }
+    if (reportsWidget) {
+        reportsWidget->setVisible(false);
+    }
+    if (passwordWidget) {
+        passwordWidget->setVisible(false);
+    }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
     chatsWidget->setVisible(true); // Show the chats widget
+
+    ui->dashButton_3->setVisible(false);
+    ui->profButton_4->setVisible(false);
+    ui->notifButton_4->setVisible(false);
+}
+
+void WardenFort::gotoReports() {
+    if (!reportsWidget) {
+        reportsWidget = new class reports(this);
+        ui->frame_2->layout()->addWidget(reportsWidget); // Add chatsWidget to the existing layout
+    }
+
+    if (accountWidget) {
+        accountWidget->setVisible(false);
+    }
+    if (notifWidget) {
+        notifWidget->setVisible(false);
+    }
+
+    if (passwordWidget) {
+        passwordWidget->setVisible(false);
+    }
+
+    ui->frame->setVisible(false); // Hide the dashboard frame
+    reportsWidget->setVisible(true); // Show the chats widget
+
+    ui->dashButton_3->setVisible(false);
+    ui->profButton_4->setVisible(false);
+    ui->notifButton_4->setVisible(false);
+}
+
+void WardenFort::gotoPasswd() {
+    if (!passwordWidget) {
+        passwordWidget = new class passwordSecWidget(this);
+        ui->frame_2->layout()->addWidget(passwordWidget); // Add chatsWidget to the existing layout
+    }
+
+    if (accountWidget) {
+        accountWidget->setVisible(false);
+    }
+    if (notifWidget) {
+        notifWidget->setVisible(false);
+    }
+    if (reportsWidget) {
+        reportsWidget->setVisible(false);
+    }
+
+
+    ui->frame->setVisible(false); // Hide the dashboard frame
+    passwordWidget->setVisible(true); // Show the chats widget
 
     ui->dashButton_3->setVisible(false);
     ui->profButton_4->setVisible(false);
