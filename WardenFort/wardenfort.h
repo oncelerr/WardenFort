@@ -14,6 +14,7 @@
 #include <QJsonArray>
 #include <pcap.h>
 #include <Winsock2.h>
+#include <unordered_map>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -59,6 +60,7 @@ public:
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
     void saveDataToFile();
     QString getLocalIpAddress();
+    void readCSV();
 
 public slots:
     void showDoSPopup();
@@ -83,6 +85,14 @@ private:
     BOOL LoadNpcapDlls();
 
     QVector<CaptureThread*> captureThreads; // Declaration of captureThreads vector
+    accountWidget *accountWidget;  // Add this line
+    notifWidget *notifWidget;
+    chats *chatsWidget;
+
+    QString getLocalIpAddress();
+    void initializeDeviceIpFilter();
+
+    QString localIpAddress;
 };
 
 #endif // WARDENFORT_H

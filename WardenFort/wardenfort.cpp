@@ -28,6 +28,8 @@
 #include <unordered_map>
 #include <QMap>
 #include <QProgressDialog>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
 
 #include <QCoreApplication>
 #include <QNetworkAccessManager>
@@ -40,6 +42,9 @@
 #include <QJsonArray>
 #include <QDebug>
 #include <QUrlQuery>
+#include <QMessageBox>
+#include <QSqlQuery>
+#include <QSqlError>
 
 #include <QApplication>
 #include <QFileDialog>
@@ -114,11 +119,20 @@ bool isKnownMaliciousIP(const QString& ip) {
     return maliciousIPs.contains(ip);
 }
 
+// Map to track consecutive appearances of each IP address
+std::unordered_map<QString, int> consecutiveAppearanceCount;
+QString lastSourceIp;
+
+
 WardenFort::WardenFort(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::WardenFort)
 {
     ui->setupUi(this);
+
+    if (!ui->frame_2->layout()) {
+        ui->frame_2->setLayout(new QVBoxLayout()); // Ensure frame_2 has a layout
+    }
 
     networkManager = new QNetworkAccessManager(this);
     manager = new QNetworkAccessManager(this);
@@ -147,6 +161,21 @@ WardenFort::WardenFort(QWidget* parent)
     loginsession* log = new loginsession;
     QString Name = log->username;
 
+    initializeDeviceIpFilter();
+
+}
+
+void WardenFort::initializeDeviceIpFilter() {
+    localIpAddress = getLocalIpAddress();
+}
+
+QString WardenFort::getLocalIpAddress() {
+    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost)) {
+            return address.toString();
+        }
+    }
+    return QString();
 }
 
 WardenFort::~WardenFort()
@@ -394,11 +423,24 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
     QString timestamp = QString(buffer);
 
-    QString packetInfo = "Timestamp: " + timestamp + "\n";
-    packetInfo += "Packet length: " + QString::number(pkthdr->len) + " bytes\n";
-    packetInfo += "Captured length: " + QString::number(pkthdr->caplen) + " bytes\n";
+    QString sourceIp = QString("%1.%2.%3.%4")
+                           .arg(ih->saddr.byte1)
+                           .arg(ih->saddr.byte2)
+                           .arg(ih->saddr.byte3)
+                           .arg(ih->saddr.byte4);
+    QString destIp = QString("%1.%2.%3.%4")
+                         .arg(ih->daddr.byte1)
+                         .arg(ih->daddr.byte2)
+                         .arg(ih->daddr.byte3)
+                         .arg(ih->daddr.byte4);
 
-    const struct my_tcphdr* tcpHeader = reinterpret_cast<const struct my_tcphdr*>(packet + sizeof(ip_header));
+    QString protocol = getProtocolName(ih->proto);
+    QString info = "No Information";
+
+    QColor backgroundColor;
+
+    if (protocol == "TCP") {
+        const struct my_tcphdr* tcpHeader = reinterpret_cast<const struct my_tcphdr*>(packet + sizeof(ip_header));
 
     QString sourceIp = QString("%1.%2.%3.%4")
                            .arg(ih->saddr.byte1)
@@ -481,32 +523,26 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
         }
         if (connectionCount[sourceIp] > threshold) {
             info = "Threat detected: Potential DoS Attack from " + sourceIp;
+        // New logic to detect potential DoS attacks
+        // Check if the source IP matches the local IP
+        if (sourceIp != wardenFort->localIpAddress) {
+            // If the source IP is not the local IP, proceed with DoS detection
+            if (sourceIp == wardenFort->lastSourceIp) {
+                wardenFort->consecutiveAppearanceCount[sourceIp]++;
+            } else {
+                wardenFort->consecutiveAppearanceCount[wardenFort->lastSourceIp] = 0;
+            }
+            wardenFort->lastSourceIp = sourceIp;
 
-            j++;
-            k = i + j;
-            wardenFort->setcriticalAnomalies(QString::number(j));
-            wardenFort->setOverallAlert(QString::number(k));
-            backgroundColor = QColor(75, 44, 44); //red
+            if (wardenFort->consecutiveAppearanceCount[sourceIp] >= 10) {
+                info = "Threat detected: Potential DoS Attack from " + sourceIp;
+                j++;
+                k = i + j;
+                wardenFort->setcriticalAnomalies(QString::number(j));
+                wardenFort->setOverallAlert(QString::number(k));
+                backgroundColor = QColor(75, 44, 44); //red
+            }
         }
-
-        if (dport == unusualPort) {
-            info = "Threat detected: Communication over unusual port " + QString::number(dport);
-            i++;
-            k = i + j;
-            wardenFort->settrafficAnomalies(i);
-            wardenFort->setOverallAlert(QString::number(k));
-            backgroundColor = QColor(75, 44, 44); //red
-        }
-
-        if (containsKnownExploitSignature(packet)) {
-            info = "Threat detected: Known exploit attempt";
-            j++;
-            k = i + j;
-            wardenFort->setcriticalAnomalies(QString::number(j));
-            wardenFort->setOverallAlert(QString::number(k));
-            backgroundColor = QColor(75, 44, 44); //red
-        }
-
     } else if (protocol == "UDP") {
         backgroundColor = QColor(45, 44, 75);  // blue UDP packets
 
@@ -607,6 +643,7 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
                 qDebug() << "Database not open!";
             }
         }
+    }
     }
 }
 
@@ -1280,4 +1317,200 @@ void WardenFort::gotoNotif(){
     notification *notif = new notification;
     notif->show();
     this->hide();
+
+void WardenFort::putIntoCSV(const QByteArray& iaResponseData)
+{
+    // Parse JSON response data
+    QJsonParseError iaError;
+    QJsonDocument iaJsonDoc = QJsonDocument::fromJson(iaResponseData, &iaError);
+    if (iaError.error != QJsonParseError::NoError) {
+        qDebug() << "Error parsing JSON:" << iaError.errorString();
+        // Handle parsing error here
+        return;
+    }
+
+    // Extract relevant fields from JSON
+    QJsonObject iaDataObj = iaJsonDoc.object().value("data").toObject();
+    QString ipAddress = iaDataObj.value("ipAddress").toString();
+    QString isPublic = iaDataObj.value("isPublic").toBool() ? "true" : "false";
+    QString isWhitelisted = iaDataObj.value("isWhitelisted").toBool() ? "true" : "false";
+    QString abuseConfidenceScore = QString::number(iaDataObj.value("abuseConfidenceScore").toInt());
+    QString countryCode = iaDataObj.value("countryCode").toString();
+    QString isp = iaDataObj.value("isp").toString();
+    QString domain = iaDataObj.value("domain").toString();
+    QString isTor = iaDataObj.value("isTor").toBool() ? "true" : "false";
+    QString totalReports = QString::number(iaDataObj.value("totalReports").toInt());
+
+    // Write data to CSV
+    QFile file("multiple.csv");
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        qDebug() << "Failed to open file for writing";
+        return;
+    }
+
+    QTextStream fout(&file);
+
+    // Check if the file is empty
+    if (file.size() == 0) {
+        fout << "IP Address" << ","
+             << "Is Public" << ","
+             << "Is White Listed" << ","
+             << "Abuse Confidence Score" << ","
+             << "Country Code" << ","
+             << "ISP" << ","
+             << "Domain" << ","
+             << "Is Tor" << ","
+             << "Total Reports" << "\n";
+    }
+
+    fout << ipAddress << ","
+         << isPublic << ","
+         << isWhitelisted << ","
+         << abuseConfidenceScore << ","
+         << countryCode << ","
+         << isp << ","
+         << domain << ","
+         << isTor << ","
+         << totalReports << "\n";
+
+    file.close();
+}
+
+void WardenFort::checkIACSV(QString ip)
+{
+    // Create a QNetworkAccessManager instance
+    QNetworkAccessManager* manager = new QNetworkAccessManager(this);
+
+    // Connect the finished signal of the network reply to a lambda function
+    // Connect the finished signal of the QNetworkAccessManager to a lambda function for handling the response
+    connect(manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply* reply) {
+        if (reply->error() == QNetworkReply::NoError) {
+            qDebug() << "Request succeeded";
+            // Read response
+            QByteArray iaCheck = reply->readAll();
+            // Process and write to CSV
+            putIntoCSV(iaCheck);
+        } else {
+            qDebug() << "Request failed:" << reply->errorString();
+            // Notify the user or handle the error appropriately
+            QMessageBox::critical(this, "Error", "Failed to retrieve data from the server. Error: " + reply->errorString());
+        }
+        // Clean up
+        reply->deleteLater();
+    });
+
+    // Create a QNetworkRequest with the desired URL and headers
+    QNetworkRequest request(QUrl("https://api.abuseipdb.com/api/v2/check?ipAddress=" + ip));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Key", "94806f1bbd82cdd8b87b7ed5567d0204fe57accf05554e2a02fedd02e3074a6ef0fafd2630c3f1cf");
+
+    // Perform the network request
+    QNetworkReply *reply = manager->get(request);
+
+    // Check for errors in starting the request
+    if (reply == nullptr) {
+        qDebug() << "Failed to start the request.";
+        // Notify the user or handle the error appropriately
+        QMessageBox::critical(this, "Error", "Failed to start the request.");
+        // Clean up
+        delete reply;
+    }
+
+}
+
+void WardenFort::gotoProf() {
+    if (!accountWidget) {
+        accountWidget = new class accountWidget(this);
+        ui->frame_2->layout()->addWidget(accountWidget); // Add accountWidget to the existing layout
+    }
+
+    if (notifWidget) {
+        notifWidget->setVisible(false);
+    }
+    if (chatsWidget) {
+        chatsWidget->setVisible(false);
+    }
+
+    ui->frame->setVisible(false); // Hide the dashboard frame
+    accountWidget->setVisible(true); // Show the account widget
+
+    // Animate the movement of roundedBG to (2, 86) with ease-in and ease-out effect
+    QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
+    animation->setDuration(1000); // Duration in milliseconds
+    animation->setStartValue(ui->roundedBG->geometry());
+    animation->setEndValue(QRect(2, 485, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void WardenFort::gotoDash() {
+    if (accountWidget) {
+        accountWidget->setVisible(false);
+    }
+    if (notifWidget) {
+        notifWidget->setVisible(false);
+    }
+    if (chatsWidget) {
+        chatsWidget->setVisible(false);
+    }
+
+    ui->frame->setVisible(true);
+
+    // Animate the movement of roundedBG to (2, 86) with ease-in and ease-out effect
+    QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
+    animation->setDuration(1000); // Duration in milliseconds
+    animation->setStartValue(ui->roundedBG->geometry());
+    animation->setEndValue(QRect(2, 86, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void WardenFort::gotoNotif() {
+    if (!notifWidget) {
+        notifWidget = new class notifWidget(this);
+        ui->frame_2->layout()->addWidget(notifWidget); // Add notifWidget to the existing layout
+    }
+
+    if (accountWidget) {
+        accountWidget->setVisible(false);
+    }
+    if (chatsWidget) {
+        chatsWidget->setVisible(false);
+    }
+
+    ui->frame->setVisible(false);
+    notifWidget->setVisible(true);
+
+    // Animate the movement of roundedBG to (2, 86) with ease-in and ease-out effect
+    QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
+    animation->setDuration(500); // Duration in milliseconds
+    animation->setStartValue(ui->roundedBG->geometry());
+    animation->setEndValue(QRect(2, 143, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void WardenFort::gotoChats() {
+    if (!chatsWidget) {
+        chatsWidget = new class chats(this);
+        ui->frame_2->layout()->addWidget(chatsWidget); // Add chatsWidget to the existing layout
+    }
+
+    if (accountWidget) {
+        accountWidget->setVisible(false);
+    }
+    if (notifWidget) {
+        notifWidget->setVisible(false);
+    }
+
+    ui->frame->setVisible(false); // Hide the dashboard frame
+    chatsWidget->setVisible(true); // Show the chats widget
+
+    // Animate the movement of roundedBG to (2, 86) with ease-in and ease-out effect
+    QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
+    animation->setDuration(500); // Duration in milliseconds
+    animation->setStartValue(ui->roundedBG->geometry());
+    animation->setEndValue(QRect(2, 323, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
