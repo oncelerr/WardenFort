@@ -1585,6 +1585,9 @@ void WardenFort::gotoReports() {
     if (passwordWidget) {
         passwordWidget->setVisible(false);
     }
+    if (chatsWidget) {
+        chatsWidget->setVisible(false);
+    }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
     reportsWidget->setVisible(true); // Show the chats widget
@@ -1609,7 +1612,9 @@ void WardenFort::gotoPasswd() {
     if (reportsWidget) {
         reportsWidget->setVisible(false);
     }
-
+    if (chatsWidget) {
+        chatsWidget->setVisible(false);
+    }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
     passwordWidget->setVisible(true); // Show the chats widget
