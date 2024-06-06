@@ -521,20 +521,19 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
             wardenFort->setOverallAlert(QString::number(k));
             backgroundColor = QColor(75, 44, 44); //red
         }
-        if (connectionCount[sourceIp] > threshold) {
-            info = "Threat detected: Potential DoS Attack from " + sourceIp;
+
         // New logic to detect potential DoS attacks
         // Check if the source IP matches the local IP
-        if (sourceIp != wardenFort->localIpAddress) {
+        if (sourceIp != localIpAddress) {
             // If the source IP is not the local IP, proceed with DoS detection
-            if (sourceIp == wardenFort->lastSourceIp) {
-                wardenFort->consecutiveAppearanceCount[sourceIp]++;
+            if (sourceIp == lastSourceIp) {
+                consecutiveAppearanceCount[sourceIp]++;
             } else {
-                wardenFort->consecutiveAppearanceCount[wardenFort->lastSourceIp] = 0;
+                consecutiveAppearanceCount[lastSourceIp] = 0;
             }
-            wardenFort->lastSourceIp = sourceIp;
+            lastSourceIp = sourceIp;
 
-            if (wardenFort->consecutiveAppearanceCount[sourceIp] >= 10) {
+            if (consecutiveAppearanceCount[sourceIp] >= 10) {
                 info = "Threat detected: Potential DoS Attack from " + sourceIp;
                 j++;
                 k = i + j;

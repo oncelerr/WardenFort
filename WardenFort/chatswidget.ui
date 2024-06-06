@@ -1,0 +1,1092 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>chats</class>
+ <widget class="QWidget" name="chats">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1044</width>
+    <height>541</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QWidget" name="chat_bg" native="true">
+      <property name="geometry">
+       <rect>
+        <x>235</x>
+        <y>1</y>
+        <width>782</width>
+        <height>519</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">    background-color: rgb(44, 60, 75);
+border-radius: 10px;
+</string>
+      </property>
+      <widget class="QWidget" name="user_bg_3" native="true">
+       <property name="geometry">
+        <rect>
+         <x>42</x>
+         <y>20</y>
+         <width>716</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(27, 31, 48);
+border-radius: 20px;
+</string>
+       </property>
+       <widget class="QGraphicsView" name="user_img_2">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>10</y>
+          <width>31</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="user_name_2">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>17</y>
+          <width>49</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 255, 255);</string>
+        </property>
+        <property name="text">
+         <string>null</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="callButton_2">
+        <property name="geometry">
+         <rect>
+          <x>580</x>
+          <y>13</y>
+          <width>40</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="wardenfort.qrc">
+          <normaloff>:/wardenfort/phone-call.png</normaloff>:/wardenfort/phone-call.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="findButton_2">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>12</y>
+          <width>30</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="wardenfort.qrc">
+          <normaloff>:/wardenfort/find.png</normaloff>:/wardenfort/find.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="optionButton_2">
+        <property name="geometry">
+         <rect>
+          <x>670</x>
+          <y>12</y>
+          <width>30</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="wardenfort.qrc">
+          <normaloff>:/wardenfort/dots.png</normaloff>:/wardenfort/dots.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QLineEdit" name="typeField_2">
+       <property name="geometry">
+        <rect>
+         <x>43</x>
+         <y>449</y>
+         <width>681</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(27, 31, 48);
+color: rgb(255, 255, 255);
+border-radius: 20px;
+padding-left: 20px;</string>
+       </property>
+       <property name="placeholderText">
+        <string>Type your message</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="uploadimgButton_2">
+       <property name="geometry">
+        <rect>
+         <x>573</x>
+         <y>464</y>
+         <width>40</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="wardenfort.qrc">
+         <normaloff>:/wardenfort/photo.png</normaloff>:/wardenfort/photo.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="emojiButton_2">
+       <property name="geometry">
+        <rect>
+         <x>620</x>
+         <y>463</y>
+         <width>40</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="wardenfort.qrc">
+         <normaloff>:/wardenfort/happy.png</normaloff>:/wardenfort/happy.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="sendButton_2">
+       <property name="geometry">
+        <rect>
+         <x>736</x>
+         <y>465</y>
+         <width>40</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="wardenfort.qrc">
+         <normaloff>:/wardenfort/send.png</normaloff>:/wardenfort/send.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="uploadfileButton_2">
+       <property name="geometry">
+        <rect>
+         <x>659</x>
+         <y>462</y>
+         <width>40</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="wardenfort.qrc">
+         <normaloff>:/wardenfort/upload (1).png</normaloff>:/wardenfort/upload (1).png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="receiver_img_3">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>90</y>
+         <width>31</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="receiver_box_3">
+       <property name="geometry">
+        <rect>
+         <x>95</x>
+         <y>100</y>
+         <width>301</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+    background-color: rgba(27, 31, 48, 0.5);
+}</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="receiver_time_3">
+       <property name="geometry">
+        <rect>
+         <x>61</x>
+         <y>127</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="sender_time_2">
+       <property name="geometry">
+        <rect>
+         <x>746</x>
+         <y>245</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="sender_img_2">
+       <property name="geometry">
+        <rect>
+         <x>740</x>
+         <y>208</y>
+         <width>31</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="sender_box_2">
+       <property name="geometry">
+        <rect>
+         <x>432</x>
+         <y>219</y>
+         <width>301</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+    background-color: rgba(27, 31, 48, 0.5);
+}</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="receiver_time_4">
+       <property name="geometry">
+        <rect>
+         <x>66</x>
+         <y>357</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="receiver_img_4">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>320</y>
+         <width>31</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="receiver_box_4">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>330</y>
+         <width>301</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+    background-color: rgba(27, 31, 48, 0.5);
+}</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QLabel" name="searching">
+      <property name="geometry">
+       <rect>
+        <x>208</x>
+        <y>22</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="wardenfort.qrc">:/wardenfort/search.png</pixmap>
+      </property>
+     </widget>
+     <widget class="QWidget" name="user_bg" native="true">
+      <property name="geometry">
+       <rect>
+        <x>1</x>
+        <y>1</y>
+        <width>261</width>
+        <height>519</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: #191F32;
+border-radius: 20px;
+</string>
+      </property>
+      <widget class="QGraphicsView" name="recipientimg1_2">
+       <property name="geometry">
+        <rect>
+         <x>17</x>
+         <y>85</y>
+         <width>31</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_name_8">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>79</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 700 11pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_message_8">
+       <property name="geometry">
+        <rect>
+         <x>64</x>
+         <y>99</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_time_8">
+       <property name="geometry">
+        <rect>
+         <x>212</x>
+         <y>92</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 7pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>00:00</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="line1_2">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>70</y>
+         <width>231</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	background-color: rgb(44, 60, 75);
+}</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_name_9">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>149</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 700 11pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="recipientimg2_2">
+       <property name="geometry">
+        <rect>
+         <x>17</x>
+         <y>155</y>
+         <width>31</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_time_9">
+       <property name="geometry">
+        <rect>
+         <x>212</x>
+         <y>162</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 7pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>00:00</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_message_9">
+       <property name="geometry">
+        <rect>
+         <x>64</x>
+         <y>169</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="line2_2">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>140</y>
+         <width>231</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	background-color: rgb(44, 60, 75);
+}</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_name_10">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>219</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 700 11pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="recipientimg3_2">
+       <property name="geometry">
+        <rect>
+         <x>17</x>
+         <y>225</y>
+         <width>31</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_time_10">
+       <property name="geometry">
+        <rect>
+         <x>212</x>
+         <y>232</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 7pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>00:00</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_message_10">
+       <property name="geometry">
+        <rect>
+         <x>64</x>
+         <y>239</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="line3_2">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>210</y>
+         <width>231</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	background-color: rgb(44, 60, 75);
+}</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_name_11">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>289</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 700 11pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="recipientimg4_2">
+       <property name="geometry">
+        <rect>
+         <x>17</x>
+         <y>295</y>
+         <width>31</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_time_11">
+       <property name="geometry">
+        <rect>
+         <x>212</x>
+         <y>302</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 7pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>00:00</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_message_11">
+       <property name="geometry">
+        <rect>
+         <x>64</x>
+         <y>309</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="line4_2">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>280</y>
+         <width>271</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	background-color: rgb(44, 60, 75);
+}</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="line5_2">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>350</y>
+         <width>231</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	background-color: rgb(44, 60, 75);
+}</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_name_12">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>359</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 700 11pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_time_12">
+       <property name="geometry">
+        <rect>
+         <x>212</x>
+         <y>372</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 7pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>00:00</string>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="recipientimg5_2">
+       <property name="geometry">
+        <rect>
+         <x>17</x>
+         <y>365</y>
+         <width>31</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_message_12">
+       <property name="geometry">
+        <rect>
+         <x>64</x>
+         <y>379</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_name_13">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>429</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 700 11pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="recipientimg6_2">
+       <property name="geometry">
+        <rect>
+         <x>17</x>
+         <y>435</y>
+         <width>31</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView {
+    background-color: rgb(255, 255, 255);
+    width: 25px; /* Set width and height to same value */
+    height: 25px; /* Set width and height to same value */
+    border-radius: 15px; /* Half of width/height for a circle */
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_time_13">
+       <property name="geometry">
+        <rect>
+         <x>212</x>
+         <y>442</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+font: 7pt &quot;Segoe UI&quot;;
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>00:00</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="recipient_message_13">
+       <property name="geometry">
+        <rect>
+         <x>64</x>
+         <y>449</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255, 0);</string>
+       </property>
+       <property name="text">
+        <string>null</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_10">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>420</y>
+         <width>231</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+	background-color: rgb(44, 60, 75);
+}</string>
+       </property>
+      </widget>
+      <zorder>lineEdit_10</zorder>
+      <zorder>line4_2</zorder>
+      <zorder>line3_2</zorder>
+      <zorder>line2_2</zorder>
+      <zorder>line1_2</zorder>
+      <zorder>recipientimg1_2</zorder>
+      <zorder>recipient_name_8</zorder>
+      <zorder>recipient_message_8</zorder>
+      <zorder>recipient_time_8</zorder>
+      <zorder>recipient_name_9</zorder>
+      <zorder>recipientimg2_2</zorder>
+      <zorder>recipient_time_9</zorder>
+      <zorder>recipient_message_9</zorder>
+      <zorder>recipient_name_10</zorder>
+      <zorder>recipientimg3_2</zorder>
+      <zorder>recipient_time_10</zorder>
+      <zorder>recipient_message_10</zorder>
+      <zorder>recipient_name_11</zorder>
+      <zorder>recipientimg4_2</zorder>
+      <zorder>recipient_time_11</zorder>
+      <zorder>recipient_message_11</zorder>
+      <zorder>line5_2</zorder>
+      <zorder>recipient_name_12</zorder>
+      <zorder>recipient_time_12</zorder>
+      <zorder>recipientimg5_2</zorder>
+      <zorder>recipient_message_12</zorder>
+      <zorder>recipient_name_13</zorder>
+      <zorder>recipientimg6_2</zorder>
+      <zorder>recipient_time_13</zorder>
+      <zorder>recipient_message_13</zorder>
+     </widget>
+     <widget class="QLineEdit" name="searchField">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>17</y>
+        <width>221</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 0px;    
+background-color: rgb(44, 60, 75);
+border-radius: 10px;
+padding-left: 10px;
+color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="placeholderText">
+       <string>search</string>
+      </property>
+     </widget>
+     <zorder>chat_bg</zorder>
+     <zorder>user_bg</zorder>
+     <zorder>searchField</zorder>
+     <zorder>searching</zorder>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="wardenfort.qrc"/>
+ </resources>
+ <connections/>
+</ui>
