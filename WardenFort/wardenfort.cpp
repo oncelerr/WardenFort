@@ -543,7 +543,7 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
             }
             lastSourceIp = sourceIp;
 
-            if (consecutiveAppearanceCount[sourceIp] >= 10) {
+            if (consecutiveAppearanceCount[sourceIp] >= 8) {
                 info = "Threat detected: Potential DoS Attack from " + sourceIp;
                 j++;
                 k = i + j;
@@ -1525,9 +1525,9 @@ void WardenFort::gotoProf() {
 
     // Animate the movement of roundedBG to (2, 86) with ease-in and ease-out effect
     QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
-    animation->setDuration(1000); // Duration in milliseconds
+    animation->setDuration(500); // Duration in milliseconds
     animation->setStartValue(ui->roundedBG->geometry());
-    animation->setEndValue(QRect(2, 485, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEndValue(QRect(-9, 501, ui->roundedBG->width(), ui->roundedBG->height()));
     animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
@@ -1547,9 +1547,9 @@ void WardenFort::gotoDash() {
 
     // Animate the movement of roundedBG to (2, 86) with ease-in and ease-out effect
     QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
-    animation->setDuration(1000); // Duration in milliseconds
+    animation->setDuration(500); // Duration in milliseconds
     animation->setStartValue(ui->roundedBG->geometry());
-    animation->setEndValue(QRect(2, 86, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEndValue(QRect(-9, 102, ui->roundedBG->width(), ui->roundedBG->height()));
     animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
@@ -1574,7 +1574,7 @@ void WardenFort::gotoNotif() {
     QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
     animation->setDuration(500); // Duration in milliseconds
     animation->setStartValue(ui->roundedBG->geometry());
-    animation->setEndValue(QRect(2, 143, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEndValue(QRect(-9, 160, ui->roundedBG->width(), ui->roundedBG->height()));
     animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
@@ -1599,7 +1599,7 @@ void WardenFort::gotoChats() {
     QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
     animation->setDuration(500); // Duration in milliseconds
     animation->setStartValue(ui->roundedBG->geometry());
-    animation->setEndValue(QRect(2, 323, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEndValue(QRect(-9, 340, ui->roundedBG->width(), ui->roundedBG->height()));
     animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }

@@ -66,7 +66,6 @@ public:
     void saveDataToFile();
     void readCSV();
     QString getLocalIpAddress();
-    void readCSV();
 
 public slots:
     void showDoSPopup();
