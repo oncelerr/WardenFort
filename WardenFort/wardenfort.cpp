@@ -1476,6 +1476,12 @@ void WardenFort::gotoProf() {
     if (chatsWidget) {
         chatsWidget->setVisible(false);
     }
+    if (reportsWidget) {
+        reportsWidget->setVisible(false);
+    }
+    if (passwordWidget) {
+        passwordWidget->setVisible(false);
+    }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
     accountWidget->setVisible(true); // Show the account widget
@@ -1494,6 +1500,12 @@ void WardenFort::gotoDash() {
     }
     if (chatsWidget) {
         chatsWidget->setVisible(false);
+    }
+    if (reportsWidget) {
+        reportsWidget->setVisible(false);
+    }
+    if (passwordWidget) {
+        passwordWidget->setVisible(false);
     }
 
     ui->frame->setVisible(true);
