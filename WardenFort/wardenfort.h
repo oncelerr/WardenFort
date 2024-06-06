@@ -103,9 +103,6 @@ private:
     notifWidget *notifWidget;
     chats *chatsWidget;
     reports *reportsWidget;
-    accountWidget *accountWidget;  // Add this line
-    notifWidget *notifWidget;
-    chats *chatsWidget;
 
     void initializeDeviceIpFilter();
 };

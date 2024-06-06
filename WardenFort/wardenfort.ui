@@ -621,11 +621,11 @@ border-top-right-radius: 10px;</string>
       </widget>
      </widget>
      <zorder>roundedBG</zorder>
+     <zorder>settingsButton_2</zorder>
      <zorder>chatButton_2</zorder>
      <zorder>alertButton_2</zorder>
      <zorder>calendarButton_2</zorder>
      <zorder>dashButton_2</zorder>
-     <zorder>settingsButton_3</zorder>
      <zorder>reportButton_2</zorder>
      <zorder>logoButton_2</zorder>
      <zorder>profButton_2</zorder>

@@ -1633,9 +1633,13 @@ void WardenFort::gotoReports() {
     ui->frame->setVisible(false); // Hide the dashboard frame
     reportsWidget->setVisible(true); // Show the chats widget
 
-    ui->dashButton_3->setVisible(false);
-    ui->profButton_4->setVisible(false);
-    ui->notifButton_4->setVisible(false);
+    // Animate the movement of roundedBG to (2, 86) with ease-in and ease-out effect
+    QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
+    animation->setDuration(500); // Duration in milliseconds
+    animation->setStartValue(ui->roundedBG->geometry());
+    animation->setEndValue(QRect(-9, 218, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void WardenFort::gotoPasswd() {
@@ -1660,7 +1664,11 @@ void WardenFort::gotoPasswd() {
     ui->frame->setVisible(false); // Hide the dashboard frame
     passwordWidget->setVisible(true); // Show the chats widget
 
-    ui->dashButton_3->setVisible(false);
-    ui->profButton_4->setVisible(false);
-    ui->notifButton_4->setVisible(false);
+    // Animate the movement of roundedBG to (2, 86) with ease-in and ease-out effect
+    QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
+    animation->setDuration(500); // Duration in milliseconds
+    animation->setStartValue(ui->roundedBG->geometry());
+    animation->setEndValue(QRect(-9, 396, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
