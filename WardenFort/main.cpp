@@ -26,19 +26,20 @@ int main(int argc, char* argv[])
 
     qDebug() << "Database connected successfully";
 
-    //login login;
-    //login.show();
+    login login;
+    login.show();
+
     reports reports;
     //reports.show();
 
-
     //CalendarNotifications calendarnotifications;
     //calendarnotifications.show();
+
     //Calendar calendar;
     //calendar.show();
 
     WardenFort wardenfort;
-    wardenfort.show();
+    //wardenfort.show();
 
     return a.exec();
 }

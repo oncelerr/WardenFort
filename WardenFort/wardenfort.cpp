@@ -1093,29 +1093,6 @@ void WardenFort::saveDataToFile() {
             QStringList dateTimeParts = rowData[0].split(' ');
             QString date = dateTimeParts[0];
             QString time = dateTimeParts[1];
-
-            // Prepare the SQL query to insert into the database
-            QSqlQuery query(QSqlDatabase::database()); // Use the existing database connection
-            query.prepare("INSERT INTO packets (date, time, sourceIP, destinationIP, sourcePORT, destinationPORT, flags, capLEN, protocol, info, occurrence) "
-                          "VALUES (:date, :time, :sourceIP, :destinationIP, :sourcePORT, :destinationPORT, :flags, :capLEN, :protocol, :info, :occurrence)");
-            query.bindValue(":date", date);
-            query.bindValue(":time", time);
-            query.bindValue(":sourceIP", rowData[1]);
-            query.bindValue(":destinationIP", rowData[2]);
-            query.bindValue(":sourcePORT", rowData[3]);
-            query.bindValue(":destinationPORT", rowData[4]);
-            query.bindValue(":flags", rowData[5]);
-            query.bindValue(":capLEN", rowData[6]);
-            query.bindValue(":protocol", rowData[7]);
-            query.bindValue(":info", rowData[8]);
-            query.bindValue(":occurrence", occurrenceCount[sourceIP]);
-
-            // Execute the query
-            if (!query.exec()) {
-                qDebug() << "Error inserting data into database:" << query.lastError().text();
-            }
-
-
         }
 
         // Update the progress dialog
