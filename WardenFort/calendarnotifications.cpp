@@ -70,17 +70,9 @@ void CalendarNotifications::updateNotifications() {
             QString text = notif.second.first;
             bool isImportant = notif.second.second;
 
-            NotificationWidget *widget = new NotificationWidget();
-            widget->setDate("");
-            widget->setTime(time);
-            widget->setText(isImportant ? "<span style='color:red;'>" + text + "</span>" : text);
-            widget->setImportant(isImportant);
-
             QListWidgetItem *item = new QListWidgetItem(ui->notificationList);
-            item->setSizeHint(widget->sizeHint());
 
             ui->notificationList->addItem(item);
-            ui->notificationList->setItemWidget(item, widget);
         }
     }
 

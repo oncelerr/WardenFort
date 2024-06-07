@@ -1540,6 +1540,10 @@ void WardenFort::gotoNotif() {
     if (!notifWidget) {
         notifWidget = new class notifWidget(this);
         ui->frame_2->layout()->addWidget(notifWidget); // Add notifWidget to the existing layout
+    } else {
+        int offset = 0;
+
+        notifWidget->addNotifications(offset, 6);  // Update notifications every time the screen is shown
     }
 
     if (accountWidget) {

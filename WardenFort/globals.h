@@ -4,7 +4,7 @@
 #include <QString>
 
 struct User {
-    int userId = -1;
+    int userId = 1;
     QString username;
     QString password;
     QString firstName;
