@@ -16,7 +16,6 @@ CONFIG += c++17
 SOURCES += \
     accountwidget.cpp \
     animatedlabel.cpp \
-    calendar.cpp \
     calendarnotifications.cpp\
     chatswidget.cpp \
     customcalendarwidget.cpp \
@@ -41,7 +40,6 @@ SOURCES += \
 
 HEADERS += \
     accountwidget.h \
-    calendar.h \
     calendarnotifications.h\
     chatswidget.h \
     customcalendarwidget.h \

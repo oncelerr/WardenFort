@@ -6,7 +6,6 @@
         <file>bell.png</file>
         <file>c1.png</file>
         <file>cal_icon.png</file>
-        <file>calendar.png</file>
         <file>chat (2).png</file>
         <file>chat1.png</file>
         <file>cyber (1).png</file>
@@ -63,6 +62,7 @@
         <file>wf_smol (1).png</file>
         <file>wf_smol.png</file>
         <file>p1.png</file>
+        <file>calendar.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
