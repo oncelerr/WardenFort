@@ -6,10 +6,17 @@
 #include <QFontDatabase>
 #include <QTextCharFormat>
 #include <QHBoxLayout>
+#include <QSqlError>
+#include "database.h"
 
 CustomCalendarWidget::CustomCalendarWidget(QWidget *parent)
     : QCalendarWidget(parent), yearComboBox(new QComboBox(this))
 {
+    // Initialize the database
+    //initializeDatabase();
+
+    loadEvents();
+
     // Load Inter font
     int fontId = QFontDatabase::addApplicationFont(":/fonts/Inter-Regular.ttf"); // Ensure this path is correct
     QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
@@ -66,6 +73,78 @@ CustomCalendarWidget::CustomCalendarWidget(QWidget *parent)
 
     // Connect the signal to open the event dialog when a date is selected
     connect(this, &QCalendarWidget::activated, this, &CustomCalendarWidget::addEvent);
+}
+
+void CustomCalendarWidget::initializeDatabase()
+{
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("D:/WardenFort/WardenFort/wardenfort.db");
+
+    if (!db.open()) {
+        QMessageBox::critical(this, "Database Error", db.lastError().text());
+        return;
+    }
+
+    QSqlQuery query;
+    if (!query.exec("CREATE TABLE IF NOT EXISTS events (date TEXT, event TEXT, description TEXT)")) {
+        QMessageBox::critical(this, "Database Error", query.lastError().text());
+    }
+}
+void CustomCalendarWidget::loadEvents()
+{
+    QSqlDatabase db = Database::getConnection();
+    if (!db.open()) {
+        QMessageBox::critical(this, "Database Error", db.lastError().text());
+        return;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM calendar");
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Database Error", query.lastError().text());
+        return;
+    }
+
+    while (query.next()) {
+        QString dateString = query.value(2).toString().trimmed();
+        QDate date = QDate::fromString(dateString, "yyyy-MM-dd");
+
+        if (!date.isValid()) {
+            qDebug() << "Invalid date format for:" << dateString;
+            continue;
+        }
+
+        QString eventTitle = query.value(0).toString();
+        QString description = query.value(1).toString();
+        events[date].append(eventTitle);
+
+        // Debug output to verify data loading
+        qDebug() << "Loaded event:" << eventTitle << "for date:" << date.toString();
+    }
+
+    db.close();
+}
+
+
+
+void CustomCalendarWidget::saveEventToDatabase(const QDate &date, const QString &eventTitle, const QString &eventDescription)
+{
+    QSqlDatabase db = Database::getConnection();
+    if (!db.open()) {
+        QMessageBox::critical(this, "Database Error", db.lastError().text());
+        return;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO calendar (date, events, description) VALUES (:date, :event, :description)");
+    query.bindValue(":date", date.toString(Qt::ISODate));
+    query.bindValue(":event", eventTitle);
+    query.bindValue(":description", eventDescription);
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Database Error", query.lastError().text());
+    }
+
+    db.close();
 }
 
 void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate date) const
@@ -134,6 +213,12 @@ void CustomCalendarWidget::addEvent(const QDate &date)
             // Highlight the date with no background change
             QTextCharFormat format;
             setDateTextFormat(date, format);
+
+            // Save the event to the database
+            saveEventToDatabase(date, eventTitle, eventDescription);
+
+            // Update the calendar to reflect the new event
+            updateCells();
         }
     }
 }
