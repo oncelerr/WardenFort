@@ -15,5 +15,5 @@ Calendar::Calendar(QWidget *parent) :
 
 Calendar::~Calendar() // Define the destructor here
 {
-    delete ui;
+    delete customWidget;
 }
