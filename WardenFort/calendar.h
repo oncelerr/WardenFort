@@ -2,6 +2,7 @@
 #define CALENDAR_H
 
 #include <QMainWindow>
+#include "CustomCalendarWidget.h"
 
 namespace Ui {
 class Calendar;
@@ -17,6 +18,7 @@ public:
 
 private:
     Ui::Calendar *ui;
+    CustomCalendarWidget *customWidget;
 };
 
 #endif // CALENDAR_H

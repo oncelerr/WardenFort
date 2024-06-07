@@ -7,7 +7,8 @@
 #include <QDate>
 #include <QComboBox>
 #include <QPainter>
-#include <QPaintEvent>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
 class CustomCalendarWidget : public QCalendarWidget
 {
@@ -26,6 +27,11 @@ protected:
 private:
     QMap<QDate, QVector<QString>> events; // Store events
     QComboBox *yearComboBox; // Dropdown for year selection
+    QSqlDatabase db; // Database connection
+
+    void initializeDatabase();
+    void loadEvents();
+    void saveEventToDatabase(const QDate &date, const QString &eventTitle, const QString &eventDescription);
 };
 
 #endif // CUSTOMCALENDARWIDGET_H

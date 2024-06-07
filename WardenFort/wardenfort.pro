@@ -16,8 +16,11 @@ CONFIG += c++17
 SOURCES += \
     accountwidget.cpp \
     animatedlabel.cpp \
+    calendar.cpp \
     calendarnotifications.cpp\
     chatswidget.cpp \
+    customcalendarwidget.cpp \
+    eventdialog.cpp \
     notificationwidget.cpp\
     database.cpp \
     enter.cpp \
@@ -38,8 +41,11 @@ SOURCES += \
 
 HEADERS += \
     accountwidget.h \
+    calendar.h \
     calendarnotifications.h\
     chatswidget.h \
+    customcalendarwidget.h \
+    eventdialog.h \
     notificationwidget.h\
     animatedlabel.h \
     database.h \
@@ -62,6 +68,7 @@ FORMS += \
     accountwidget.ui \
     calendarnotifications.ui\
     chatswidget.ui \
+    eventdialog.ui \
     notificationwidget.ui\
     dialog.ui \
     enter.ui \
