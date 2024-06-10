@@ -16,6 +16,7 @@
 #include <Winsock2.h>
 #include "passwordsecwidget.h"
 #include <unordered_map>
+#include "customcalendarwidget.h"
 
 #include "accountwidget.h"
 #include "notifwidget.h"
@@ -64,6 +65,7 @@ public:
     void gotoChats();
     void gotoPasswd();
     void gotoReports();
+    void gotoCalendar();
 
     void startPacketCapture();
     void packetHandler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
@@ -103,6 +105,7 @@ private:
     notifWidget *notifWidget;
     chats *chatsWidget;
     reports *reportsWidget;
+    CustomCalendarWidget *customCalendar = nullptr; // Declare customCalendar here
 
     void initializeDeviceIpFilter();
 };

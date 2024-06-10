@@ -13,8 +13,19 @@ void Database::initializeConnection() {
         db.setDatabaseName("D:/Projects/WardenFort/WardenFort/WardenFort/wardenfort.db");
         if (!db.open()) {
             qDebug() << "Error opening database:" << db.lastError().text();
+        } else {
+            qDebug() << "Database opened successfully";
         }
         dbStorage.setLocalData(db);
+    } else {
+        QSqlDatabase db = dbStorage.localData();
+        if (!db.isOpen()) {
+            if (!db.open()) {
+                qDebug() << "Error re-opening database:" << db.lastError().text();
+            } else {
+                qDebug() << "Database re-opened successfully";
+            }
+        }
     }
 }
 

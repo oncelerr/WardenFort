@@ -1,5 +1,8 @@
 #include "notificationwidget.h"
 #include "ui_notificationwidget.h"
+#include <QMouseEvent>
+#include <QListWidget>
+#include <QListWidgetItem>
 
 NotificationWidget::NotificationWidget(const QString &text, const QString &timeOrDate, QWidget *parent) :
     QWidget(parent),
@@ -13,4 +16,32 @@ NotificationWidget::NotificationWidget(const QString &text, const QString &timeO
 NotificationWidget::~NotificationWidget()
 {
     delete ui;
+}
+
+void NotificationWidget::setDate(const QString &date) {
+
+}
+
+void NotificationWidget::setTime(const QString &time) {
+
+}
+
+void NotificationWidget::setText(const QString &text) {
+
+}
+
+void NotificationWidget::setDetails(const QString &details) {
+
+}
+
+void NotificationWidget::setImportant(bool important) {
+
+}
+
+void NotificationWidget::mousePressEvent(QMouseEvent *event) {
+
+}
+
+void NotificationWidget::onExpandButtonClicked() {
+
 }

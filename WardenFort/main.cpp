@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     //CalendarNotifications calendarnotifications;
     //calendarnotifications.show();
 
-    //Calendar calendar;
+    Calendar calendar;
     //calendar.show();
 
     WardenFort wardenfort;

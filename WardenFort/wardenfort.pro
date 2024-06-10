@@ -5,8 +5,6 @@ QT       += core gui printsupport
 QT       += network
 QT       += sql
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -16,6 +14,7 @@ CONFIG += c++17
 SOURCES += \
     accountwidget.cpp \
     animatedlabel.cpp \
+    calendar.cpp \
     calendarnotifications.cpp\
     chatswidget.cpp \
     customcalendarwidget.cpp \
@@ -40,6 +39,7 @@ SOURCES += \
 
 HEADERS += \
     accountwidget.h \
+    calendar.h \
     calendarnotifications.h\
     chatswidget.h \
     customcalendarwidget.h \
@@ -64,6 +64,7 @@ HEADERS += \
 
 FORMS += \
     accountwidget.ui \
+    calendar.ui \
     calendarnotifications.ui\
     chatswidget.ui \
     eventdialog.ui \

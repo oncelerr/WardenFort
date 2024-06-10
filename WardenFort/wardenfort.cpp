@@ -18,6 +18,7 @@
 #include <QLayout>    // Include QLayout
 #include <QLayoutItem> // Include QLayoutItem
 #include "notifwidget.h"
+#include "customcalendarwidget.h"
 #include "globals.h"
 #include "database.h"
 #include <QFileDialog>
@@ -136,7 +137,8 @@ WardenFort::WardenFort(QWidget* parent)
     accountWidget(nullptr),
     notifWidget(nullptr),
     chatsWidget(nullptr),
-    reportsWidget(nullptr){
+    reportsWidget(nullptr),
+    customCalendar(nullptr){
     ui->setupUi(this);
 
     if (!ui->frame_2->layout()) {
@@ -158,6 +160,7 @@ WardenFort::WardenFort(QWidget* parent)
     connect(ui->chatButton_2, &QPushButton::clicked, this, &WardenFort::gotoChats);
     connect(ui->reportButton_2, &QPushButton::clicked, this, &WardenFort::gotoReports);
     connect(ui->settingsButton_2, &QPushButton::clicked, this, &WardenFort::gotoPasswd);
+    connect(ui->calendarButton_2, &QPushButton::clicked, this, &WardenFort::gotoCalendar);
 
     connect(this, &WardenFort::dosAttackDetected, this, &WardenFort::showDoSPopup);
 
@@ -1495,6 +1498,9 @@ void WardenFort::gotoProf() {
     if (passwordWidget) {
         passwordWidget->setVisible(false);
     }
+    if (customCalendar) {
+        customCalendar->setVisible(false);
+    }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
     accountWidget->setVisible(true); // Show the account widget
@@ -1523,6 +1529,9 @@ void WardenFort::gotoDash() {
     }
     if (passwordWidget) {
         passwordWidget->setVisible(false);
+    }
+    if (customCalendar) {
+        customCalendar->setVisible(false);
     }
 
     ui->frame->setVisible(true);
@@ -1558,6 +1567,9 @@ void WardenFort::gotoNotif() {
     if (passwordWidget) {
         passwordWidget->setVisible(false);
     }
+    if (customCalendar) {
+        customCalendar->setVisible(false);
+    }
 
     ui->frame->setVisible(false);
     notifWidget->setVisible(true);
@@ -1588,6 +1600,9 @@ void WardenFort::gotoChats() {
     }
     if (passwordWidget) {
         passwordWidget->setVisible(false);
+    }
+    if (customCalendar) {
+        customCalendar->setVisible(false);
     }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
@@ -1621,6 +1636,9 @@ void WardenFort::gotoReports() {
     if (chatsWidget) {
         chatsWidget->setVisible(false);
     }
+    if (customCalendar) {
+        customCalendar->setVisible(false);
+    }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
     reportsWidget->setVisible(true); // Show the chats widget
@@ -1652,6 +1670,9 @@ void WardenFort::gotoPasswd() {
     if (chatsWidget) {
         chatsWidget->setVisible(false);
     }
+    if (customCalendar) {
+        customCalendar->setVisible(false);
+    }
 
     ui->frame->setVisible(false); // Hide the dashboard frame
     passwordWidget->setVisible(true); // Show the chats widget
@@ -1664,3 +1685,41 @@ void WardenFort::gotoPasswd() {
     animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
+
+void WardenFort::gotoCalendar() {
+    // If the custom calendar widget is not created yet, create it and add to the layout
+    if (!customCalendar) {
+        customCalendar = new CustomCalendarWidget(this);
+        ui->frame_2->layout()->addWidget(customCalendar); // Add customCalendar to the existing layout
+    }
+
+    // Hide other widgets
+    if (accountWidget) {
+        accountWidget->setVisible(false);
+    }
+    if (notifWidget) {
+        notifWidget->setVisible(false);
+    }
+    if (chatsWidget) {
+        chatsWidget->setVisible(false);
+    }
+    if (reportsWidget) {
+        reportsWidget->setVisible(false);
+    }
+    if (passwordWidget) {
+        passwordWidget->setVisible(false);
+    }
+
+    // Hide the dashboard frame and show the custom calendar widget
+    ui->frame->setVisible(false);
+    customCalendar->setVisible(true);
+
+    // Animate the movement of roundedBG to the calendar position with ease-in and ease-out effect
+    QPropertyAnimation* animation = new QPropertyAnimation(ui->roundedBG, "geometry");
+    animation->setDuration(500); // Duration in milliseconds
+    animation->setStartValue(ui->roundedBG->geometry());
+    animation->setEndValue(QRect(-9, 279, ui->roundedBG->width(), ui->roundedBG->height()));
+    animation->setEasingCurve(QEasingCurve::InOutQuad); // Ease-in and ease-out effect
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+

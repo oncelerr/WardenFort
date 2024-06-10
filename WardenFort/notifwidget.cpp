@@ -46,8 +46,8 @@ void notifWidget::hideEvent(QHideEvent *event) {
 
 void notifWidget::addNotifications(int offset, int limit) {
     QSqlDatabase db = Database::getConnection(); // Retrieve the correct thread-local database connection
-    if (!db.isValid()) {
-        qDebug() << "Database connection is not valid";
+    if (!db.isOpen()) {
+        qDebug() << "Database connection is not open";
         return;
     }
 

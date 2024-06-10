@@ -65,15 +65,23 @@ void CalendarNotifications::updateNotifications() {
         ui->notificationList->addItem(dateItem);
 
         // Add notifications for the date
-        for (const auto &notif : notifList) {
+        /*for (const auto &notif : notifList) {
             QString time = notif.first;
             QString text = notif.second.first;
             bool isImportant = notif.second.second;
 
+            NotificationWidget *widget = new NotificationWidget();
+            widget->setDate("");
+            widget->setTime(time);
+            widget->setText(isImportant ? "<span style='color:red;'>" + text + "</span>" : text);
+            widget->setImportant(isImportant);
+
             QListWidgetItem *item = new QListWidgetItem(ui->notificationList);
+            item->setSizeHint(widget->sizeHint());
 
             ui->notificationList->addItem(item);
-        }
+            ui->notificationList->setItemWidget(item, widget);
+        }*/
     }
 
     applyDateItemStyles();

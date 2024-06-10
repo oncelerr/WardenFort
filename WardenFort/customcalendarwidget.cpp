@@ -74,22 +74,6 @@ CustomCalendarWidget::CustomCalendarWidget(QWidget *parent)
     // Connect the signal to open the event dialog when a date is selected
     connect(this, &QCalendarWidget::activated, this, &CustomCalendarWidget::addEvent);
 }
-
-void CustomCalendarWidget::initializeDatabase()
-{
-    db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("D:/WardenFort/WardenFort/wardenfort.db");
-
-    if (!db.open()) {
-        QMessageBox::critical(this, "Database Error", db.lastError().text());
-        return;
-    }
-
-    QSqlQuery query;
-    if (!query.exec("CREATE TABLE IF NOT EXISTS events (date TEXT, event TEXT, description TEXT)")) {
-        QMessageBox::critical(this, "Database Error", query.lastError().text());
-    }
-}
 void CustomCalendarWidget::loadEvents()
 {
     QSqlDatabase db = Database::getConnection();
