@@ -15,14 +15,15 @@ public:
     explicit NotificationWidget(const QString &text, const QString &timeOrDate, QWidget *parent = nullptr);
     ~NotificationWidget();
 
+    QString info() const;
+    bool isChecked() const;
+    void setChecked(bool checked);
+
     void setDate(const QString &date);
     void setTime(const QString &time);
     void setText(const QString &text);
     void setDetails(const QString &details);
     void setImportant(bool important);
-
-signals:
-    void sizeChanged(); // Signal to notify when the size changes
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -32,11 +33,7 @@ private slots:
 
 private:
     Ui::NotificationWidget *ui;
-    bool isImportant;
-    bool detailsVisible;
-
-    void applyTextColor();
-
+    QString m_info;
 };
 
 #endif // NOTIFICATIONWIDGET_H

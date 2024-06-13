@@ -27,6 +27,8 @@ notifWidget::notifWidget(QWidget *parent)
     connect(timer, &QTimer::timeout, this, &notifWidget::updateNotifications);
     connect(ui->leftBTN, &QPushButton::clicked, this, &notifWidget::onLeftButtonClicked);
     connect(ui->rightBTN, &QPushButton::clicked, this, &notifWidget::onRightButtonClicked);
+    connect(ui->checkBox, &QCheckBox::stateChanged, this, &notifWidget::onMainCheckBoxStateChanged);
+    connect(ui->delBTN, &QPushButton::clicked, this, &notifWidget::onDeleteButtonClicked); // Connect the delete button
 }
 
 notifWidget::~notifWidget()
@@ -49,6 +51,16 @@ void notifWidget::addNotifications(int offset, int limit) {
     if (!db.isOpen()) {
         qDebug() << "Database connection is not open";
         return;
+    }
+
+    // Save the checked states
+    QMap<QString, bool> checkedStates;
+    for (int i = 0; i < ui->widgetList->count(); ++i) {
+        QListWidgetItem *item = ui->widgetList->item(i);
+        NotificationWidget *notificationWidget = qobject_cast<NotificationWidget*>(ui->widgetList->itemWidget(item));
+        if (notificationWidget) {
+            checkedStates[notificationWidget->info()] = notificationWidget->isChecked();
+        }
     }
 
     QSqlQuery countQuery(db);
@@ -105,9 +117,13 @@ void notifWidget::addNotifications(int offset, int limit) {
         item->setSizeHint(notification->sizeHint());
         ui->widgetList->addItem(item);
         ui->widgetList->setItemWidget(item, notification);
+
+        // Restore the checked state
+        if (checkedStates.contains(info)) {
+            notification->setChecked(checkedStates[info]);
+        }
     }
 }
-
 
 void notifWidget::updateNotifications() {
     int offset = 0; // Offset for the first page
@@ -128,4 +144,49 @@ void notifWidget::onLeftButtonClicked() {
     }
     int offset = currentPage * pageSize; // Calculate the offset
     addNotifications(offset, pageSize); // Fetch and display the previous set of rows
+}
+
+// Slot to handle main checkbox state change
+void notifWidget::onMainCheckBoxStateChanged(int state) {
+    bool checked = (state == Qt::Checked);
+    for (int i = 0; i < ui->widgetList->count(); ++i) {
+        QListWidgetItem *item = ui->widgetList->item(i);
+        NotificationWidget *notificationWidget = qobject_cast<NotificationWidget*>(ui->widgetList->itemWidget(item));
+        if (notificationWidget) {
+            notificationWidget->setChecked(checked);
+        }
+    }
+}
+
+// Slot to handle delete button click
+void notifWidget::onDeleteButtonClicked() {
+    QSqlDatabase db = Database::getConnection();
+    if (!db.isOpen()) {
+        qDebug() << "Database connection is not open";
+        return;
+    }
+
+    QSqlQuery deleteQuery(db);
+
+    // Iterate through the list and delete checked notifications
+    for (int i = 0; i < ui->widgetList->count(); ++i) {
+        QListWidgetItem *item = ui->widgetList->item(i);
+        NotificationWidget *notificationWidget = qobject_cast<NotificationWidget*>(ui->widgetList->itemWidget(item));
+        if (notificationWidget && notificationWidget->isChecked()) {
+            // Delete from the database
+            deleteQuery.prepare("DELETE FROM packets WHERE user_id = :user_id AND info = :info");
+            deleteQuery.bindValue(":user_id", loggedInUser.userId);
+            deleteQuery.bindValue(":info", notificationWidget->info());
+            if (!deleteQuery.exec()) {
+                qDebug() << "Error executing delete query:" << deleteQuery.lastError().text();
+            }
+
+            // Remove from the list
+            delete item;
+        }
+    }
+
+    // Refresh the notifications list
+    int offset = currentPage * pageSize;
+    addNotifications(offset, pageSize);
 }

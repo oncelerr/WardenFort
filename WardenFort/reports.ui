@@ -86,7 +86,7 @@ color: white;</string>
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>122</x>
+        <x>85</x>
         <y>80</y>
         <width>71</width>
         <height>16</height>
@@ -109,7 +109,7 @@ background-color: transparent;</string>
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>369</x>
+        <x>418</x>
         <y>80</y>
         <width>49</width>
         <height>16</height>
