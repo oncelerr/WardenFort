@@ -3,12 +3,15 @@
 
 #include <QWidget>
 #include <QWebSocket>
+#include "ui_chatswidget.h"
+#include "contacts.h"
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class chats; }
-QT_END_NAMESPACE
+namespace Ui {
+class chats;
+}
 
-class chats : public QWidget {
+class chats : public QWidget
+{
     Q_OBJECT
 
 public:
@@ -16,14 +19,18 @@ public:
     ~chats();
 
 private slots:
+    void populateContactsList();
     void onConnected();
     void onDisconnected();
     void onTextMessageReceived(const QString &message);
     void onSendButtonClicked();
+    void handleListItemClicked(QListWidgetItem *item); // New slot declaration
 
 private:
     Ui::chats *ui;
     QWebSocket *webSocket;
+
+    // Add any other private members as needed
 };
 
 #endif // CHATSWIDGET_H

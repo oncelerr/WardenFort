@@ -18,6 +18,7 @@ SOURCES += \
     calendar.cpp \
     calendarnotifications.cpp\
     chatswidget.cpp \
+    contacts.cpp \
     customcalendarwidget.cpp \
     eventdialog.cpp \
     notificationwidget.cpp\
@@ -43,6 +44,7 @@ HEADERS += \
     calendar.h \
     calendarnotifications.h\
     chatswidget.h \
+    contacts.h \
     customcalendarwidget.h \
     eventdialog.h \
     notificationwidget.h\
@@ -68,6 +70,7 @@ FORMS += \
     calendar.ui \
     calendarnotifications.ui\
     chatswidget.ui \
+    contacts.ui \
     eventdialog.ui \
     notificationwidget.ui\
     dialog.ui \
