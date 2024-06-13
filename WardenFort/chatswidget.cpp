@@ -136,9 +136,10 @@ void chats::onSendButtonClicked() {
 }
 
 void chats::handleListItemClicked(QListWidgetItem *item) {
-    // Retrieve the contacts widget from the clicked item
     contacts *contactWidget = qobject_cast<contacts *>(ui->listWidget->itemWidget(item));
     if (contactWidget) {
-        qDebug() << "Clicked on contact with label:" << contactWidget->getLabel();
+        QString recipient = contactWidget->getLabel(); // Assuming getLabel() retrieves the username
+        QString messageText = "/msg " + recipient + " "; // Command to indicate private message
+        ui->typeField_2->setText(messageText);
     }
 }
