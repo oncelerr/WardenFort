@@ -17,7 +17,7 @@ chats::chats(QWidget *parent) :
     connect(ui->sendButton_2, &QPushButton::clicked, this, &chats::onSendButtonClicked);
 
     // Connect to the WebSocket server
-    webSocket->open(QUrl("ws://localhost:12345"));
+    webSocket->open(QUrl("ws://192.168.0.166:12345"));
 }
 
 chats::~chats() {
