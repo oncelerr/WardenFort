@@ -10,8 +10,6 @@
 #include <QSqlError>
 #include <QDebug>
 
-QString recipient = NULL;
-
 chats::chats(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::chats),
@@ -114,11 +112,23 @@ void chats::onSendButtonClicked() {
     }
 
     QJsonObject message;
-    message["type"] = "private_message";
+    message["type"] = "message";
     message["username"] = loggedInUser.username;
     message["content"] = messageText;
-    message["sender"] = loggedInUser.username;
 
+    // Check if it's a private message
+    if (messageText.startsWith("/msg")) {
+        QStringList parts = messageText.split(" ");
+        if (parts.size() >= 3) {
+            QString recipient = parts[1];
+            message["type"] = "message";
+            message["recipient"] = recipient;
+            message["content"] = parts.mid(2).join(" ");
+        } else {
+            qDebug() << "[Error] Invalid private message format.";
+            return;
+        }
+    }
 
     webSocket->sendTextMessage(QJsonDocument(message).toJson(QJsonDocument::Compact));
     qDebug() << "You: " + messageText;
@@ -130,6 +140,5 @@ void chats::handleListItemClicked(QListWidgetItem *item) {
     contacts *contactWidget = qobject_cast<contacts *>(ui->listWidget->itemWidget(item));
     if (contactWidget) {
         qDebug() << "Clicked on contact with label:" << contactWidget->getLabel();
-        recipient = contactWidget->getLabel();
     }
 }
