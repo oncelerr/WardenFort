@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>401</width>
-    <height>324</height>
+    <width>413</width>
+    <height>397</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>80</y>
+     <y>70</y>
      <width>251</width>
      <height>31</height>
     </rect>
@@ -45,7 +45,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>90</y>
+     <y>80</y>
      <width>81</width>
      <height>16</height>
     </rect>
@@ -91,8 +91,8 @@ color: white;</string>
   <widget class="QPushButton" name="okButton">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>270</y>
+     <x>100</x>
+     <y>350</y>
      <width>80</width>
      <height>24</height>
     </rect>
@@ -105,7 +105,7 @@ color: white;</string>
    <property name="styleSheet">
     <string notr="true">QPushButton {
 border-radius: 15px; 
-background-color: rgb(22, 27, 46);
+background-color: #01FDF5
 color: white;
 }
 QPushButton:hover {
@@ -121,8 +121,8 @@ background-color: rgb(24, 40, 55);
   <widget class="QPushButton" name="cancelButton">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>270</y>
+     <x>240</x>
+     <y>350</y>
      <width>80</width>
      <height>24</height>
     </rect>
@@ -135,7 +135,7 @@ background-color: rgb(24, 40, 55);
    <property name="styleSheet">
     <string notr="true">QPushButton {
 border-radius: 15px; 
-background-color: rgb(22, 27, 46);
+background-color: #01FDF5
 color: white;
 }
 QPushButton:hover {
@@ -152,7 +152,7 @@ background-color: rgb(24, 40, 55);
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>140</y>
+     <y>130</y>
      <width>81</width>
      <height>16</height>
     </rect>
@@ -175,9 +175,9 @@ color: white;</string>
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>140</y>
+     <y>130</y>
      <width>251</width>
-     <height>91</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -187,6 +187,45 @@ color: white;</string>
    </property>
    <property name="styleSheet">
     <string notr="true">color: white;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>220</y>
+     <width>101</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Inter</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent;
+color: white;</string>
+   </property>
+   <property name="text">
+    <string>Existing Events:</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="eventListWidget">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>250</y>
+     <width>351</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent;</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
    </property>
   </widget>
  </widget>

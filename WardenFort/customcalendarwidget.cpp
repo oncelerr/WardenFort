@@ -74,6 +74,7 @@ CustomCalendarWidget::CustomCalendarWidget(QWidget *parent)
     // Connect the signal to open the event dialog when a date is selected
     connect(this, &QCalendarWidget::activated, this, &CustomCalendarWidget::addEvent);
 }
+
 void CustomCalendarWidget::loadEvents()
 {
     QSqlDatabase db = Database::getConnection();
@@ -109,8 +110,6 @@ void CustomCalendarWidget::loadEvents()
     db.close();
 }
 
-
-
 void CustomCalendarWidget::saveEventToDatabase(const QDate &date, const QString &eventTitle, const QString &eventDescription)
 {
     QSqlDatabase db = Database::getConnection();
@@ -124,6 +123,25 @@ void CustomCalendarWidget::saveEventToDatabase(const QDate &date, const QString 
     query.bindValue(":date", date.toString(Qt::ISODate));
     query.bindValue(":event", eventTitle);
     query.bindValue(":description", eventDescription);
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Database Error", query.lastError().text());
+    }
+
+    db.close();
+}
+
+void CustomCalendarWidget::deleteEventFromDatabase(const QDate &date, const QString &eventTitle)
+{
+    QSqlDatabase db = Database::getConnection();
+    if (!db.open()) {
+        QMessageBox::critical(this, "Database Error", db.lastError().text());
+        return;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM calendar WHERE date = :date AND events = :event");
+    query.bindValue(":date", date.toString(Qt::ISODate));
+    query.bindValue(":event", eventTitle);
     if (!query.exec()) {
         QMessageBox::critical(this, "Database Error", query.lastError().text());
     }
@@ -187,29 +205,106 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
 
 void CustomCalendarWidget::addEvent(const QDate &date)
 {
-    EventDialog dialog(this); // Use EventDialog here
+    QStringList existingEvents = events.value(date);
+    EventDialog dialog(this, date, existingEvents); // Pass existing events to the dialog
+
+    // Show the dialog and handle the event creation if accepted
     if (dialog.exec() == QDialog::Accepted) {
         QString eventTitle = dialog.getEventTitle();
         QString eventDescription = dialog.getEventDescription();
         if (!eventTitle.isEmpty()) {
             events[date].append(eventTitle);
 
-            // Highlight the date with no background change
-            QTextCharFormat format;
-            setDateTextFormat(date, format);
-
             // Save the event to the database
             saveEventToDatabase(date, eventTitle, eventDescription);
-
-            // Update the calendar to reflect the new event
-            updateCells();
         }
     }
+
+    // Update the calendar to reflect any changes, even if the dialog was simply closed
+    updateCells();
 }
+
+void CustomCalendarWidget::updateCells()
+{
+    // Ensure the calendar cells are updated properly
+    QDate firstDate = this->minimumDate();
+    QDate lastDate = this->maximumDate();
+    for (QDate date = firstDate; date <= lastDate; date = date.addDays(1)) {
+        updateCell(date);
+    }
+}
+
+void CustomCalendarWidget::handleEventDeleted(const QString &eventTitle)
+{
+    QDate date = selectedDate();
+
+    qDebug() << "handleEventDeleted called for event:" << eventTitle << "on date:" << date.toString(Qt::ISODate);
+
+    // Check if events map contains the selected date
+    if (events.contains(date)) {
+        // Remove the event from the events map
+        events[date].removeAll(eventTitle);
+
+        // If no more events exist for that date, remove the date entry from events map
+        if (events[date].isEmpty()) {
+            events.remove(date);
+
+            // Update the database to remove the date if it has no more events
+            QSqlDatabase db = Database::getConnection();
+            if (!db.open()) {
+                QMessageBox::critical(this, "Database Error", db.lastError().text());
+                return;
+            }
+
+            QSqlQuery query(db);
+            query.prepare("DELETE FROM calendar WHERE date = :date");
+            query.bindValue(":date", date.toString(Qt::ISODate));
+            if (!query.exec()) {
+                QMessageBox::critical(this, "Database Error", query.lastError().text());
+            }
+
+            db.close();
+
+            qDebug() << "Empty date removed from database:" << date.toString(Qt::ISODate);
+        } else {
+            // Update the database to reflect the removed event
+            QSqlDatabase db = Database::getConnection();
+            if (!db.open()) {
+                QMessageBox::critical(this, "Database Error", db.lastError().text());
+                return;
+            }
+
+            QSqlQuery query(db);
+            query.prepare("DELETE FROM calendar WHERE events = :event AND date = :date");
+            query.bindValue(":event", eventTitle);
+            query.bindValue(":date", date.toString(Qt::ISODate));
+            if (!query.exec()) {
+                QMessageBox::critical(this, "Database Error", query.lastError().text());
+            }
+
+            db.close();
+
+            qDebug() << "Event deleted from database:" << eventTitle << "on date:" << date.toString(Qt::ISODate);
+        }
+
+        // Update the specific cell for the date
+        updateCell(date);
+
+        qDebug() << "Cell updated for date:" << date.toString(Qt::ISODate);
+    } else {
+        qDebug() << "No events found for date:" << date.toString(Qt::ISODate);
+    }
+}
+
+
 
 void CustomCalendarWidget::updateYear(int yearIndex)
 {
     int year = yearComboBox->itemText(yearIndex).toInt();
     setSelectedDate(QDate(year, selectedDate().month(), selectedDate().day()));
     setCurrentPage(year, selectedDate().month());
+
+    // Ensure cells are updated when the year changes
+    updateCells();
 }
+

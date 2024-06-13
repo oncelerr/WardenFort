@@ -16,24 +16,30 @@ class CustomCalendarWidget : public QCalendarWidget
 
 public:
     CustomCalendarWidget(QWidget *parent = nullptr);
-
+    void updateCells();
+    void clearEventListWidget(); // Declaration of the method to clear events from the UI
+    void loadEvents();
+    void handleEventDeleted(const QString &eventTitle);
 private slots:
     void addEvent(const QDate &date);
     void updateYear(int yearIndex);
 
+
+public slots:
+    void deleteEventFromDatabase(const QDate &date, const QString &eventTitle);
+
 protected:
-    void paintCell(QPainter *painter, const QRect &rect, QDate date) const override; // Match the base class signature
+    void paintCell(QPainter *painter, const QRect &rect, QDate date) const override;
 
 private:
-    QMap<QDate, QVector<QString>> events; // Store events
-    QComboBox *yearComboBox; // Dropdown for year selection
-    QSqlDatabase db; // Database connection
+    QMap<QDate, QVector<QString>> events;
+    QComboBox *yearComboBox;
+    QSqlDatabase db;
 
     void initializeDatabase();
-    void loadEvents();
+
     void saveEventToDatabase(const QDate &date, const QString &eventTitle, const QString &eventDescription);
     void updateEventInDatabase(const QDate &date, const QString &oldEventTitle, const QString &newEventTitle, const QString &newEventDescription);
-    void deleteEventFromDatabase(const QDate &date, const QString &eventTitle);
 };
 
 #endif // CUSTOMCALENDARWIDGET_H
