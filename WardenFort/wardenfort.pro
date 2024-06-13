@@ -4,6 +4,7 @@ QT       += charts
 QT       += core gui printsupport
 QT       += network
 QT       += sql
+QT += websockets
 
 CONFIG += c++17
 

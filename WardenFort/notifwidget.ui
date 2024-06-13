@@ -129,6 +129,40 @@ color: white;</string>
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
      </widget>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="geometry">
+       <rect>
+        <x>58</x>
+        <y>76</y>
+        <width>78</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Check all</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="delBTN">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>76</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="wardenfort.qrc">
+        <normaloff>:/wardenfort/bin.png</normaloff>:/wardenfort/bin.png</iconset>
+      </property>
+     </widget>
     </widget>
    </item>
   </layout>

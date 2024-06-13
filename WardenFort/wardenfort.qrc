@@ -63,6 +63,7 @@
         <file>wf_smol.png</file>
         <file>p1.png</file>
         <file>calendar.png</file>
+        <file>bin.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

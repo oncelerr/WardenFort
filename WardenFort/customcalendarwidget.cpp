@@ -28,13 +28,13 @@ CustomCalendarWidget::CustomCalendarWidget(QWidget *parent)
     }
 
     // Set the stylesheet for customizing the calendar
-    setStyleSheet("QCalendarWidget { background-color: white; }"
-                  "QCalendarWidget QToolButton { color: white; background-color: #191F32; }"
+    setStyleSheet("QCalendarWidget { background-color: pink; }"
+                  "QCalendarWidget QToolButton { color: pink; background-color: pink; }"
                   "QCalendarWidget QToolButton#qt_calendar_prevmonth, "
-                  "QCalendarWidget QToolButton#qt_calendar_nextmonth { color: green; }"
-                  "QCalendarWidget QMenu { background-color: white; color: black; }" // Ensuring dropdown text is black
-                  "QCalendarWidget QAbstractItemView:enabled { color: black; background-color: white; selection-background-color: blue; }"
-                  "QCalendarWidget QAbstractItemView:disabled { color: gray; }"
+                  "QCalendarWidget QToolButton#qt_calendar_nextmonth { color: pink; }"
+                  "QCalendarWidget QMenu { background-color: #133d52; color: white; }" // Ensuring dropdown text is black
+                  "QCalendarWidget QAbstractItemView:enabled { color: black; background-color: #133d52; selection-background-color: pink; }"
+                  "QCalendarWidget QAbstractItemView:disabled { color: pink; }"
                   "QCalendarWidget QWidget { font-family: 'Inter'; }");
 
     // Customize month/year text color and positioning
@@ -62,7 +62,7 @@ CustomCalendarWidget::CustomCalendarWidget(QWidget *parent)
     yearComboBox->setCurrentText(QString::number(currentYear));
 
     // Set the QComboBox stylesheet to make the background white
-    yearComboBox->setStyleSheet("QComboBox { background-color: white; color: black; }"
+    yearComboBox->setStyleSheet("QComboBox { background-color: pink; color: black; }"
                                 "QComboBox QAbstractItemView { background-color: white; color: black; }");
 
     // Connect QComboBox to update the calendar year
