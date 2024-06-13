@@ -64,6 +64,8 @@
         <file>p1.png</file>
         <file>calendar.png</file>
         <file>bin.png</file>
+        <file>next.png</file>
+        <file>previous.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

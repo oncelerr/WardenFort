@@ -28,19 +28,19 @@ CustomCalendarWidget::CustomCalendarWidget(QWidget *parent)
     }
 
     // Set the stylesheet for customizing the calendar
-    setStyleSheet("QCalendarWidget { background-color: pink; }"
-                  "QCalendarWidget QToolButton { color: pink; background-color: pink; }"
+    setStyleSheet("QCalendarWidget { background-color: #242f83; }"
+                  "QCalendarWidget QToolButton { color: pink; background-color: #242f83; }"
                   "QCalendarWidget QToolButton#qt_calendar_prevmonth, "
                   "QCalendarWidget QToolButton#qt_calendar_nextmonth { color: pink; }"
-                  "QCalendarWidget QMenu { background-color: #133d52; color: white; }" // Ensuring dropdown text is black
-                  "QCalendarWidget QAbstractItemView:enabled { color: black; background-color: #133d52; selection-background-color: pink; }"
+                  "QCalendarWidget QMenu { background-color: black; color: yellow; }" // Ensuring dropdown text is black
+                  "QCalendarWidget QAbstractItemView:enabled { color: white; background-color: #191f32; selection-background-color: green; }"
                   "QCalendarWidget QAbstractItemView:disabled { color: pink; }"
                   "QCalendarWidget QWidget { font-family: 'Inter'; }");
 
     // Customize month/year text color and positioning
     QToolButton *monthButton = findChild<QToolButton*>("qt_calendar_monthbutton");
     if (monthButton) {
-        monthButton->setStyleSheet("color: white; background-color: #191F32; font-family: 'Inter';");
+        monthButton->setStyleSheet("color: white; background-color: #191f32 ; font-family: 'Inter';");
     }
 
     // Replace the year button with a QComboBox
@@ -62,8 +62,35 @@ CustomCalendarWidget::CustomCalendarWidget(QWidget *parent)
     yearComboBox->setCurrentText(QString::number(currentYear));
 
     // Set the QComboBox stylesheet to make the background white
-    yearComboBox->setStyleSheet("QComboBox { background-color: pink; color: black; }"
-                                "QComboBox QAbstractItemView { background-color: white; color: black; }");
+    yearComboBox->setStyleSheet("QComboBox { background-color: #191f32; color: white; }"
+                                "QComboBox QAbstractItemView { background-color: #191f32; color: white; }");
+
+    // Connect QComboBox to update the calendar year
+    connect(yearComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CustomCalendarWidget::updateYear);
+
+    // Hide the week numbers
+    setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+
+    // Connect the signal to open the event dialog when a date is selected
+    connect(this, &QCalendarWidget::activated, this, &CustomCalendarWidget::addEvent);
+
+    // Load and set icons for next and previous month buttons
+    QToolButton *nextMonthButton = findChild<QToolButton*>("qt_calendar_nextmonth");
+    QToolButton *prevMonthButton = findChild<QToolButton*>("qt_calendar_prevmonth");
+
+    if (nextMonthButton && prevMonthButton) {
+        QIcon nextIcon("D:/Project/WardenFort/WardenFort/next.png");
+        QIcon prevIcon("D:/Project/WardenFort/WardenFort/previous.png");
+
+        nextMonthButton->setIcon(nextIcon);
+        prevMonthButton->setIcon(prevIcon);
+
+        nextMonthButton->setStyleSheet("QToolButton#qt_calendar_nextmonth { background-color: #191f32; }");
+        prevMonthButton->setStyleSheet("QToolButton#qt_calendar_prevmonth { background-color: #191f32; }");
+
+        nextMonthButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        prevMonthButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    }
 
     // Connect QComboBox to update the calendar year
     connect(yearComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CustomCalendarWidget::updateYear);
@@ -166,7 +193,7 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
     // Custom painting code for selected date
     if (date == selectedDate()) {
         painter->save();
-        painter->setBrush(QColor("#FFB6C1")); // Light pink color for selected date background
+        painter->setBrush(QColor("#2d2e60")); // Selected Date Background
         painter->setPen(Qt::NoPen);
         painter->drawRect(rect);
         painter->restore();
@@ -177,10 +204,11 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
         painter->save();
 
         // Draw the event background color only for the event text area
-        painter->setBrush(QColor("#FFFFE0")); // Light yellow background
+        painter->setBrush(QColor("#3afefe")); // neon blue background
         painter->setPen(Qt::NoPen); // Ensure no border is drawn
         QRect eventRect = rect.adjusted(2, rect.height() - 20, -2, -2); // Draw at the bottom part of the cell
-        painter->drawRect(eventRect);
+        int radius = 5;
+        painter->drawRoundedRect(eventRect, radius, radius);
 
         // Draw the event text
         painter->setPen(Qt::black); // Set pen color to black for the text
