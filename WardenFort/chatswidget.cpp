@@ -108,11 +108,12 @@ void chats::onTextMessageReceived(const QString &message) {
         qDebug() << "[Error] " + content;
     } else if (type == "history") {
         QJsonArray history = jsonObj["content"].toArray();
+        qDebug() << "Chat history:";
         for (const QJsonValue &value : history) {
-            QJsonObject messageObj = value.toObject();
-            QString sender = messageObj["sender"].toString();
-            QString content = messageObj["content"].toString();
-            qDebug() << "History - " + sender + ": " + content;
+            QJsonObject msg = value.toObject();
+            QString sender = msg["sender"].toString();
+            QString content = msg["content"].toString();
+            qDebug() << sender + ": " + content;
         }
     }
 }
@@ -153,10 +154,9 @@ void chats::handleListItemClicked(QListWidgetItem *item) {
     if (contactWidget) {
         QString recipient = contactWidget->getLabel(); // Assuming getLabel() retrieves the username
         QJsonObject request;
-        request["type"] = "history";
+        request["type"] = "history_request";
         request["recipient"] = recipient;
         webSocket->sendTextMessage(QJsonDocument(request).toJson(QJsonDocument::Compact));
-        QString messageText = "/msg " + recipient + " "; // Command to indicate private message
-        ui->typeField_2->setText(messageText);
+        qDebug() << "Requesting history for" << recipient;
     }
 }
