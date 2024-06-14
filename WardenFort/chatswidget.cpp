@@ -9,6 +9,10 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QListWidgetItem>
+#include <QWebSocket>
 
 chats::chats(QWidget *parent) :
     QWidget(parent),
@@ -102,8 +106,17 @@ void chats::onTextMessageReceived(const QString &message) {
     } else if (type == "error") {
         QString content = jsonObj["content"].toString();
         qDebug() << "[Error] " + content;
+    } else if (type == "history") {
+        QJsonArray history = jsonObj["content"].toArray();
+        for (const QJsonValue &value : history) {
+            QJsonObject messageObj = value.toObject();
+            QString sender = messageObj["sender"].toString();
+            QString content = messageObj["content"].toString();
+            qDebug() << "History - " + sender + ": " + content;
+        }
     }
 }
+
 
 void chats::onSendButtonClicked() {
     QString messageText = ui->typeField_2->text();
@@ -139,6 +152,10 @@ void chats::handleListItemClicked(QListWidgetItem *item) {
     contacts *contactWidget = qobject_cast<contacts *>(ui->listWidget->itemWidget(item));
     if (contactWidget) {
         QString recipient = contactWidget->getLabel(); // Assuming getLabel() retrieves the username
+        QJsonObject request;
+        request["type"] = "history";
+        request["recipient"] = recipient;
+        webSocket->sendTextMessage(QJsonDocument(request).toJson(QJsonDocument::Compact));
         QString messageText = "/msg " + recipient + " "; // Command to indicate private message
         ui->typeField_2->setText(messageText);
     }
