@@ -118,7 +118,6 @@ void chats::onTextMessageReceived(const QString &message) {
     }
 }
 
-
 void chats::onSendButtonClicked() {
     QString messageText = ui->typeField_2->text();
     if (messageText.isEmpty()) {
@@ -145,7 +144,6 @@ void chats::onSendButtonClicked() {
     }
 
     webSocket->sendTextMessage(QJsonDocument(message).toJson(QJsonDocument::Compact));
-    qDebug() << "You: " + messageText;
     ui->typeField_2->clear();
 }
 
