@@ -118,7 +118,7 @@ void CustomCalendarWidget::loadEvents()
     }
 
     while (query.next()) {
-        QString dateString = query.value(2).toString().trimmed();
+        QString dateString = query.value(1).toString().trimmed();
         QDate date = QDate::fromString(dateString, "yyyy-MM-dd");
 
         if (!date.isValid()) {
@@ -127,7 +127,6 @@ void CustomCalendarWidget::loadEvents()
         }
 
         QString eventTitle = query.value(0).toString();
-        QString description = query.value(1).toString();
         events[date].append(eventTitle);
 
         // Debug output to verify data loading
@@ -137,7 +136,7 @@ void CustomCalendarWidget::loadEvents()
     db.close();
 }
 
-void CustomCalendarWidget::saveEventToDatabase(const QDate &date, const QString &eventTitle, const QString &eventDescription)
+void CustomCalendarWidget::saveEventToDatabase(const QDate &date, const QString &eventTitle)
 {
     QSqlDatabase db = Database::getConnection();
     if (!db.open()) {
@@ -146,10 +145,9 @@ void CustomCalendarWidget::saveEventToDatabase(const QDate &date, const QString 
     }
 
     QSqlQuery query(db);
-    query.prepare("INSERT INTO calendar (date, events, description) VALUES (:date, :event, :description)");
+    query.prepare("INSERT INTO calendar (date, events) VALUES (:date, :event)");
     query.bindValue(":date", date.toString(Qt::ISODate));
     query.bindValue(":event", eventTitle);
-    query.bindValue(":description", eventDescription);
     if (!query.exec()) {
         QMessageBox::critical(this, "Database Error", query.lastError().text());
     }
@@ -239,12 +237,11 @@ void CustomCalendarWidget::addEvent(const QDate &date)
     // Show the dialog and handle the event creation if accepted
     if (dialog.exec() == QDialog::Accepted) {
         QString eventTitle = dialog.getEventTitle();
-        QString eventDescription = dialog.getEventDescription();
         if (!eventTitle.isEmpty()) {
             events[date].append(eventTitle);
 
             // Save the event to the database
-            saveEventToDatabase(date, eventTitle, eventDescription);
+            saveEventToDatabase(date, eventTitle);
         }
     }
 

@@ -64,14 +64,9 @@ QString EventDialog::getEventTitle() const
     return ui->eventTitleLineEdit->text();
 }
 
-QString EventDialog::getEventDescription() const
-{
-    return ui->eventDescriptionPlainTextEdit->toPlainText();
-}
-
 void EventDialog::on_okButton_clicked()
 {
-    emit eventAdded(getEventTitle(), getEventDescription()); // Emit eventAdded signal with the new event information
+    emit eventAdded(getEventTitle()); // Emit eventAdded signal with the new event information
     accept();
 }
 
@@ -127,7 +122,7 @@ void EventDialog::deleteEvent()
 }
 
 // Add event
-void EventDialog::addEvent(const QString &title, const QString &description)
+void EventDialog::addEvent(const QString &title)
 {
     qDebug() << "addEvent triggered";
 
@@ -142,7 +137,6 @@ void EventDialog::addEvent(const QString &title, const QString &description)
     query.prepare("INSERT INTO calendar (date, events, description) VALUES (:date, :event, :description)");
     query.bindValue(":date", eventDate.toString(Qt::ISODate));
     query.bindValue(":event", title);
-    query.bindValue(":description", description);
     if (!query.exec()) {
         QMessageBox::critical(this, "Database Error", query.lastError().text());
     }

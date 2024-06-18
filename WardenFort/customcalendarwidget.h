@@ -38,8 +38,8 @@ private:
 
     void initializeDatabase();
 
-    void saveEventToDatabase(const QDate &date, const QString &eventTitle, const QString &eventDescription);
-    void updateEventInDatabase(const QDate &date, const QString &oldEventTitle, const QString &newEventTitle, const QString &newEventDescription);
+    void saveEventToDatabase(const QDate &date, const QString &eventTitle);
+    void updateEventInDatabase(const QDate &date, const QString &oldEventTitle, const QString &newEventTitle);
 };
 
 #endif // CUSTOMCALENDARWIDGET_H

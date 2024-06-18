@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>413</width>
-    <height>397</height>
+    <height>323</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,7 +92,7 @@ color: white;</string>
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>350</y>
+     <y>270</y>
      <width>80</width>
      <height>24</height>
     </rect>
@@ -122,7 +122,7 @@ background-color: rgb(24, 40, 55);
    <property name="geometry">
     <rect>
      <x>240</x>
-     <y>350</y>
+     <y>270</y>
      <width>80</width>
      <height>24</height>
     </rect>
@@ -148,52 +148,11 @@ background-color: rgb(24, 40, 55);
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>130</y>
-     <width>81</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Inter</family>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: transparent;
-color: white;</string>
-   </property>
-   <property name="text">
-    <string>Description:</string>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="eventDescriptionPlainTextEdit">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>130</y>
-     <width>251</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Inter</family>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: white;</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>220</y>
+     <y>140</y>
      <width>101</width>
      <height>16</height>
     </rect>
@@ -216,7 +175,7 @@ color: white;</string>
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>250</y>
+     <y>170</y>
      <width>351</width>
      <height>81</height>
     </rect>
