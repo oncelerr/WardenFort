@@ -1,15 +1,16 @@
-// chatmessagewidget.cpp
 #include "chatmessagewidget.h"
+#include <QLabel>
+#include <QHBoxLayout>
 
-ChatMessageWidget::ChatMessageWidget(const QString &sender, const QString &message, bool isSentByUser, QWidget *parent) :
-    QWidget(parent),
-    messageLabel(new QLabel)
-{
-    QHBoxLayout *layout = new QHBoxLayout(this);
+ChatMessageWidget::ChatMessageWidget(const QString &message, bool isSender, QWidget *parent)
+    : QWidget(parent) {
+    messageLabel = new QLabel(message, this);
+    messageLabel->setWordWrap(true);
+    messageLabel->setStyleSheet("background-color: #252d3c; color: white; border-radius: 10px; padding: 10px;");
 
-    messageLabel->setText(sender + ": " + message);
+    layout = new QHBoxLayout(this);
 
-    if (isSentByUser) {
+    if (isSender) {
         layout->addStretch();
         layout->addWidget(messageLabel);
     } else {

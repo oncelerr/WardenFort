@@ -66,6 +66,7 @@
         <file>bin.png</file>
         <file>next.png</file>
         <file>previous.png</file>
+        <file>cathello.gif</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

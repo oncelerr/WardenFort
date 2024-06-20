@@ -14,6 +14,9 @@
 #include <QJsonValue>
 #include <QListWidgetItem>
 #include <QWebSocket>
+#include <QFrame>
+#include <QLabel>
+#include <QMovie>
 
 QString recipient;
 
@@ -24,6 +27,7 @@ chats::chats(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Connect WebSocket signals
     connect(webSocket, &QWebSocket::connected, this, &chats::onConnected);
     connect(webSocket, &QWebSocket::disconnected, this, &chats::onDisconnected);
     connect(webSocket, &QWebSocket::textMessageReceived, this, &chats::onTextMessageReceived);
@@ -37,6 +41,10 @@ chats::chats(QWidget *parent) :
 
     // Populate contacts list
     populateContactsList();
+
+    // Set up chatHistory listWidget
+    ui->chatHistory->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->chatHistory->setFocusPolicy(Qt::NoFocus);
 }
 
 chats::~chats() {
@@ -151,16 +159,63 @@ void chats::handleListItemClicked(QListWidgetItem *item) {
         webSocket->sendTextMessage(QJsonDocument(request).toJson(QJsonDocument::Compact));
         qDebug() << "Requesting history for" << recipient;
 
-        ui->user_name_2->setText(recipient);
+        QSqlDatabase db = Database::getConnection();
+        QSqlQuery query(db);
+        QString queryString = "SELECT firstName FROM user_db WHERE username = :username";
+        query.prepare(queryString);
+        query.bindValue(":username", recipient);
+
+        if (!query.exec()) {
+            qDebug() << "Error executing query:" << query.lastError().text();
+            db.close();
+            return;
+        }
+
+        if (query.next()) {
+            QString firstName = query.value("firstName").toString();
+            ui->user_name_2->setText(firstName);
+        } else {
+            ui->user_name_2->setText("Unknown");
+        }
+
+        db.close();
     }
     qDebug() << ui->listWidget->itemWidget(item);
 }
 
 void chats::displayChatHistory(const QJsonArray &history) {
     ui->chatHistory->clear(); // Clear existing chat history
+    QFrame *frame = ui->frame_2;
     if (history.isEmpty()) {
-        ui->chatHistory->addItem("Say Hi!");
+        frame->setVisible(true);
+        // Assuming frame_2 is a QFrame in your chats widget
+
+
+        // Clear any existing content in frame_2
+        // You may want to adjust this based on your actual requirement
+        while (frame->layout()->count() > 0) {
+            QLayoutItem *item = frame->layout()->takeAt(0);
+            delete item->widget();
+            delete item;
+        }
+
+        // Handle the case when history is empty
+        // For example, display a default message or leave it blank
+        QLabel *label = new QLabel(frame);
+        label->setText("Say Hi!");
+        label->setStyleSheet("font-size: 16px; color: white;");
+        label->setAlignment(Qt::AlignCenter);
+        frame->layout()->addWidget(label);
+
+        // Add the GIF to frame_2 from the Qt resource file
+        QString gifPath = ":/wardenfort/cathello.gif";  // Adjust path as per your resource file structure
+        QMovie *movie = new QMovie(gifPath);
+        QLabel *gifLabel = new QLabel(frame);
+        gifLabel->setMovie(movie);
+        movie->start();
+        frame->layout()->addWidget(gifLabel);
     } else {
+        frame->setVisible(false);
         for (const QJsonValue &value : history) {
             QJsonObject msg = value.toObject();
             QString sender = msg["sender"].toString();
@@ -172,7 +227,7 @@ void chats::displayChatHistory(const QJsonArray &history) {
 
 void chats::appendChatMessage(const QString &sender, const QString &content) {
     bool isSentByUser = (sender == loggedInUser.username);
-    ChatMessageWidget *chatMessageWidget = new ChatMessageWidget(sender, content, isSentByUser);
+    ChatMessageWidget *chatMessageWidget = new ChatMessageWidget(content, isSentByUser);
     QListWidgetItem *item = new QListWidgetItem(ui->chatHistory);
     item->setSizeHint(chatMessageWidget->sizeHint());
     ui->chatHistory->addItem(item);

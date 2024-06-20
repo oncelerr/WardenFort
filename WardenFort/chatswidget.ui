@@ -303,6 +303,26 @@ padding-left: 20px;</string>
         <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
        </property>
       </widget>
+      <widget class="QFrame" name="frame_2">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>150</y>
+         <width>151</width>
+         <height>211</height>
+        </rect>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout"/>
+      </widget>
      </widget>
      <widget class="QLabel" name="searching">
       <property name="geometry">
