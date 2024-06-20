@@ -154,7 +154,7 @@ void chats::onTextMessageReceived(const QString &message) {
         if (msgRecipient == recipient || (sender == recipient && msgRecipient.isEmpty())) {
             if (type == "file") {
                 QString filename = jsonObj["filename"].toString();
-                QString downloadUrl = "http://your_server_address/uploaded_files/" + filename;
+                QString downloadUrl = "http://192.168.0.166/" + filename;
                 QString downloadLink = "<a href=\"" + downloadUrl + "\" download>" + filename + "</a>";
                 appendChatMessage(sender, downloadLink);
             } else {
@@ -261,7 +261,7 @@ void chats::displayChatHistory(const QJsonArray &history) {
             QString content = msg["content"].toString();
             if (msg.contains("filename")) {
                 QString filename = msg["filename"].toString();
-                QString downloadUrl = "http://your_server_address/uploaded_files/" + filename;
+                QString downloadUrl = "http://192.168.0.166/" + filename;
                 QString downloadLink = "<a href=\"" + downloadUrl + "\" download>" + filename + "</a>";
                 appendChatMessage(sender, downloadLink);
             } else {
