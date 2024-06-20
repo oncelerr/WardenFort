@@ -172,7 +172,7 @@ border-radius: 20px;
         <rect>
          <x>43</x>
          <y>449</y>
-         <width>681</width>
+         <width>671</width>
          <height>51</height>
         </rect>
        </property>
@@ -241,7 +241,7 @@ padding-left: 20px;</string>
       <widget class="QPushButton" name="sendButton_2">
        <property name="geometry">
         <rect>
-         <x>736</x>
+         <x>720</x>
          <y>465</y>
          <width>40</width>
          <height>24</height>
@@ -290,154 +290,17 @@ padding-left: 20px;</string>
         </size>
        </property>
       </widget>
-      <widget class="QGraphicsView" name="receiver_img_3">
+      <widget class="QListWidget" name="chatHistory">
        <property name="geometry">
         <rect>
-         <x>55</x>
-         <y>90</y>
-         <width>31</width>
-         <height>31</height>
+         <x>42</x>
+         <y>80</y>
+         <width>716</width>
+         <height>361</height>
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">QGraphicsView {
-    background-color: rgb(255, 255, 255);
-    width: 25px; /* Set width and height to same value */
-    height: 25px; /* Set width and height to same value */
-    border-radius: 15px; /* Half of width/height for a circle */
-}
-</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="receiver_box_3">
-       <property name="geometry">
-        <rect>
-         <x>95</x>
-         <y>100</y>
-         <width>301</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QLineEdit {
-    background-color: rgba(27, 31, 48, 0.5);
-}</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="receiver_time_3">
-       <property name="geometry">
-        <rect>
-         <x>61</x>
-         <y>127</y>
-         <width>31</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);</string>
-       </property>
-       <property name="text">
-        <string>null</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="sender_time_2">
-       <property name="geometry">
-        <rect>
-         <x>746</x>
-         <y>245</y>
-         <width>31</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);</string>
-       </property>
-       <property name="text">
-        <string>null</string>
-       </property>
-      </widget>
-      <widget class="QGraphicsView" name="sender_img_2">
-       <property name="geometry">
-        <rect>
-         <x>740</x>
-         <y>208</y>
-         <width>31</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QGraphicsView {
-    background-color: rgb(255, 255, 255);
-    width: 25px; /* Set width and height to same value */
-    height: 25px; /* Set width and height to same value */
-    border-radius: 15px; /* Half of width/height for a circle */
-}
-</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="sender_box_2">
-       <property name="geometry">
-        <rect>
-         <x>432</x>
-         <y>219</y>
-         <width>301</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QLineEdit {
-    background-color: rgba(27, 31, 48, 0.5);
-}</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="receiver_time_4">
-       <property name="geometry">
-        <rect>
-         <x>66</x>
-         <y>357</y>
-         <width>31</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);</string>
-       </property>
-       <property name="text">
-        <string>null</string>
-       </property>
-      </widget>
-      <widget class="QGraphicsView" name="receiver_img_4">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>320</y>
-         <width>31</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QGraphicsView {
-    background-color: rgb(255, 255, 255);
-    width: 25px; /* Set width and height to same value */
-    height: 25px; /* Set width and height to same value */
-    border-radius: 15px; /* Half of width/height for a circle */
-}
-</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="receiver_box_4">
-       <property name="geometry">
-        <rect>
-         <x>100</x>
-         <y>330</y>
-         <width>301</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QLineEdit {
-    background-color: rgba(27, 31, 48, 0.5);
-}</string>
+        <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
        </property>
       </widget>
      </widget>

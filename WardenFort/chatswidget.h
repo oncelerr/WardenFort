@@ -25,6 +25,7 @@ private slots:
     void onTextMessageReceived(const QString &message);
     void onSendButtonClicked();
     void handleListItemClicked(QListWidgetItem *item); // New slot declaration
+    void displayChatHistory(const QJsonArray &history);
 
 private:
     Ui::chats *ui;

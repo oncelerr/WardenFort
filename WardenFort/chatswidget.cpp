@@ -71,6 +71,12 @@ void chats::populateContactsList() {
         ui->listWidget->setItemWidget(item, contactWidget);
     }
 
+    // Select the first item in the listWidget and trigger handleListItemClicked
+    if (ui->listWidget->count() > 0) {
+        ui->listWidget->setCurrentRow(0);
+        handleListItemClicked(ui->listWidget->item(0));
+    }
+
     // Close the database connection
     db.close();
 }
@@ -108,13 +114,7 @@ void chats::onTextMessageReceived(const QString &message) {
         qDebug() << "[Error] " + content;
     } else if (type == "history") {
         QJsonArray history = jsonObj["content"].toArray();
-        qDebug() << "Chat history:";
-        for (const QJsonValue &value : history) {
-            QJsonObject msg = value.toObject();
-            QString sender = msg["sender"].toString();
-            QString content = msg["content"].toString();
-            qDebug() << sender + ": " + content;
-        }
+        displayChatHistory(history);
     }
 }
 
@@ -156,5 +156,22 @@ void chats::handleListItemClicked(QListWidgetItem *item) {
         request["recipient"] = recipient;
         webSocket->sendTextMessage(QJsonDocument(request).toJson(QJsonDocument::Compact));
         qDebug() << "Requesting history for" << recipient;
+
+        ui->user_name_2->setText(recipient);
+    }
+    qDebug() << ui->listWidget->itemWidget(item);
+}
+
+void chats::displayChatHistory(const QJsonArray &history) {
+    ui->chatHistory->clear(); // Clear existing chat history
+    if (history.isEmpty()) {
+        ui->chatHistory->addItem("Say Hi!");
+    } else {
+        for (const QJsonValue &value : history) {
+            QJsonObject msg = value.toObject();
+            QString sender = msg["sender"].toString();
+            QString content = msg["content"].toString();
+            ui->chatHistory->addItem(sender + ": " + content);
+        }
     }
 }
