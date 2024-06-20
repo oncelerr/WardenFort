@@ -155,8 +155,9 @@ void chats::onTextMessageReceived(const QString &message) {
             if (type == "file") {
                 QString filename = jsonObj["filename"].toString();
                 QString downloadUrl = "http://192.168.0.166/uploaded_files/" + filename;  // Adjust the IP address and path as necessary
-                QString downloadLink = "<a href=\"" + downloadUrl + "</a>";
+                QString downloadLink = "<a href=\"" + downloadUrl + "\" download=\"" + filename + "\">" + filename + "</a>";
                 appendChatMessage(sender, downloadLink);
+                qDebug() << downloadLink;
             } else {
                 appendChatMessage(sender, content);
             }
