@@ -103,14 +103,17 @@ void chats::onTextMessageReceived(const QString &message) {
 
     QString type = jsonObj["type"].toString();
 
-    if (type == "message") {
+    if (type == "message" || type == "private_message") {
         QString sender = jsonObj["sender"].toString();
         QString content = jsonObj["content"].toString();
+        if (jsonObj.contains("recipient")) {
+            QString msgRecipient = jsonObj["recipient"].toString();
+            if (msgRecipient == recipient || sender == loggedInUser.username) {
+                // If the message is related to the current recipient, update the chat history
+                appendChatMessage(sender, content);
+            }
+        }
         qDebug() << sender + ": " + content;
-    } else if (type == "private_message") {
-        QString sender = jsonObj["sender"].toString();
-        QString content = jsonObj["content"].toString();
-        qDebug() << "[Private] " + sender + ": " + content;
     } else if (type == "error") {
         QString content = jsonObj["content"].toString();
         qDebug() << "[Error] " + content;
@@ -133,6 +136,9 @@ void chats::onSendButtonClicked() {
 
     webSocket->sendTextMessage(QJsonDocument(message).toJson(QJsonDocument::Compact));
     ui->typeField_2->clear();
+
+    // Add the sent message to the chat history
+    appendChatMessage(loggedInUser.username, messageText);
 }
 
 void chats::handleListItemClicked(QListWidgetItem *item) {
@@ -162,4 +168,9 @@ void chats::displayChatHistory(const QJsonArray &history) {
             ui->chatHistory->addItem(sender + ": " + content);
         }
     }
+}
+
+void chats::appendChatMessage(const QString &sender, const QString &content) {
+    QString message = sender + ": " + content;
+    ui->chatHistory->addItem(message);
 }
