@@ -2,6 +2,7 @@
 #include "globals.h"
 #include "ui_chatswidget.h"
 #include "contacts.h"
+#include "chatmessagewidget.h"
 #include "database.h"
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -106,12 +107,11 @@ void chats::onTextMessageReceived(const QString &message) {
     if (type == "message" || type == "private_message") {
         QString sender = jsonObj["sender"].toString();
         QString content = jsonObj["content"].toString();
-        if (jsonObj.contains("recipient")) {
-            QString msgRecipient = jsonObj["recipient"].toString();
-            if (msgRecipient == recipient || sender == loggedInUser.username) {
-                // If the message is related to the current recipient, update the chat history
-                appendChatMessage(sender, content);
-            }
+        QString msgRecipient = jsonObj.value("recipient").toString();
+
+        // Update the chat history only if the message is relevant to the current recipient
+        if (msgRecipient == recipient || (sender == recipient && msgRecipient.isEmpty())) {
+            appendChatMessage(sender, content);
         }
         qDebug() << sender + ": " + content;
     } else if (type == "error") {
@@ -165,12 +165,16 @@ void chats::displayChatHistory(const QJsonArray &history) {
             QJsonObject msg = value.toObject();
             QString sender = msg["sender"].toString();
             QString content = msg["content"].toString();
-            ui->chatHistory->addItem(sender + ": " + content);
+            appendChatMessage(sender, content);
         }
     }
 }
 
 void chats::appendChatMessage(const QString &sender, const QString &content) {
-    QString message = sender + ": " + content;
-    ui->chatHistory->addItem(message);
+    bool isSentByUser = (sender == loggedInUser.username);
+    ChatMessageWidget *chatMessageWidget = new ChatMessageWidget(sender, content, isSentByUser);
+    QListWidgetItem *item = new QListWidgetItem(ui->chatHistory);
+    item->setSizeHint(chatMessageWidget->sizeHint());
+    ui->chatHistory->addItem(item);
+    ui->chatHistory->setItemWidget(item, chatMessageWidget);
 }
