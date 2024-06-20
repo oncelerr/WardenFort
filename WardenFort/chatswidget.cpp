@@ -21,7 +21,10 @@
 #include <QFile>
 #include <QByteArray>
 #include <QJsonDocument>
-
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QMessageBox>
 #include <QDesktopServices>
 #include <QUrl>
 
@@ -158,23 +161,9 @@ void chats::onTextMessageReceived(const QString &message) {
             if (type == "file") {
                 QString filename = jsonObj["filename"].toString();
                 QString downloadUrl = "http://192.168.0.166/uploaded_files/" + filename;  // Adjust the IP address and path as necessary
-
-                // Create clickable label for file download
-                QLabel *downloadLabel = new QLabel();
-                downloadLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-                downloadLabel->setText("<a href=\"" + downloadUrl + "\">" + filename + "</a>");
-                downloadLabel->setOpenExternalLinks(true);
-
-                // Connect the linkActivated signal to handle the download
-                connect(downloadLabel, &QLabel::linkActivated, [=](const QString &link) {
-                    QDesktopServices::openUrl(QUrl(link));
-                });
-
-                appendChatMessage(sender, "Uploaded file: ");
-                QListWidgetItem *item = new QListWidgetItem(ui->chatHistory);
-                item->setSizeHint(downloadLabel->sizeHint());
-                ui->chatHistory->addItem(item);
-                ui->chatHistory->setItemWidget(item, downloadLabel);
+                QString downloadLink = "<a href=\"" + downloadUrl + "\" download=\"" + filename + "\">" + filename + "</a>";
+                appendChatMessage(sender, downloadLink);
+                qDebug() << downloadLink;
             } else {
                 appendChatMessage(sender, content);
             }
@@ -241,15 +230,14 @@ void chats::handleListItemClicked(QListWidgetItem *item) {
     qDebug() << ui->listWidget->itemWidget(item);
 }
 
-void chats::displayChatHistory(const QJsonArray &history) {
+void chats::displayChatHistory(const QJsonArray &history)
+{
     ui->chatHistory->clear(); // Clear existing chat history
     QFrame *frame = ui->frame_2;
     if (history.isEmpty()) {
         frame->setVisible(true);
-        // Assuming frame_2 is a QFrame in your chats widget
 
         // Clear any existing content in frame_2
-        // You may want to adjust this based on your actual requirement
         while (frame->layout()->count() > 0) {
             QLayoutItem *item = frame->layout()->takeAt(0);
             delete item->widget();
@@ -257,37 +245,70 @@ void chats::displayChatHistory(const QJsonArray &history) {
         }
 
         // Handle the case when history is empty
-        // For example, display a default message or leave it blank
         QLabel *label = new QLabel(frame);
-        label->setText("Say Hi!");
+        label->setText("No chat history available");
         label->setStyleSheet("font-size: 16px; color: white;");
         label->setAlignment(Qt::AlignCenter);
         frame->layout()->addWidget(label);
-
-        // Add the GIF to frame_2 from the Qt resource file
-        QString gifPath = ":/wardenfort/cathello.gif";  // Adjust path as per your resource file structure
-        QMovie *movie = new QMovie(gifPath);
-        QLabel *gifLabel = new QLabel(frame);
-        gifLabel->setMovie(movie);
-        movie->start();
-        frame->layout()->addWidget(gifLabel);
     } else {
         frame->setVisible(false);
         for (const QJsonValue &value : history) {
             QJsonObject msg = value.toObject();
             QString sender = msg["sender"].toString();
             QString content = msg["content"].toString();
-            if (msg.contains("filename")) {
+            QString type = msg["type"].toString();
+
+            if (type == "file") {
                 QString filename = msg["filename"].toString();
-                QString downloadUrl = "http://192.168.0.166/uploaded_files/" + filename;  // Adjust the IP address and path as necessary
-                QString downloadLink = "<a href=\"" + downloadUrl + "\" download=\"" + filename + "\">" + filename + "</a>";
-                appendChatMessage(sender, downloadLink);
+                QString downloadUrl = "http://192.168.0.166/uploaded_files/" + filename;  // Adjust URL as necessary
+
+                // Create a clickable button for downloading the file
+                QPushButton *downloadButton = new QPushButton(filename);
+                downloadButton->setStyleSheet("text-decoration: underline; color: blue;");
+                downloadButton->setCursor(Qt::PointingHandCursor);
+
+                connect(downloadButton, &QPushButton::clicked, [=]() {
+                    downloadFile(downloadUrl, filename);
+                });
+
+                // Add the button to chat history
+                //appendChatMessage(sender, "Uploaded file: ");
+                QListWidgetItem *item = new QListWidgetItem(ui->chatHistory);
+                item->setSizeHint(downloadButton->sizeHint());
+                ui->chatHistory->addItem(item);
+                ui->chatHistory->setItemWidget(item, downloadButton);
             } else {
                 appendChatMessage(sender, content);
             }
         }
     }
 }
+
+void chats::downloadFile(const QString &urlString, const QString &filename)
+{
+    QUrl url(urlString);
+    QNetworkRequest request(url);
+
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    QNetworkReply *reply = manager->get(request);
+
+    connect(reply, &QNetworkReply::finished, [=]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QFile file(filename);
+            if (file.open(QIODevice::WriteOnly)) {
+                file.write(reply->readAll());
+                file.close();
+                QMessageBox::information(this, "Download Complete", "File downloaded successfully.");
+            } else {
+                QMessageBox::critical(this, "Download Error", "Failed to save file.");
+            }
+        } else {
+            QMessageBox::critical(this, "Download Error", reply->errorString());
+        }
+        reply->deleteLater();
+    });
+}
+
 
 void chats::appendChatMessage(const QString &sender, const QString &content) {
     bool isSentByUser = (sender == loggedInUser.username);

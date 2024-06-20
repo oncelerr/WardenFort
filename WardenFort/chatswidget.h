@@ -28,6 +28,7 @@ private slots:
     void displayChatHistory(const QJsonArray &history);
     void appendChatMessage(const QString &sender, const QString &content);
     void onUploadFileButtonClicked();
+    void downloadFile(const QString &url, const QString &filename);
 
 private:
     Ui::chats *ui;
