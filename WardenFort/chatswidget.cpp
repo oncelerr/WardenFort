@@ -14,6 +14,8 @@
 #include <QListWidgetItem>
 #include <QWebSocket>
 
+QString recipient;
+
 chats::chats(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::chats),
@@ -126,22 +128,8 @@ void chats::onSendButtonClicked() {
 
     QJsonObject message;
     message["type"] = "message";
-    message["username"] = loggedInUser.username;
+    message["recipient"] = recipient;
     message["content"] = messageText;
-
-    // Check if it's a private message
-    if (messageText.startsWith("/msg")) {
-        QStringList parts = messageText.split(" ");
-        if (parts.size() >= 3) {
-            QString recipient = parts[1];
-            message["type"] = "message";
-            message["recipient"] = recipient;
-            message["content"] = parts.mid(2).join(" ");
-        } else {
-            qDebug() << "[Error] Invalid private message format.";
-            return;
-        }
-    }
 
     webSocket->sendTextMessage(QJsonDocument(message).toJson(QJsonDocument::Compact));
     ui->typeField_2->clear();
@@ -150,7 +138,7 @@ void chats::onSendButtonClicked() {
 void chats::handleListItemClicked(QListWidgetItem *item) {
     contacts *contactWidget = qobject_cast<contacts *>(ui->listWidget->itemWidget(item));
     if (contactWidget) {
-        QString recipient = contactWidget->getLabel(); // Assuming getLabel() retrieves the username
+        recipient = contactWidget->getLabel(); // Assuming getLabel() retrieves the username
         QJsonObject request;
         request["type"] = "history_request";
         request["recipient"] = recipient;
