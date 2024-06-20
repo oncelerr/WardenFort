@@ -2,6 +2,7 @@
 #include "globals.h"
 #include "ui_chatswidget.h"
 #include "contacts.h"
+#include "chatmessagewidget.h"
 #include "database.h"
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -9,8 +10,12 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QListWidgetItem>
+#include <QWebSocket>
 
-QString recipient = NULL;
+QString recipient;
 
 chats::chats(QWidget *parent) :
     QWidget(parent),
@@ -69,6 +74,12 @@ void chats::populateContactsList() {
         ui->listWidget->setItemWidget(item, contactWidget);
     }
 
+    // Select the first item in the listWidget and trigger handleListItemClicked
+    if (ui->listWidget->count() > 0) {
+        ui->listWidget->setCurrentRow(0);
+        handleListItemClicked(ui->listWidget->item(0));
+    }
+
     // Close the database connection
     db.close();
 }
@@ -93,17 +104,22 @@ void chats::onTextMessageReceived(const QString &message) {
 
     QString type = jsonObj["type"].toString();
 
-    if (type == "message") {
+    if (type == "message" || type == "private_message") {
         QString sender = jsonObj["sender"].toString();
         QString content = jsonObj["content"].toString();
+        QString msgRecipient = jsonObj.value("recipient").toString();
+
+        // Update the chat history only if the message is relevant to the current recipient
+        if (msgRecipient == recipient || (sender == recipient && msgRecipient.isEmpty())) {
+            appendChatMessage(sender, content);
+        }
         qDebug() << sender + ": " + content;
-    } else if (type == "private_message") {
-        QString sender = jsonObj["sender"].toString();
-        QString content = jsonObj["content"].toString();
-        qDebug() << "[Private] " + sender + ": " + content;
     } else if (type == "error") {
         QString content = jsonObj["content"].toString();
         qDebug() << "[Error] " + content;
+    } else if (type == "history") {
+        QJsonArray history = jsonObj["content"].toArray();
+        displayChatHistory(history);
     }
 }
 
@@ -114,22 +130,51 @@ void chats::onSendButtonClicked() {
     }
 
     QJsonObject message;
-    message["type"] = "private_message";
-    message["username"] = loggedInUser.username;
+    message["type"] = "message";
+    message["recipient"] = recipient;
     message["content"] = messageText;
-    message["sender"] = loggedInUser.username;
-
 
     webSocket->sendTextMessage(QJsonDocument(message).toJson(QJsonDocument::Compact));
-    qDebug() << "You: " + messageText;
     ui->typeField_2->clear();
+
+    // Add the sent message to the chat history
+    appendChatMessage(loggedInUser.username, messageText);
 }
 
 void chats::handleListItemClicked(QListWidgetItem *item) {
-    // Retrieve the contacts widget from the clicked item
     contacts *contactWidget = qobject_cast<contacts *>(ui->listWidget->itemWidget(item));
     if (contactWidget) {
-        qDebug() << "Clicked on contact with label:" << contactWidget->getLabel();
-        recipient = contactWidget->getLabel();
+        recipient = contactWidget->getLabel(); // Assuming getLabel() retrieves the username
+        QJsonObject request;
+        request["type"] = "history_request";
+        request["recipient"] = recipient;
+        webSocket->sendTextMessage(QJsonDocument(request).toJson(QJsonDocument::Compact));
+        qDebug() << "Requesting history for" << recipient;
+
+        ui->user_name_2->setText(recipient);
     }
+    qDebug() << ui->listWidget->itemWidget(item);
+}
+
+void chats::displayChatHistory(const QJsonArray &history) {
+    ui->chatHistory->clear(); // Clear existing chat history
+    if (history.isEmpty()) {
+        ui->chatHistory->addItem("Say Hi!");
+    } else {
+        for (const QJsonValue &value : history) {
+            QJsonObject msg = value.toObject();
+            QString sender = msg["sender"].toString();
+            QString content = msg["content"].toString();
+            appendChatMessage(sender, content);
+        }
+    }
+}
+
+void chats::appendChatMessage(const QString &sender, const QString &content) {
+    bool isSentByUser = (sender == loggedInUser.username);
+    ChatMessageWidget *chatMessageWidget = new ChatMessageWidget(sender, content, isSentByUser);
+    QListWidgetItem *item = new QListWidgetItem(ui->chatHistory);
+    item->setSizeHint(chatMessageWidget->sizeHint());
+    ui->chatHistory->addItem(item);
+    ui->chatHistory->setItemWidget(item, chatMessageWidget);
 }

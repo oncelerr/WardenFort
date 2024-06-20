@@ -17,6 +17,7 @@ SOURCES += \
     animatedlabel.cpp \
     calendar.cpp \
     calendarnotifications.cpp\
+    chatmessagewidget.cpp \
     chatswidget.cpp \
     contacts.cpp \
     customcalendarwidget.cpp \
@@ -43,6 +44,7 @@ HEADERS += \
     accountwidget.h \
     calendar.h \
     calendarnotifications.h\
+    chatmessagewidget.h \
     chatswidget.h \
     contacts.h \
     customcalendarwidget.h \
@@ -69,6 +71,7 @@ FORMS += \
     accountwidget.ui \
     calendar.ui \
     calendarnotifications.ui\
+    chatmessagewidget.ui \
     chatswidget.ui \
     contacts.ui \
     eventdialog.ui \
