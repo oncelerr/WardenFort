@@ -22,6 +22,9 @@
 #include <QByteArray>
 #include <QJsonDocument>
 
+#include <QDesktopServices>
+#include <QUrl>
+
 QString recipient;
 
 chats::chats(QWidget *parent) :
@@ -155,9 +158,23 @@ void chats::onTextMessageReceived(const QString &message) {
             if (type == "file") {
                 QString filename = jsonObj["filename"].toString();
                 QString downloadUrl = "http://192.168.0.166/uploaded_files/" + filename;  // Adjust the IP address and path as necessary
-                QString downloadLink = "<a href=\"" + downloadUrl + "\" download=\"" + filename + "\">" + filename + "</a>";
-                appendChatMessage(sender, downloadLink);
-                qDebug() << downloadLink;
+
+                // Create clickable label for file download
+                QLabel *downloadLabel = new QLabel();
+                downloadLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+                downloadLabel->setText("<a href=\"" + downloadUrl + "\">" + filename + "</a>");
+                downloadLabel->setOpenExternalLinks(true);
+
+                // Connect the linkActivated signal to handle the download
+                connect(downloadLabel, &QLabel::linkActivated, [=](const QString &link) {
+                    QDesktopServices::openUrl(QUrl(link));
+                });
+
+                appendChatMessage(sender, "Uploaded file: ");
+                QListWidgetItem *item = new QListWidgetItem(ui->chatHistory);
+                item->setSizeHint(downloadLabel->sizeHint());
+                ui->chatHistory->addItem(item);
+                ui->chatHistory->setItemWidget(item, downloadLabel);
             } else {
                 appendChatMessage(sender, content);
             }
