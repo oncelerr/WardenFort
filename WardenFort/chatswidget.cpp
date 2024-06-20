@@ -17,6 +17,10 @@
 #include <QFrame>
 #include <QLabel>
 #include <QMovie>
+#include <QFileDialog>
+#include <QFile>
+#include <QByteArray>
+#include <QJsonDocument>
 
 QString recipient;
 
@@ -32,6 +36,7 @@ chats::chats(QWidget *parent) :
     connect(webSocket, &QWebSocket::disconnected, this, &chats::onDisconnected);
     connect(webSocket, &QWebSocket::textMessageReceived, this, &chats::onTextMessageReceived);
     connect(ui->sendButton_2, &QPushButton::clicked, this, &chats::onSendButtonClicked);
+    connect(ui->uploadfileButton_2, &QPushButton::clicked, this, &chats::onUploadFileButtonClicked);
 
     // Connect listWidget itemClicked signal to handleListItemClicked slot
     connect(ui->listWidget, &QListWidget::itemClicked, this, &chats::handleListItemClicked);
@@ -51,6 +56,34 @@ chats::~chats() {
     webSocket->close();
     delete webSocket;
     delete ui;
+}
+
+void chats::onUploadFileButtonClicked() {
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Files (*.*)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Could not open file for reading";
+        return;
+    }
+
+    QByteArray fileData = file.readAll();
+    QString base64Data = QString::fromLatin1(fileData.toBase64());
+    file.close();
+
+    QJsonObject message;
+    message["type"] = "file";
+    message["recipient"] = recipient;
+    message["filename"] = QFileInfo(fileName).fileName();
+    message["content"] = base64Data;
+
+    webSocket->sendTextMessage(QJsonDocument(message).toJson(QJsonDocument::Compact));
+
+    // Optionally, you can also show the file upload in the chat history
+    appendChatMessage(loggedInUser.username, "Uploaded file: " + QFileInfo(fileName).fileName());
 }
 
 void chats::populateContactsList() {
@@ -112,14 +145,21 @@ void chats::onTextMessageReceived(const QString &message) {
 
     QString type = jsonObj["type"].toString();
 
-    if (type == "message" || type == "private_message") {
+    if (type == "message" || type == "private_message" || type == "file") {
         QString sender = jsonObj["sender"].toString();
         QString content = jsonObj["content"].toString();
         QString msgRecipient = jsonObj.value("recipient").toString();
 
         // Update the chat history only if the message is relevant to the current recipient
         if (msgRecipient == recipient || (sender == recipient && msgRecipient.isEmpty())) {
-            appendChatMessage(sender, content);
+            if (type == "file") {
+                QString filename = jsonObj["filename"].toString();
+                QString downloadUrl = "http://your_server_address/uploaded_files/" + filename;
+                QString downloadLink = "<a href=\"" + downloadUrl + "\" download>" + filename + "</a>";
+                appendChatMessage(sender, downloadLink);
+            } else {
+                appendChatMessage(sender, content);
+            }
         }
         qDebug() << sender + ": " + content;
     } else if (type == "error") {
@@ -190,7 +230,6 @@ void chats::displayChatHistory(const QJsonArray &history) {
         frame->setVisible(true);
         // Assuming frame_2 is a QFrame in your chats widget
 
-
         // Clear any existing content in frame_2
         // You may want to adjust this based on your actual requirement
         while (frame->layout()->count() > 0) {
@@ -220,7 +259,14 @@ void chats::displayChatHistory(const QJsonArray &history) {
             QJsonObject msg = value.toObject();
             QString sender = msg["sender"].toString();
             QString content = msg["content"].toString();
-            appendChatMessage(sender, content);
+            if (msg.contains("filename")) {
+                QString filename = msg["filename"].toString();
+                QString downloadUrl = "http://your_server_address/uploaded_files/" + filename;
+                QString downloadLink = "<a href=\"" + downloadUrl + "\" download>" + filename + "</a>";
+                appendChatMessage(sender, downloadLink);
+            } else {
+                appendChatMessage(sender, content);
+            }
         }
     }
 }

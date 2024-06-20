@@ -180,7 +180,8 @@ border-radius: 20px;
         <string notr="true">background-color: rgb(27, 31, 48);
 color: rgb(255, 255, 255);
 border-radius: 20px;
-padding-left: 20px;</string>
+padding-left: 20px;
+padding-right:150px;</string>
        </property>
        <property name="placeholderText">
         <string>Type your message</string>
@@ -189,7 +190,7 @@ padding-left: 20px;</string>
       <widget class="QPushButton" name="uploadimgButton_2">
        <property name="geometry">
         <rect>
-         <x>573</x>
+         <x>576</x>
          <y>464</y>
          <width>40</width>
          <height>24</height>

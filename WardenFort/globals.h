@@ -5,7 +5,7 @@
 
 struct User {
     int userId = 1;
-    QString username;
+    QString username = "jona";
     QString password;
     QString firstName;
     QString lastName;
