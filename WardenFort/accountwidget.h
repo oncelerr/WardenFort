@@ -2,6 +2,7 @@
 #define ACCOUNTWIDGET_H
 
 #include <QWidget>
+#include <QEvent>
 
 namespace Ui {
 class accountWidget;
@@ -14,8 +15,14 @@ class accountWidget : public QWidget
 public:
     explicit accountWidget(QWidget *parent = nullptr);
     ~accountWidget();
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
+private slots:
+    void onChangeButtonClicked();
+    void saveProfilePicToDatabase(const QString &filePath);
     void changeEmail();
-    void setGenderComboBox(const QString &gender);
     void changeUsername();
 
 private:

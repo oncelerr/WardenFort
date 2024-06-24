@@ -149,8 +149,8 @@ color: rgb(255, 255, 255);</string>
      <widget class="QPushButton" name="delBTN">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>76</y>
+        <x>950</x>
+        <y>80</y>
         <width>21</width>
         <height>24</height>
        </rect>

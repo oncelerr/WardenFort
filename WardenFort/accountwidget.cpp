@@ -8,6 +8,9 @@
 #include "globals.h"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QTimer>
+#include <QFileDialog>
+#include <database.h>
 
 accountWidget::accountWidget(QWidget *parent)
     : QWidget(parent)
@@ -16,25 +19,92 @@ accountWidget::accountWidget(QWidget *parent)
     ui->setupUi(this);
     connect(ui->pushButton_2, &QPushButton::clicked, this, &accountWidget::changeEmail);
     connect(ui->pushButton_3, &QPushButton::clicked, this, &accountWidget::changeUsername);
+    connect(ui->changeBTN, &QPushButton::clicked, this, &accountWidget::onChangeButtonClicked);
 
     // Set the placeholders with the logged-in user data
     ui->lineEdit->setPlaceholderText(loggedInUser.firstName);
     ui->lineEdit_2->setPlaceholderText(loggedInUser.lastName);
-    setGenderComboBox(loggedInUser.gender); // Assuming gender is already part of the comboBox items
-    ui->dateEdit->setDate(QDate::fromString(loggedInUser.dateOfBirth, "MM-dd-yyyy")); // Assuming dateOfBirth is in "yyyy-MM-dd" format
     ui->lineEdit_3->setPlaceholderText(loggedInUser.email);
     ui->lineEdit_4->setPlaceholderText(loggedInUser.username);
 
     // Optional: Set the current text directly if you want to show the values as entered text
+    ui->lineEdit_5->setText(loggedInUser.gender);
+    ui->lineEdit_6->setText(loggedInUser.dateOfBirth);
     ui->lineEdit->setText(loggedInUser.firstName);
     ui->lineEdit_2->setText(loggedInUser.lastName);
     ui->lineEdit_3->setText(loggedInUser.email);
     ui->lineEdit_4->setText(loggedInUser.username);
+
+    // Install event filter on label_5
+    ui->label_5->installEventFilter(this);
+    ui->changeBTN->installEventFilter(this);
+    ui->changeBTN->setVisible(false);
+
+    // Set the initial icon for the profile picture button
+    if (!loggedInUser.profilePic.isEmpty()) {
+        QIcon icon(loggedInUser.profilePic);
+        ui->pushButton_4->setIcon(icon);
+        ui->pushButton_4->setIconSize(ui->pushButton_4->size());
+    }
 }
 
 accountWidget::~accountWidget()
 {
     delete ui;
+}
+
+bool accountWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == ui->label_5 || obj == ui->changeBTN) {
+        if (event->type() == QEvent::Enter) {
+            ui->changeBTN->show();
+            return true;
+        } else if (event->type() == QEvent::Leave) {
+            // Use a timer to delay the hiding of changeBTN
+            QTimer::singleShot(100, this, [this]() {
+                if (!ui->label_5->underMouse() && !ui->changeBTN->underMouse()) {
+                    ui->changeBTN->hide();
+                }
+            });
+            return true;
+        }
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
+void accountWidget::onChangeButtonClicked() {
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Images (*.png *.jpg *.jpeg)"));
+    if (filePath.isEmpty()) {
+        return; // User cancelled the file dialog
+    }
+
+    // Save the selected file path to the database
+    saveProfilePicToDatabase(filePath);
+}
+
+void accountWidget::saveProfilePicToDatabase(const QString &filePath) {
+    if (loggedInUser.userId != -1) {
+        QSqlDatabase db = Database::getConnection();
+        QSqlQuery query(db);
+        query.prepare("UPDATE user_db SET profilePic = :profilePic WHERE user_id = :user_id");
+        query.bindValue(":profilePic", filePath);
+        query.bindValue(":user_id", loggedInUser.userId);
+
+        if (query.exec()) {
+            QMessageBox::information(this, tr("Profile Picture Changed"),
+                                     tr("Your profile picture has been successfully changed."));
+            // Update the UI with the new profile picture
+            QIcon icon(filePath);
+            ui->pushButton_4->setIcon(icon);
+            ui->pushButton_4->setIconSize(ui->pushButton_4->size());
+        } else {
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("Failed to change profile picture: %1").arg(query.lastError().text()));
+        }
+    } else {
+        QMessageBox::critical(this, tr("Error"),
+                              tr("You must log in first"));
+    }
 }
 
 void accountWidget::changeEmail() {
@@ -62,7 +132,8 @@ void accountWidget::changeEmail() {
             }
 
             // Update the email in the database
-            QSqlQuery query;
+            QSqlDatabase db = Database::getConnection();
+            QSqlQuery query(db);
             query.prepare("UPDATE user_db SET email = :email WHERE user_id = :user_id");
             query.bindValue(":email", newEmail);
             query.bindValue(":user_id", loggedInUser.userId);
@@ -83,7 +154,7 @@ void accountWidget::changeEmail() {
         QMessageBox loginFirstMsg;
         loginFirstMsg.setStyleSheet("QMessageBox { color: white; }"); // Set font color to white
         loginFirstMsg.critical(this, tr("Error"),
-                               tr("You must logged in first"));
+                               tr("You must log in first"));
     }
 }
 
@@ -102,7 +173,8 @@ void accountWidget::changeUsername() {
             }
 
             // Update the username in the database
-            QSqlQuery query;
+            QSqlDatabase db = Database::getConnection();
+            QSqlQuery query(db);
             query.prepare("UPDATE user_db SET username = :username WHERE user_id = :user_id");
             query.bindValue(":username", newUsername);
             query.bindValue(":user_id", loggedInUser.userId);
@@ -118,13 +190,5 @@ void accountWidget::changeUsername() {
     } else {
         QMessageBox::critical(this, tr("Error"),
                               tr("You must log in first"));
-    }
-}
-
-void accountWidget::setGenderComboBox(const QString &gender)
-{
-    int index = ui->comboBox->findText(gender);
-    if (index != -1) { // If the gender is found in the combo box items
-        ui->comboBox->setCurrentIndex(index);
     }
 }

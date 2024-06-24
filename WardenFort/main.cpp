@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     qDebug() << "Database connected successfully";
 
     login login;
-    //login.show();
+    login.show();
 
     reports reports;
     //reports.show();
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     //calendar.show();
 
     WardenFort wardenfort;
-    wardenfort.show();
+    //wardenfort.show();
 
     return a.exec();
 }

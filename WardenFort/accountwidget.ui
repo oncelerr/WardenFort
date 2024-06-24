@@ -58,39 +58,13 @@ border-radius: 10px;</string>
        <pixmap>../../../Downloads/Ellipse.png</pixmap>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>80</y>
-        <width>31</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../../../Downloads/profileButton.png</normaloff>../../../Downloads/profileButton.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>25</width>
-        <height>24</height>
-       </size>
-      </property>
-      <property name="flat">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
         <x>40</x>
         <y>30</y>
-        <width>151</width>
-        <height>121</height>
+        <width>141</width>
+        <height>131</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -253,67 +227,6 @@ padding-left: 10px;
       </property>
       <property name="text">
        <string>Gender</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>330</y>
-        <width>220</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QComboBox {
-border-radius: 15px; 
-background-color: #191F32;
-padding-left: 10px;
-	color: rgb(255, 255, 255);
-}
-QComboBox::down-arrow { 
-image: none; 
-border: none;
-border-radius: 10px;
-}
-QComboBox::drop-down { 
-width: 0px; 
-}
-
-</string>
-      </property>
-      <item>
-       <property name="text">
-        <string>Male</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Female</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QDateEdit" name="dateEdit">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>330</y>
-        <width>220</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QDateEdit {
-border-radius: 15px; 
-background-color: #191F32;
-padding-left: 10px;
-	color: rgb(255, 255, 255);
-}
-QDateEdit::down-button,QDateEdit::up-button { 
-width: 0; height: 0; border: none; 
-}
-
-</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_11">
@@ -527,9 +440,163 @@ border-radius: 15px;</string>
        <string/>
       </property>
      </widget>
+     <widget class="QLineEdit" name="lineEdit_5">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>330</y>
+        <width>220</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
+border-radius: 15px; 
+background-color: #191F32;
+padding-left: 10px;
+	color: rgb(255, 255, 255);
+}
+
+</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_6">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>330</y>
+        <width>220</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
+border-radius: 15px; 
+background-color: #191F32;
+padding-left: 10px;
+	color: rgb(255, 255, 255);
+}
+
+</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="geometry">
+       <rect>
+        <x>42</x>
+        <y>30</y>
+        <width>141</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius: 10px;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="wardenfort.qrc">
+        <normaloff>:/wardenfort/no-profile-picture-15258.png</normaloff>:/wardenfort/no-profile-picture-15258.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>141</width>
+        <height>131</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="changeBTN">
+      <property name="geometry">
+       <rect>
+        <x>62</x>
+        <y>85</y>
+        <width>101</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Change Profile</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_5">
+      <property name="geometry">
+       <rect>
+        <x>36</x>
+        <y>25</y>
+        <width>151</width>
+        <height>141</height>
+       </rect>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius: 10px;
+background-color: rgba(255, 255, 255, 0);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="wardenfort.qrc">
+        <normaloff>:/wardenfort/crop.png</normaloff>:/wardenfort/crop.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>141</width>
+        <height>133</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame">
+      <property name="geometry">
+       <rect>
+        <x>176</x>
+        <y>20</y>
+        <width>120</width>
+        <height>151</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(44, 60, 75);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>41</width>
+        <height>151</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(44, 60, 75);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
      <zorder>label_4</zorder>
-     <zorder>label_5</zorder>
-     <zorder>pushButton</zorder>
      <zorder>label_6</zorder>
      <zorder>label_7</zorder>
      <zorder>label_8</zorder>
@@ -537,8 +604,6 @@ border-radius: 15px;</string>
      <zorder>lineEdit</zorder>
      <zorder>lineEdit_2</zorder>
      <zorder>label_10</zorder>
-     <zorder>comboBox</zorder>
-     <zorder>dateEdit</zorder>
      <zorder>label_11</zorder>
      <zorder>label_12</zorder>
      <zorder>lineEdit_3</zorder>
@@ -549,6 +614,14 @@ border-radius: 15px;</string>
      <zorder>label_15</zorder>
      <zorder>label_16</zorder>
      <zorder>label_18</zorder>
+     <zorder>lineEdit_5</zorder>
+     <zorder>lineEdit_6</zorder>
+     <zorder>pushButton_4</zorder>
+     <zorder>pushButton_5</zorder>
+     <zorder>frame</zorder>
+     <zorder>frame_2</zorder>
+     <zorder>label_5</zorder>
+     <zorder>changeBTN</zorder>
     </widget>
    </item>
   </layout>
