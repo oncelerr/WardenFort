@@ -72,6 +72,8 @@ public:
     void saveDataToFile();
     void readCSV();
     QString getLocalIpAddress();
+    void closeDumpFile();
+
 
 public slots:
     void showDoSPopup();
@@ -92,7 +94,6 @@ private:
     void on_logoutButton_released();
     void sendRequestToChatGPT(const QString &inputText);
     QString extractResponseText(const QJsonDocument &responseJson);
-
     bool isFilteredAdapter(pcap_if_t* adapter);
     BOOL LoadNpcapDlls();
     void putIntoCSV(const QByteArray& iaResponseData);
@@ -104,6 +105,7 @@ private:
     accountWidget *accountWidget;  // Add this line
     notifWidget *notifWidget;
     chats *chatsWidget;
+
     reports *reportsWidget;
     CustomCalendarWidget *customCalendar = nullptr; // Declare customCalendar here
 
