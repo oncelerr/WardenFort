@@ -69,6 +69,8 @@
         <file>cathello.gif</file>
         <file>no-profile-picture-15258.png</file>
         <file>crop.png</file>
+        <file>refresh.png</file>
+        <file>trash.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

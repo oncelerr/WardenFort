@@ -3,12 +3,14 @@
 
 #include <QWidget>
 #include <QTimer>
-#include <QMap>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QListWidgetItem>
 #include "notificationwidget.h"
 
-namespace Ui {
-class notifWidget;
-}
+QT_BEGIN_NAMESPACE
+namespace Ui { class notifWidget; }
+QT_END_NAMESPACE
 
 class notifWidget : public QWidget
 {
@@ -25,16 +27,19 @@ protected:
 
 private slots:
     void updateNotifications();
+
     void onRightButtonClicked();
     void onLeftButtonClicked();
     void onMainCheckBoxStateChanged(int state);
-    void onDeleteButtonClicked();  // Add this line
+    void onDeleteButtonClicked();
+    void refreshNotifications(); // Slot for refresh button clicked
 
 private:
     Ui::notifWidget *ui;
     QTimer *timer;
     int currentPage;
     int pageSize;
+
 };
 
 #endif // NOTIFWIDGET_H

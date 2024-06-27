@@ -74,7 +74,7 @@ color: white;</string>
      <widget class="QPushButton" name="leftBTN">
       <property name="geometry">
        <rect>
-        <x>885</x>
+        <x>858</x>
         <y>76</y>
         <width>21</width>
         <height>24</height>
@@ -91,7 +91,7 @@ color: white;</string>
      <widget class="QPushButton" name="rightBTN">
       <property name="geometry">
        <rect>
-        <x>915</x>
+        <x>888</x>
         <y>76</y>
         <width>21</width>
         <height>24</height>
@@ -108,7 +108,7 @@ color: white;</string>
      <widget class="QLabel" name="totalNotif">
       <property name="geometry">
        <rect>
-        <x>748</x>
+        <x>721</x>
         <y>78</y>
         <width>131</width>
         <height>16</height>
@@ -149,8 +149,8 @@ color: rgb(255, 255, 255);</string>
      <widget class="QPushButton" name="delBTN">
       <property name="geometry">
        <rect>
-        <x>950</x>
-        <y>80</y>
+        <x>946</x>
+        <y>77</y>
         <width>21</width>
         <height>24</height>
        </rect>
@@ -160,7 +160,36 @@ color: rgb(255, 255, 255);</string>
       </property>
       <property name="icon">
        <iconset resource="wardenfort.qrc">
-        <normaloff>:/wardenfort/bin.png</normaloff>:/wardenfort/bin.png</iconset>
+        <normaloff>:/wardenfort/trash.png</normaloff>:/wardenfort/trash.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>17</width>
+        <height>17</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="refreshBTN">
+      <property name="geometry">
+       <rect>
+        <x>915</x>
+        <y>77</y>
+        <width>21</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="wardenfort.qrc">
+        <normaloff>:/wardenfort/refresh.png</normaloff>:/wardenfort/refresh.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>19</width>
+        <height>19</height>
+       </size>
       </property>
      </widget>
     </widget>

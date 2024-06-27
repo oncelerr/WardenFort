@@ -4,6 +4,8 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QString>
+#include <database.h>
+#include <globals.h>
 
 passwordSecWidget::passwordSecWidget(QWidget *parent)
     : QWidget(parent)
@@ -21,24 +23,15 @@ passwordSecWidget::~passwordSecWidget()
 
 
 void changePassword(const QString& username, const QString& newPassword) {
-    // Assuming you have a database connection established
-    QSqlDatabase db = QSqlDatabase::database();
-
-    // Check if the database is open
-    if (!db.isOpen()) {
-        qDebug() << "Database is not open";
-        return;
-    }
-
-    // Prepare the SQL query to update the password
-    QSqlQuery query;
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
     query.prepare("UPDATE user_db SET passwd = :passwd WHERE username = :username");
     query.bindValue(":passwd", newPassword);
-    query.bindValue(":username", username);
+    query.bindValue(":username", loggedInUser.username);
 
     // Execute the query
     if (query.exec()) {
-        qDebug() << "Password updated successfully for user:" << username;
+        qDebug() << "Password updated successfully for user:" << loggedInUser.username;
     }
     else {
         qDebug() << "Error updating password:" << query.lastError().text();

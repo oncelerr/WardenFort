@@ -14,9 +14,9 @@
 notifWidget::notifWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::notifWidget)
-    , timer(new QTimer(this)) // Initialize the QTimer
-    , currentPage(0) // Initialize current page number
-    , pageSize(6) // Set page size to 6
+    , timer(new QTimer(this))
+    , currentPage(0)
+    , pageSize(6)
 {
     ui->setupUi(this);
 
@@ -28,7 +28,11 @@ notifWidget::notifWidget(QWidget *parent)
     connect(ui->leftBTN, &QPushButton::clicked, this, &notifWidget::onLeftButtonClicked);
     connect(ui->rightBTN, &QPushButton::clicked, this, &notifWidget::onRightButtonClicked);
     connect(ui->checkBox, &QCheckBox::stateChanged, this, &notifWidget::onMainCheckBoxStateChanged);
-    connect(ui->delBTN, &QPushButton::clicked, this, &notifWidget::onDeleteButtonClicked); // Connect the delete button
+    connect(ui->delBTN, &QPushButton::clicked, this, &notifWidget::onDeleteButtonClicked);
+    connect(ui->refreshBTN, &QPushButton::clicked, this, &notifWidget::refreshNotifications); // Connect refresh button
+
+    // Initialize the timer and start when widget is shown
+    connect(timer, &QTimer::timeout, this, &notifWidget::updateNotifications);
 }
 
 notifWidget::~notifWidget()
@@ -36,18 +40,27 @@ notifWidget::~notifWidget()
     delete ui;
 }
 
-void notifWidget::showEvent(QShowEvent *event) {
+void notifWidget::showEvent(QShowEvent *event)
+{
     QWidget::showEvent(event);
     timer->start(10000); // Start the timer when the widget is shown
 }
 
-void notifWidget::hideEvent(QHideEvent *event) {
+void notifWidget::hideEvent(QHideEvent *event)
+{
     QWidget::hideEvent(event);
     timer->stop(); // Stop the timer when the widget is hidden
 }
 
-void notifWidget::addNotifications(int offset, int limit) {
-    QSqlDatabase db = Database::getConnection(); // Retrieve the correct thread-local database connection
+void notifWidget::updateNotifications()
+{
+    int offset = currentPage * pageSize; // Calculate the offset based on current page and page size
+    addNotifications(offset, pageSize); // Add notifications based on offset and page size
+}
+
+void notifWidget::addNotifications(int offset, int limit)
+{
+    QSqlDatabase db = Database::getConnection();
     if (!db.isOpen()) {
         qDebug() << "Database connection is not open";
         return;
@@ -71,13 +84,11 @@ void notifWidget::addNotifications(int offset, int limit) {
         return;
     }
 
-    // Fetch the count of notifications
     int totalCount = 0;
     if (countQuery.next()) {
         totalCount = countQuery.value(0).toInt();
     }
 
-    // Update the total notifications label
     ui->totalNotif->setText(QString::number(totalCount) + " Alerts");
 
     QSqlQuery query(db);
@@ -125,29 +136,24 @@ void notifWidget::addNotifications(int offset, int limit) {
     }
 }
 
-void notifWidget::updateNotifications() {
-    int offset = 0; // Offset for the first page
-    addNotifications(offset, pageSize); // Load the first page
+void notifWidget::onRightButtonClicked()
+{
+    currentPage++;
+    int offset = currentPage * pageSize;
+    addNotifications(offset, pageSize);
 }
 
-// Right button clicked
-void notifWidget::onRightButtonClicked() {
-    currentPage++; // Increment the page number
-    int offset = currentPage * pageSize; // Calculate the offset
-    addNotifications(offset, pageSize); // Fetch and display the next set of rows
-}
-
-// Left button clicked
-void notifWidget::onLeftButtonClicked() {
+void notifWidget::onLeftButtonClicked()
+{
     if (currentPage > 0) {
-        currentPage--; // Decrement the page number if not on the first page
+        currentPage--;
     }
-    int offset = currentPage * pageSize; // Calculate the offset
-    addNotifications(offset, pageSize); // Fetch and display the previous set of rows
+    int offset = currentPage * pageSize;
+    addNotifications(offset, pageSize);
 }
 
-// Slot to handle main checkbox state change
-void notifWidget::onMainCheckBoxStateChanged(int state) {
+void notifWidget::onMainCheckBoxStateChanged(int state)
+{
     bool checked = (state == Qt::Checked);
     for (int i = 0; i < ui->widgetList->count(); ++i) {
         QListWidgetItem *item = ui->widgetList->item(i);
@@ -158,8 +164,8 @@ void notifWidget::onMainCheckBoxStateChanged(int state) {
     }
 }
 
-// Slot to handle delete button click
-void notifWidget::onDeleteButtonClicked() {
+void notifWidget::onDeleteButtonClicked()
+{
     QSqlDatabase db = Database::getConnection();
     if (!db.isOpen()) {
         qDebug() << "Database connection is not open";
@@ -168,12 +174,10 @@ void notifWidget::onDeleteButtonClicked() {
 
     QSqlQuery deleteQuery(db);
 
-    // Iterate through the list and delete checked notifications
     for (int i = 0; i < ui->widgetList->count(); ++i) {
         QListWidgetItem *item = ui->widgetList->item(i);
         NotificationWidget *notificationWidget = qobject_cast<NotificationWidget*>(ui->widgetList->itemWidget(item));
         if (notificationWidget && notificationWidget->isChecked()) {
-            // Delete from the database
             deleteQuery.prepare("DELETE FROM packets WHERE user_id = :user_id AND info = :info");
             deleteQuery.bindValue(":user_id", loggedInUser.userId);
             deleteQuery.bindValue(":info", notificationWidget->info());
@@ -181,12 +185,17 @@ void notifWidget::onDeleteButtonClicked() {
                 qDebug() << "Error executing delete query:" << deleteQuery.lastError().text();
             }
 
-            // Remove from the list
             delete item;
+            --i;
         }
     }
 
-    // Refresh the notifications list
+    int offset = currentPage * pageSize;
+    addNotifications(offset, pageSize);
+}
+
+void notifWidget::refreshNotifications()
+{
     int offset = currentPage * pageSize;
     addNotifications(offset, pageSize);
 }

@@ -11,6 +11,7 @@
 #include <QtNetwork/QSslSocket>
 #include <QGridLayout> // Include QGridLayout
 #include <QDialog> // Include QDialog
+#include <database.h>
 
 // Gmail SMTP server settings
 const QString SmtpServerAddress = "smtp.gmail.com";
@@ -47,7 +48,8 @@ enter::~enter()
 
 void enter::onFindUsername(const QString& username)
 {
-    QSqlQuery query;
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
     query.prepare("SELECT firstName FROM user_db WHERE username = :username");
     query.bindValue(":username", username);
 

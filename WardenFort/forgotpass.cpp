@@ -13,6 +13,7 @@
 #include <QSslSocket>
 #include <QTextStream>
 #include <QSqlError>
+#include <database.h>
 
 forgotpass::forgotpass(const QString& username, QWidget *parent) :
     QDialog(parent),
@@ -103,8 +104,8 @@ void forgotpass::onResetPasswordClicked1()
 
 void forgotpass::changePass() {
     QString newPass = ui->pass_change_2->text();
-
-    QSqlQuery query;
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
     query.prepare("UPDATE user_db SET passwd = :password WHERE username = :username");
     query.bindValue(":password", newPass);
     query.bindValue(":username", m_username); // Assuming the username is entered directly
