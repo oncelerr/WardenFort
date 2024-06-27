@@ -63,6 +63,12 @@
 
 #include <unordered_map>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <sys/time.h>
+#endif
+
 // Ensure linkage with ws2_32.lib
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -144,7 +150,7 @@ WardenFort::WardenFort(QWidget* parent)
     if (!ui->frame_2->layout()) {
         ui->frame_2->setLayout(new QVBoxLayout()); // Ensure frame_2 has a layout
     }
-
+    extern pcap_dumper_t* dumpfile;
     networkManager = new QNetworkAccessManager(this);
     manager = new QNetworkAccessManager(this);
     connect(ui->searchBTN, &QPushButton::clicked, this, &WardenFort::performSearch);
@@ -177,7 +183,6 @@ WardenFort::WardenFort(QWidget* parent)
 
     loginsession* log = new loginsession;
     QString Name = log->username;
-
     initializeDeviceIpFilter();
 
 }
@@ -432,6 +437,7 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     sport = ntohs(uh->sport);
     dport = ntohs(uh->dport);
 
+
     struct tm* timeinfo;
     char buffer[80];
     time_t packet_time = static_cast<time_t>(pkthdr->ts.tv_sec);
@@ -600,7 +606,9 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
     } else {
         backgroundColor = QColor(61, 62, 74);  // white Default color for other protocols
     }
+    // Save the packet to a dump file
 
+    //pcap_dump((u_char *)dumpfile, pkthdr, packet);
     if (protocol == "TCP" || protocol == "UDP"){
 
         QTableWidget* tableWidget = wardenFort->getTableWidget();
@@ -648,7 +656,10 @@ void packetHandler(WardenFort* wardenFort, const struct pcap_pkthdr* pkthdr, con
             }
         }
     }
-    }
+
+
+
+}
 
 
 void WardenFort::showDoSPopup() {
@@ -685,34 +696,58 @@ void packetHandlerWrapper(u_char* user, const struct pcap_pkthdr* pkt_header, co
     packetHandler(wardenFort, pkt_header, pkt_data);
 }
 
+struct PacketHandlerContext {
+    pcap_dumper_t* dumpfile;
+    WardenFort* wardenFort;
+};
+void packetHandlerFunction(u_char* userData, const struct pcap_pkthdr* packetHeader, const u_char* packetData) {
+    auto* context = reinterpret_cast<PacketHandlerContext*>(userData);
+    packetHandlerWrapper(reinterpret_cast<u_char*>(context->wardenFort), packetHeader, packetData);
+    pcap_dump(reinterpret_cast<u_char*>(context->dumpfile), packetHeader, packetData);
+}
+
 void captureTCPPackets(pcap_if_t* adapter, WardenFort& wardenFort, bool& stopRequested) {
     char errbuf[PCAP_ERRBUF_SIZE];
 
     // Open the adapter for live capturing
     pcap_t* pcapHandle = pcap_open(adapter->name, // name of the device
-                                   65535, // portion of the packet to capture (increase this value)
+                                   65535, // portion of the packet to capture (increase this value if necessary)
                                    PCAP_OPENFLAG_PROMISCUOUS, // promiscuous mode
-                                   1000, // read timeout
-                                   NULL, // authentication on the remote machine
+                                   1000, // read timeout in milliseconds
+                                   NULL, // authentication on the remote machine (NULL for local capture)
                                    errbuf // error buffer
                                    );
 
     if (pcapHandle == nullptr) {
         qDebug() << "Error opening adapter for capturing:" << errbuf;
-        wardenFort.scanActiveLANAdapters();
+        wardenFort.scanActiveLANAdapters(); // Scan for active adapters if opening fails
+        return; // Exit function if opening adapter fails
     }
+
+    // Open the dump file for writing captured packets
+    pcap_dumper_t* dumpfile = pcap_dump_open(pcapHandle, "output.pcap");
+    if (dumpfile == nullptr) {
+        qDebug() << "Error opening output file:" << pcap_geterr(pcapHandle);
+        pcap_close(pcapHandle); // Close pcap handle if dump file open fails
+        return;
+    }
+
+    // Create the context for the packet handler
+    PacketHandlerContext context{dumpfile, &wardenFort};
 
     // Start capturing packets until stop is requested
     while (!stopRequested) {
-        if (pcap_dispatch(pcapHandle, 0, packetHandlerWrapper, reinterpret_cast<u_char*>(&wardenFort)) == -1) {
+        int ret = pcap_dispatch(pcapHandle, 0, packetHandlerFunction, reinterpret_cast<u_char*>(&context));
+        if (ret == -1) {
             qDebug() << "Error capturing packets:" << pcap_geterr(pcapHandle);
+            break; // Exit loop if there's an error capturing packets
         }
     }
 
-    // Close the capture handle when done
+    // Close the dump file and the capture handle when done
+    pcap_dump_close(dumpfile);
     pcap_close(pcapHandle);
 }
-
 
 
 class CaptureThread : public QThread {
@@ -1018,94 +1053,33 @@ void WardenFort::performSearch()
 }
 
 void WardenFort::saveDataToFile() {
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("CSV Files (*.csv)"));
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("PCAP Files (*.pcap)"));
     if (filePath.isEmpty()) {
         return; // User canceled or no file selected
     }
 
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "Error: Unable to open file for writing";
+    pcap_dumper_t *dumpfile = pcap_dump_open(pcap_open_dead(DLT_EN10MB, 65535), filePath.toStdString().c_str());
+    if (!dumpfile) {
+        qDebug() << "Error: Unable to open PCAP file for writing";
         return;
     }
 
-    QTextStream out(&file);
     const int rowCount = ui->tableWidget->rowCount();
-    const int columnCount = ui->tableWidget->columnCount();
-
-    // Write table headers to CSV file
-    for (int col = 0; col < columnCount; ++col) {
-        out << ui->tableWidget->horizontalHeaderItem(col)->text();
-        out << ","; // Use comma as delimiter
-    }
-    out << "Occurrence\n"; // Add the new Occurrence column header
-
-    QMap<QString, QStringList> mergedData;
-    QMap<QString, int> occurrenceCount;
-
-    // Create a progress dialog
-    QProgressDialog progressDialog(tr("Saving data..."), tr("Cancel"), 0, rowCount, this);
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setMinimumDuration(0);
-    progressDialog.setValue(0);
-
-    progressDialog.setStyleSheet(
-        "QLabel { color : white; }"
-        "QProgressBar { color : white; }"
-        "QPushButton { color : white; }"
-        );
-
-    // Collect and merge table data
     for (int row = 0; row < rowCount; ++row) {
-        // Check if the user has canceled the operation
-        if (progressDialog.wasCanceled()) {
-            file.close();
-            return;
-        }
-
         QTableWidgetItem *infoItem = ui->tableWidget->item(row, 8); // Column 8 is the information column
         if (infoItem && infoItem->text() != "No Information") {
-            QString sourceIP = ui->tableWidget->item(row, 1)->text(); // Column 1 is "Source IP"
-            QStringList rowData;
-            for (int col = 0; col < columnCount; ++col) {
-                QTableWidgetItem *item = ui->tableWidget->item(row, col);
-                rowData << (item ? item->text() : "");
-            }
-            if (mergedData.contains(sourceIP)) {
-                QStringList &existingData = mergedData[sourceIP];
-                for (int col = 0; col < columnCount; ++col) {
-                    if (!existingData[col].contains(rowData[col]) && !rowData[col].isEmpty()) {
-                        existingData[col] += "; " + rowData[col];
-                    }
-                }
-                occurrenceCount[sourceIP]++;
-            } else {
-                mergedData[sourceIP] = rowData;
-                occurrenceCount[sourceIP] = 1;
-            }
-
-            // Splitting the timestamp into date and time components
-            QStringList dateTimeParts = rowData[0].split(' ');
-            QString date = dateTimeParts[0];
-            QString time = dateTimeParts[1];
+            const QByteArray packetData = ui->tableWidget->item(row, 9)->data(Qt::UserRole).toByteArray();
+            pcap_pkthdr pkthdr;
+            pkthdr.caplen = packetData.size();
+            pkthdr.len = packetData.size();
+            //gettimeofday(&pkthdr.ts, nullptr);
+            pcap_dump((u_char *)dumpfile, &pkthdr, reinterpret_cast<const u_char *>(packetData.constData()));
         }
-
-        // Update the progress dialog
-        progressDialog.setValue(row + 1);
     }
 
-    // Write merged data to CSV file
-    QMapIterator<QString, QStringList> it(mergedData);
-    while (it.hasNext()) {
-        it.next();
-        QStringList rowData = it.value();
-        for (int col = 0; col < columnCount; ++col) {
-            out << rowData[col];
-            out << ","; // Use comma as delimiter
-        }
-        out << occurrenceCount[it.key()] << "\n"; // Write the occurrence count
-    }
-    // Prepare the SQL query to insert into the reports table
+    pcap_dump_close(dumpfile);
+
+    // Insert into the reports table
     QSqlDatabase db = Database::getConnection();
     QSqlQuery query(db);
     query.prepare("INSERT INTO reports (date, time, reportBy) VALUES (:date, :time, :reportBy)");
@@ -1113,14 +1087,13 @@ void WardenFort::saveDataToFile() {
     query.bindValue(":time", QTime::currentTime().toString(Qt::ISODate)); // Current time
     query.bindValue(":reportBy", loggedInUser.username); // Assuming userLabel is the user label
 
-    // Execute the query for reports table
     if (!query.exec()) {
         qDebug() << "Error inserting data into reports table:" << query.lastError().text();
     }
 
-    file.close();
-    qDebug() << "Data saved to" << filePath;
+    qDebug() << "Packets saved to" << filePath;
 }
+
 
 void WardenFort::createPDFWithTemplate(const QString &fileName, const QString &filePath) {
     // Define your printable template using HTML and CSS
