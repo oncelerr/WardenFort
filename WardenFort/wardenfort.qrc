@@ -71,6 +71,7 @@
         <file>crop.png</file>
         <file>refresh.png</file>
         <file>trash.png</file>
+        <file>systemlogo.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

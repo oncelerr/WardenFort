@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>OTP Verification</string>
+   <string>WardenFort</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="wardenfort.qrc">
+    <normaloff>:/wardenfort/systemlogo.png</normaloff>:/wardenfort/systemlogo.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(25, 31, 50);
@@ -201,7 +205,7 @@ background-color: rgb(24, 40, 55); /* Adjust pressed color if needed */
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>C:/Users/admin/Downloads/cyber (1).png</pixmap>
+    <pixmap resource="wardenfort.qrc">:/wardenfort/cyber (1).png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="verify_text">
@@ -384,12 +388,12 @@ color: rgb(1, 253, 245);
 </string>
    </property>
   </widget>
+  <zorder>cyber_bg</zorder>
   <zorder>widget</zorder>
   <zorder>submitButton</zorder>
   <zorder>enter_text</zorder>
   <zorder>verify_text</zorder>
   <zorder>wardenfort</zorder>
-  <zorder>cyber_bg</zorder>
   <zorder>code_text</zorder>
   <zorder>timer</zorder>
   <zorder>text1</zorder>
@@ -399,6 +403,8 @@ color: rgb(1, 253, 245);
   <zorder>text6</zorder>
   <zorder>text4</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="wardenfort.qrc"/>
+ </resources>
  <connections/>
 </ui>

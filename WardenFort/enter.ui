@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>WardenFort</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="wardenfort.qrc">
+    <normaloff>:/wardenfort/systemlogo.png</normaloff>:/wardenfort/systemlogo.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(25, 31, 50);
@@ -136,7 +140,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
   <widget class="QLabel" name="cyber_bg">
    <property name="geometry">
     <rect>
-     <x>640</x>
+     <x>585</x>
      <y>130</y>
      <width>401</width>
      <height>331</height>
@@ -152,7 +156,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>C:/Users/admin/Downloads/cyber (1).png</pixmap>
+    <pixmap resource="wardenfort.qrc">:/wardenfort/cyber (1).png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="verify_text">
@@ -199,16 +203,18 @@ QPushButton {
     <string/>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>C:/Users/admin/Downloads/dd1_rotated.png</normaloff>C:/Users/admin/Downloads/dd1_rotated.png</iconset>
+    <iconset resource="wardenfort.qrc">
+     <normaloff>:/wardenfort/dd1.png</normaloff>:/wardenfort/dd1.png</iconset>
    </property>
   </widget>
+  <zorder>cyber_bg</zorder>
   <zorder>widget</zorder>
   <zorder>wardenfort</zorder>
-  <zorder>cyber_bg</zorder>
   <zorder>verify_text</zorder>
   <zorder>back_button</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="wardenfort.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -34,6 +34,10 @@
   <property name="windowTitle">
    <string>WardenFort</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="wardenfort.qrc">
+    <normaloff>:/wardenfort/systemlogo.png</normaloff>:/wardenfort/systemlogo.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">background-color: #191F32;</string>
   </property>

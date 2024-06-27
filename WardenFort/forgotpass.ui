@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Forgot Password</string>
+   <string>WardenFort</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="wardenfort.qrc">
+    <normaloff>:/wardenfort/systemlogo.png</normaloff>:/wardenfort/systemlogo.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(25, 31, 50);
@@ -197,8 +201,8 @@ color: rgb(255, 255, 255);</string>
   <widget class="QLabel" name="cyber_bg">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>120</y>
+     <x>577</x>
+     <y>123</y>
      <width>421</width>
      <height>331</height>
     </rect>
@@ -213,7 +217,7 @@ color: rgb(255, 255, 255);</string>
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>C:/Users/admin/Downloads/cyber (1).png</pixmap>
+    <pixmap resource="wardenfort.qrc">:/wardenfort/cyber (1).png</pixmap>
    </property>
   </widget>
   <widget class="QPushButton" name="back_button">
@@ -242,8 +246,8 @@ QPushButton {
     <string/>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>C:/Users/admin/Downloads/dd1_rotated.png</normaloff>C:/Users/admin/Downloads/dd1_rotated.png</iconset>
+    <iconset resource="wardenfort.qrc">
+     <normaloff>:/wardenfort/dd1.png</normaloff>:/wardenfort/dd1.png</iconset>
    </property>
   </widget>
   <widget class="QWidget" name="widget_2" native="true">
@@ -381,7 +385,13 @@ qproperty-alignment: AlignCenter;</string>
     </property>
    </widget>
   </widget>
+  <zorder>cyber_bg</zorder>
+  <zorder>widget</zorder>
+  <zorder>back_button</zorder>
+  <zorder>widget_2</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="wardenfort.qrc"/>
+ </resources>
  <connections/>
 </ui>

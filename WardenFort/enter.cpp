@@ -12,13 +12,14 @@
 #include <QGridLayout> // Include QGridLayout
 #include <QDialog> // Include QDialog
 #include <database.h>
+#include <QMessageBox>
 
 // Gmail SMTP server settings
 const QString SmtpServerAddress = "smtp.gmail.com";
 const int SmtpServerPort = 465; // Port 465 for SSL
-const QString SmtpUsername = "heyaoican@gmail.com"; // Your Gmail email address
+const QString SmtpUsername = "wardenfort.afp@gmail.com"; // Your Gmail email address
 const QString SmtpName = "WardenFort";
-const QString SmtpPassword = "noay rbpe mnbb meku"; // Your Gmail app password
+const QString SmtpPassword = "dlac nvob epnu zzuq"; // Your Gmail app password
 
 // Function to generate a 6-digit code
 void enter::generateCode() {
@@ -37,32 +38,12 @@ enter::enter(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->user_find, &QLineEdit::returnPressed, this, &enter::onSubmit);
     connect(ui->submitButton, &QPushButton::clicked, this, &enter::onSubmit);
-    connect(ui->user_find, &QLineEdit::textChanged, this, &enter::onFindUsername);
     connect(ui->back_button, &QPushButton::clicked, this, &enter::onBackButtonClicked);
 }
 
 enter::~enter()
 {
     delete ui;
-}
-
-void enter::onFindUsername(const QString& username)
-{
-    QSqlDatabase db = Database::getConnection();
-    QSqlQuery query(db);
-    query.prepare("SELECT firstName FROM user_db WHERE username = :username");
-    query.bindValue(":username", username);
-
-    if(query.exec()) {
-        if(query.next()) {
-            QString firstName = query.value(0).toString();
-            qDebug() << "First Name:" << firstName;
-        } else {
-            qDebug() << "Username not found.";
-        }
-    } else {
-        qDebug() << "Query failed:" << query.lastError().text();
-    }
 }
 
 void enter::sendEmail(const QString& recipientEmail, const QString& code) {
@@ -202,6 +183,13 @@ void enter::onSubmit()
         }
     } else {
         qDebug() << "Username not found:" << username;
+
+        // Add a popup message with customized font
+        QMessageBox msgBox;
+        msgBox.setText("Username not found");
+        msgBox.setStyleSheet("QLabel { color : white; font-size: 16px; }");
+        msgBox.setStyleSheet("QMessageBox { background-color: rgb(44, 60, 75); } QLabel { color : white; font-size: 16px; padding-right: 25px;}");
+        msgBox.exec();
     }
 }
 

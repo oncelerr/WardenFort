@@ -18,7 +18,6 @@ public:
     ~enter();
 
 private slots:
-    void onFindUsername(const QString& username);
     void onSubmit();
     void onBackButtonClicked();
     void sendEmail(const QString& recipientEmail, const QString& code);

@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Sign Up</string>
+   <string>WardenFort</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="wardenfort.qrc">
+    <normaloff>:/wardenfort/systemlogo.png</normaloff>:/wardenfort/systemlogo.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(25, 31, 50);
@@ -56,7 +60,7 @@ QCheckBox {
   <widget class="QLabel" name="cyber_bg">
    <property name="geometry">
     <rect>
-     <x>492</x>
+     <x>600</x>
      <y>130</y>
      <width>411</width>
      <height>331</height>
