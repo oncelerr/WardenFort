@@ -165,15 +165,16 @@ void enter::onSubmit()
 {
     qDebug() << "Submit button clicked";
     QString username = ui->user_find->text(); // Retrieve the entered username
-    QSqlQuery query;
+    QSqlDatabase db = Database::getConnection();
+    QSqlQuery query(db);
     query.prepare("SELECT username FROM user_db WHERE username = :username");
     query.bindValue(":username", username); // Assuming the username is entered directly
 
     // Execute the query
     if (query.exec() && query.next()) {
         QString foundUsername = query.value(0).toString(); // Retrieve the username
-
-        QSqlQuery emailQuery;
+        QSqlDatabase db = Database::getConnection();
+        QSqlQuery emailQuery(db);
         emailQuery.prepare("SELECT email FROM user_db WHERE username = :username");
         emailQuery.bindValue(":username", foundUsername);
 
