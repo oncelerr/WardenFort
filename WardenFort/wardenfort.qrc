@@ -72,6 +72,7 @@
         <file>refresh.png</file>
         <file>trash.png</file>
         <file>systemlogo.png</file>
+        <file>C:/Users/admin/Downloads/framee.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

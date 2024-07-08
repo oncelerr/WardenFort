@@ -48,7 +48,7 @@ chats::chats(QWidget *parent) :
     connect(ui->listWidget, &QListWidget::itemClicked, this, &chats::handleListItemClicked);
 
     // Connect to the WebSocket server
-    webSocket->open(QUrl("ws://192.168.0.166:12345"));
+    webSocket->open(QUrl("ws://192.168.68.158:12345"));
 
     // Populate contacts list
     populateContactsList();

@@ -58,25 +58,6 @@ border-radius: 10px;</string>
        <pixmap>../../../Downloads/Ellipse.png</pixmap>
       </property>
      </widget>
-     <widget class="QLabel" name="label_5">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>30</y>
-        <width>141</width>
-        <height>131</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: transparent;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap resource="wardenfort.qrc">:/wardenfort/frame.png</pixmap>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_6">
       <property name="geometry">
        <rect>
@@ -484,7 +465,7 @@ padding-left: 10px;
       <property name="geometry">
        <rect>
         <x>42</x>
-        <y>30</y>
+        <y>14</y>
         <width>141</width>
         <height>131</height>
        </rect>
@@ -513,7 +494,7 @@ padding-left: 10px;
       <property name="geometry">
        <rect>
         <x>62</x>
-        <y>85</y>
+        <y>70</y>
         <width>101</width>
         <height>24</height>
        </rect>
@@ -532,7 +513,7 @@ padding-left: 10px;
       <property name="geometry">
        <rect>
         <x>36</x>
-        <y>25</y>
+        <y>10</y>
         <width>151</width>
         <height>141</height>
        </rect>
@@ -562,7 +543,7 @@ background-color: rgba(255, 255, 255, 0);</string>
       <property name="geometry">
        <rect>
         <x>176</x>
-        <y>20</y>
+        <y>5</y>
         <width>120</width>
         <height>151</height>
        </rect>
@@ -596,6 +577,94 @@ background-color: rgba(255, 255, 255, 0);</string>
        <enum>QFrame::Raised</enum>
       </property>
      </widget>
+     <widget class="QPushButton" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>-97</x>
+        <y>-31</y>
+        <width>611</width>
+        <height>231</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="wardenfort.qrc">
+        <normaloff>:/wardenfort/C:/Users/admin/Downloads/framee.png</normaloff>:/wardenfort/C:/Users/admin/Downloads/framee.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>350</width>
+        <height>350</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>330</y>
+        <width>221</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox {
+    border-radius: 15px;
+    background-color: #191F32;
+    padding-left: 10px;
+    color: rgb(255, 255, 255);
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border: none;
+    border-top-right-radius: 15px; /* Ensure right border-radius for the top */
+    border-bottom-right-radius: 15px; /* Ensure right border-radius for the bottom */
+    background-color: #191F32; /* Same as combo box to blend in */
+}
+
+QComboBox::down-arrow {
+    image: url(D:/Project/WardenFort/WardenFort/downButton.png); /* Set your custom arrow image */
+    width: 10px; /* Adjust arrow size */
+    height: 10px;
+}
+
+QComboBox QAbstractItemView {
+    border-radius: 15px;
+    background-color: #191F32;
+    color: rgb(255, 255, 255);
+}
+
+QComboBox QAbstractItemView::item {
+    border-radius: 15px; /* Apply border radius to individual items */
+    background-color: #191F32;
+    color: rgb(255, 255, 255);
+}
+</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>Male</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Female</string>
+       </property>
+      </item>
+     </widget>
+     <zorder>pushButton_4</zorder>
+     <zorder>pushButton_5</zorder>
+     <zorder>frame</zorder>
+     <zorder>frame_2</zorder>
+     <zorder>label_5</zorder>
      <zorder>label_4</zorder>
      <zorder>label_6</zorder>
      <zorder>label_7</zorder>
@@ -616,12 +685,8 @@ background-color: rgba(255, 255, 255, 0);</string>
      <zorder>label_18</zorder>
      <zorder>lineEdit_5</zorder>
      <zorder>lineEdit_6</zorder>
-     <zorder>pushButton_4</zorder>
-     <zorder>pushButton_5</zorder>
-     <zorder>frame</zorder>
-     <zorder>frame_2</zorder>
-     <zorder>label_5</zorder>
      <zorder>changeBTN</zorder>
+     <zorder>comboBox</zorder>
     </widget>
    </item>
   </layout>

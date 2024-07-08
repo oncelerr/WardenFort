@@ -185,7 +185,7 @@ border-radius: 10px;</string>
         <property name="minimumSize">
          <size>
           <width>80</width>
-          <height>20</height>
+          <height>30</height>
          </size>
         </property>
         <property name="maximumSize">
