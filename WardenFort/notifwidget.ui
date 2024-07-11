@@ -17,7 +17,7 @@
    <item>
     <widget class="QFrame" name="frame_3">
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(44, 60, 75);
+      <string notr="true">background-color: rgba(44, 60, 75, 200);
 border: 0px;
 border-radius: 10px;</string>
      </property>

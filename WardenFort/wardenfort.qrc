@@ -68,11 +68,16 @@
         <file>previous.png</file>
         <file>cathello.gif</file>
         <file>no-profile-picture-15258.png</file>
-        <file>crop.png</file>
         <file>refresh.png</file>
         <file>trash.png</file>
         <file>systemlogo.png</file>
-        <file>C:/Users/admin/Downloads/framee.png</file>
+        <file>wave_1.gif</file>
+        <file>wave_2.gif</file>
+        <file>wave_0smooth.gif</file>
+        <file>wave_1smooth.gif</file>
+        <file>wave_2smooth.gif</file>
+        <file>framee.png</file>
+        <file>crop.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

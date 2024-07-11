@@ -28,14 +28,15 @@
         }
 
         // Set the stylesheet for customizing the calendar
-        setStyleSheet("QCalendarWidget { background-color: #133d53; }"
-                      "QCalendarWidget QToolButton { color: pink; background-color: #133d53; }"
+        setStyleSheet("QCalendarWidget {  border-radius: 10px;}"
+                      "QCalendarWidget QTableView { alternate-background-color: #133d53; }"
+                      "QCalendarWidget QToolButton { color: pink; }"
                       "QCalendarWidget QToolButton#qt_calendar_prevmonth, "
                       "QCalendarWidget QToolButton#qt_calendar_nextmonth { color: pink; }"
                       "QCalendarWidget QMenu { background-color: black; color: yellow; }" // Ensuring dropdown text is black
-                      "QCalendarWidget QAbstractItemView:enabled { color: black; background-color: #133d53; selection-background-color: #2f6b7c; }"
-                      "QCalendarWidget QAbstractItemView:disabled { color: pink; }"
-                      "QCalendarWidget QWidget { font-family: 'Inter'; }");
+                      "QCalendarWidget QAbstractItemView:enabled { color: white; selection-background-color: #2f6b7c; }"
+                      "QCalendarWidget QAbstractItemView:disabled { color: grey; }"
+                      "QCalendarWidget QWidget { font-family: 'Inter';}");
 
         // Customize month/year text color and positioning
         QToolButton *monthButton = findChild<QToolButton*>("qt_calendar_monthbutton");
@@ -79,8 +80,8 @@
         QToolButton *prevMonthButton = findChild<QToolButton*>("qt_calendar_prevmonth");
 
         if (nextMonthButton && prevMonthButton) {
-            QIcon nextIcon("D:/Project/WardenFort/WardenFort/next.png");
-            QIcon prevIcon("D:/Project/WardenFort/WardenFort/previous.png");
+            QIcon nextIcon("D:/Projects/WardenFort/WardenFort/WardenFort/next.png");
+            QIcon prevIcon("D:/Projects/WardenFort/WardenFort/WardenFort/previous.png");
 
             nextMonthButton->setIcon(nextIcon);
             prevMonthButton->setIcon(prevIcon);
@@ -97,6 +98,8 @@
 
         // Hide the week numbers
         setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+
+
 
         // Connect the signal to open the event dialog when a date is selected
         connect(this, &QCalendarWidget::activated, this, &CustomCalendarWidget::addEvent);
@@ -192,6 +195,11 @@
 
         // Call base class paintCell to ensure default behavior, including drawing the date
         QCalendarWidget::paintCell(painter, rect, date);
+
+        if (date.dayOfWeek() == Qt::Saturday || date.dayOfWeek() == Qt::Sunday) {
+            painter->setPen(QColor("#3afefe"));  // Set font color to #3afefe
+            painter->drawText(rect, Qt::AlignCenter, QString::number(date.day()));
+        }
 
         // Custom painting code for the current date
         if (date == QDate::currentDate()) {

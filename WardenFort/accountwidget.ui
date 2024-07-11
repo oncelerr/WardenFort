@@ -29,7 +29,7 @@
    <item>
     <widget class="QFrame" name="frame_3">
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(44, 60, 75);
+      <string notr="true">background-color: rgba(44, 60, 75, 200);
 border: 0px;
 border-radius: 10px;</string>
      </property>
@@ -512,10 +512,10 @@ padding-left: 10px;
      <widget class="QPushButton" name="pushButton_5">
       <property name="geometry">
        <rect>
-        <x>36</x>
-        <y>10</y>
+        <x>37</x>
+        <y>-4</y>
         <width>151</width>
-        <height>141</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="focusPolicy">
@@ -535,21 +535,21 @@ background-color: rgba(255, 255, 255, 0);</string>
       <property name="iconSize">
        <size>
         <width>141</width>
-        <height>133</height>
+        <height>171</height>
        </size>
       </property>
      </widget>
      <widget class="QFrame" name="frame">
       <property name="geometry">
        <rect>
-        <x>176</x>
-        <y>5</y>
+        <x>178</x>
+        <y>1</y>
         <width>120</width>
-        <height>151</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(44, 60, 75);</string>
+       <string notr="true">background-color:#283646;</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -561,14 +561,14 @@ background-color: rgba(255, 255, 255, 0);</string>
      <widget class="QFrame" name="frame_2">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>20</y>
+        <x>7</x>
+        <y>0</y>
         <width>41</width>
-        <height>151</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(44, 60, 75);</string>
+       <string notr="true">background-color: #283646;</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -580,7 +580,7 @@ background-color: rgba(255, 255, 255, 0);</string>
      <widget class="QPushButton" name="label_5">
       <property name="geometry">
        <rect>
-        <x>-97</x>
+        <x>-96</x>
         <y>-31</y>
         <width>611</width>
         <height>231</height>
@@ -594,7 +594,7 @@ background-color: rgba(255, 255, 255, 0);</string>
       </property>
       <property name="icon">
        <iconset resource="wardenfort.qrc">
-        <normaloff>:/wardenfort/C:/Users/admin/Downloads/framee.png</normaloff>:/wardenfort/C:/Users/admin/Downloads/framee.png</iconset>
+        <normaloff>:/wardenfort/framee.png</normaloff>:/wardenfort/framee.png</iconset>
       </property>
       <property name="iconSize">
        <size>

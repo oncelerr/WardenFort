@@ -60,6 +60,7 @@
 #include <QTextDocument>
 #include <QDebug>
 #include <QImage>
+#include <QMovie>
 
 #include <unordered_map>
 
@@ -150,6 +151,80 @@ WardenFort::WardenFort(QWidget* parent)
     if (!ui->frame_2->layout()) {
         ui->frame_2->setLayout(new QVBoxLayout()); // Ensure frame_2 has a layout
     }
+
+    // Ensure frame_8 has a layout
+    if (!ui->frame_8->layout()) {
+        ui->frame_8->setLayout(new QVBoxLayout());
+    }
+    if (!ui->frame_3->layout()) {
+        ui->frame_3->setLayout(new QVBoxLayout());
+    }
+    if (!ui->frame_4->layout()) {
+        ui->frame_4->setLayout(new QVBoxLayout());
+    }
+
+    // Load the GIF using QMovie from the resource file
+    QMovie *wave = new QMovie(":/wardenfort/wave_0smooth.gif");
+
+    if (!wave->isValid()) {
+        qDebug() << "Error: GIF file is not valid or not found in the resource file.";
+    } else {
+        ui->label_16->setMovie(wave);
+
+        // Start the movie
+        wave->start();
+
+        // Check if the movie is playing
+        connect(wave, &QMovie::stateChanged, this, [](QMovie::MovieState state){
+            if (state == QMovie::Running) {
+                qDebug() << "GIF is playing.";
+            } else {
+                qDebug() << "GIF is not playing.";
+            }
+        });
+    }
+
+    // Load the GIF using QMovie from the resource file
+    QMovie *wave_1 = new QMovie(":/wardenfort/wave_1smooth.gif");
+
+    if (!wave_1->isValid()) {
+        qDebug() << "Error: GIF file is not valid or not found in the resource file.";
+    } else {
+        ui->label_17->setMovie(wave_1);
+
+        // Start the movie
+        wave_1->start();
+
+        // Check if the movie is playing
+        connect(wave_1, &QMovie::stateChanged, this, [](QMovie::MovieState state){
+            if (state == QMovie::Running) {
+                qDebug() << "GIF is playing.";
+            } else {
+                qDebug() << "GIF is not playing.";
+            }
+        });
+    }
+
+    QMovie *wave_2 = new QMovie(":/wardenfort/wave_2smooth.gif");
+
+    if (!wave_2->isValid()) {
+        qDebug() << "Error: GIF file is not valid or not found in the resource file.";
+    } else {
+        ui->label_18->setMovie(wave_2);
+
+        // Start the movie
+        wave_2->start();
+
+        // Check if the movie is playing
+        connect(wave_2, &QMovie::stateChanged, this, [](QMovie::MovieState state){
+            if (state == QMovie::Running) {
+                qDebug() << "GIF is playing.";
+            } else {
+                qDebug() << "GIF is not playing.";
+            }
+        });
+    }
+
     extern pcap_dumper_t* dumpfile;
     networkManager = new QNetworkAccessManager(this);
     manager = new QNetworkAccessManager(this);
@@ -184,7 +259,6 @@ WardenFort::WardenFort(QWidget* parent)
     loginsession* log = new loginsession;
     QString Name = log->username;
     initializeDeviceIpFilter();
-
 }
 
 void WardenFort::initializeDeviceIpFilter() {
@@ -926,14 +1000,11 @@ void WardenFort::checkAbuseIP(const QString &ipAddress)
             qDebug() << it.key() << ":" << it.value().toVariant();
 
             qDebug() << "ISP:" << jsonObject.value("data").toObject().value("isp").toString();
-            ui->label_14->setText(jsonObject.value("data").toObject().value("isp").toString());
             qDebug() << "Domain:" << jsonObject.value("data").toObject().value("domain").toString();
-            ui->label_13->setText(jsonObject.value("data").toObject().value("domain").toString());
 
             qDebug() << "Total Reports:" << jsonObject.value("data").toObject().value("totalReports").toInt();
             int confScore = jsonObject.value("data").toObject().value("totalReports").toInt();
             QString confScoreString = QString::number(confScore);
-            ui->label_15->setText(confScoreString);
         }
 
         reply->deleteLater();

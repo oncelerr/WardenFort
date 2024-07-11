@@ -28,6 +28,9 @@
    </property>
    <item>
     <widget class="QFrame" name="frame">
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -44,7 +47,7 @@
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">    background-color: rgb(44, 60, 75);
+       <string notr="true">background-color: rgba(44, 60, 75, 200);
 border-radius: 10px;
 </string>
       </property>
@@ -315,6 +318,9 @@ padding-right:150px;</string>
        </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgba(44, 60, 75, 0);</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>

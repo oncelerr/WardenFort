@@ -23,7 +23,6 @@
 #include "chatswidget.h"
 #include "reports.h"
 
-
 #pragma comment(lib, "Ws2_32.lib")
 
 QT_BEGIN_NAMESPACE
