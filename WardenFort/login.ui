@@ -34,101 +34,343 @@
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="cyber_bg">
+   <widget class="QFrame" name="loginFrame">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>130</y>
-      <width>411</width>
-      <height>331</height>
+      <x>0</x>
+      <y>0</y>
+      <width>1091</width>
+      <height>571</height>
      </rect>
     </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
     </property>
-    <property name="text">
-     <string/>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
-    <property name="pixmap">
-     <pixmap resource="wardenfort.qrc">:/wardenfort/cyber (1).png</pixmap>
-    </property>
-   </widget>
-   <widget class="QWidget" name="widget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>20</y>
-      <width>333</width>
-      <height>527</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>333</width>
-      <height>527</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>333</width>
-      <height>527</height>
-     </size>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(44, 60, 75, 0.6); 
+    <widget class="QLabel" name="wf_word">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>150</y>
+       <width>201</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="wardenfort.qrc">:/wardenfort/wardenfort_word (1).png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="wf_word_2">
+     <property name="geometry">
+      <rect>
+       <x>390</x>
+       <y>140</y>
+       <width>251</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgba(0, 0, 0, 0);
+background-color: rgba(0, 0, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap>C:/Users/admin/Downloads/logo (4).png</pixmap>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="signup_button">
+     <property name="geometry">
+      <rect>
+       <x>477</x>
+       <y>458</y>
+       <width>80</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);
+border: none;
+text-decoration: underline;
+font: 7.5pt &quot;Segoe UI&quot;;
+
+</string>
+     </property>
+     <property name="text">
+      <string>Sign up</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="eye_open">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>600</x>
+       <y>327</y>
+       <width>51</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QCheckBox::indicator {
+    border: none; /* Remove border */
+}
+
+QCheckBox {
+    background-color: transparent; /* Remove background color */
+}
+</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="wardenfort.qrc">
+       <normaloff>:/wardenfort/eye_open.png</normaloff>:/wardenfort/eye_open.png</iconset>
+     </property>
+     <property name="shortcut">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <property name="tristate">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="user_icon">
+     <property name="geometry">
+      <rect>
+       <x>396</x>
+       <y>231</y>
+       <width>30</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="wardenfort.qrc">:/wardenfort/pass_icon (11).png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="pass_icon">
+     <property name="geometry">
+      <rect>
+       <x>398</x>
+       <y>310</y>
+       <width>31</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="wardenfort.qrc">:/wardenfort/pass_icon (4).png</pixmap>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="eye_closed">
+     <property name="geometry">
+      <rect>
+       <x>600</x>
+       <y>326</y>
+       <width>40</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QCheckBox::indicator {
+    border: none; /* Remove border */
+}
+
+QCheckBox {
+    background-color: transparent; /* Remove background color */
+}
+</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="wardenfort.qrc">
+       <normaloff>:/wardenfort/eye_closed.png</normaloff>:/wardenfort/eye_closed.png</iconset>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="wf_logo">
+     <property name="geometry">
+      <rect>
+       <x>470</x>
+       <y>40</y>
+       <width>101</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgba(0, 0, 0, 0);
+background-color: rgba(0, 0, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="wardenfort.qrc">:/wardenfort/7-removebg-preview 1.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="cyber_bg">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>130</y>
+       <width>411</width>
+       <height>331</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="wardenfort.qrc">:/wardenfort/cyber (1).png</pixmap>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="forgot_pass">
+     <property name="geometry">
+      <rect>
+       <x>566</x>
+       <y>357</y>
+       <width>80</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 7.5pt &quot;Segoe UI&quot;;
+color: #ffffff;
+border: 0;
+background-color: rgba(255, 255, 255, 0);
+
+</string>
+     </property>
+     <property name="text">
+      <string>Forgot Password?</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="widget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>20</y>
+       <width>333</width>
+       <height>527</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>333</width>
+       <height>527</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>333</width>
+       <height>527</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(44, 60, 75, 0.6); 
 border-radius: 50px;
 </string>
-    </property>
-    <widget class="QLabel" name="username_text">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>180</y>
-       <width>81</width>
-       <height>16</height>
-      </rect>
      </property>
-     <property name="font">
-      <font>
-       <family>Segoe UI</family>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLabel {
+     <widget class="QLabel" name="username_text">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>180</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
     color: #ffffff;
 background-color: rgba(0, 0, 0, 0);
 }
 
 
 </string>
-     </property>
-     <property name="text">
-      <string>Username</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="typeUN_box">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>200</y>
-       <width>275</width>
-       <height>52</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>275</width>
-       <height>52</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>275</width>
-       <height>52</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLineEdit {
+      </property>
+      <property name="text">
+       <string>Username</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="typeUN_box">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>200</y>
+        <width>275</width>
+        <height>52</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>275</width>
+        <height>52</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>275</width>
+        <height>52</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
 border-radius: 15px; 
 background-color: rgb(44, 60, 75);
 padding: 50px;
@@ -136,90 +378,90 @@ padding: 50px;
 }
 
 </string>
-     </property>
-     <property name="placeholderText">
-      <string>Type your username</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="typePASS_box">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>290</y>
-       <width>275</width>
-       <height>52</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>275</width>
-       <height>52</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>275</width>
-       <height>52</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLineEdit {
+      </property>
+      <property name="placeholderText">
+       <string>Type your username</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="typePASS_box">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>290</y>
+        <width>275</width>
+        <height>52</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>275</width>
+        <height>52</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>275</width>
+        <height>52</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
 border-radius: 15px; 
 background-color: rgb(44, 60, 75);
 padding: 50px;
 	color: rgb(255, 255, 255);
 }
 </string>
-     </property>
-     <property name="placeholderText">
-      <string>Type your password</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="pass_text">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>270</y>
-       <width>81</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLabel {
+      </property>
+      <property name="placeholderText">
+       <string>Type your password</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="pass_text">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>270</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
     color: #ffffff;
 background-color: rgba(0, 0, 0, 0);
 }
 
 
 </string>
-     </property>
-     <property name="text">
-      <string>Password</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="loginButton">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>400</y>
-       <width>275</width>
-       <height>34</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>275</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>275</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
+      </property>
+      <property name="text">
+       <string>Password</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="loginButton">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>400</y>
+        <width>275</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>275</width>
+        <height>34</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>275</width>
+        <height>34</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
 border-radius: 15px; 
 background-color: rgb(22, 27, 46);
 color: white;
@@ -229,244 +471,75 @@ QPushButton:hover {
 QPushButton:pressed {
 background-color: rgb(24, 40, 55); /* Adjust pressed color if needed */
 }</string>
-     </property>
-     <property name="text">
-      <string>Login</string>
-     </property>
+      </property>
+      <property name="text">
+       <string>Login</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="error_1">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>156</y>
+        <width>271</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    color: red;
+background-color: rgba(0, 0, 0, 0);
+}
+
+
+</string>
+      </property>
+      <property name="text">
+       <string>Username and Password do not match.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <zorder>typePASS_box</zorder>
+     <zorder>typeUN_box</zorder>
+     <zorder>username_text</zorder>
+     <zorder>pass_text</zorder>
+     <zorder>loginButton</zorder>
+     <zorder>error_1</zorder>
     </widget>
-    <zorder>typeUN_box</zorder>
-    <zorder>username_text</zorder>
-    <zorder>typePASS_box</zorder>
-    <zorder>pass_text</zorder>
-    <zorder>loginButton</zorder>
+    <zorder>widget</zorder>
+    <zorder>wf_word</zorder>
+    <zorder>wf_word_2</zorder>
+    <zorder>signup_button</zorder>
+    <zorder>eye_open</zorder>
+    <zorder>user_icon</zorder>
+    <zorder>pass_icon</zorder>
+    <zorder>eye_closed</zorder>
+    <zorder>wf_logo</zorder>
+    <zorder>cyber_bg</zorder>
+    <zorder>forgot_pass</zorder>
    </widget>
-   <widget class="QLabel" name="wf_logo">
+   <widget class="QLabel" name="loading">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>40</y>
-      <width>101</width>
-      <height>121</height>
+      <x>0</x>
+      <y>0</y>
+      <width>1088</width>
+      <height>567</height>
      </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgba(0, 0, 0, 0);
-background-color: rgba(0, 0, 0, 0);</string>
     </property>
     <property name="text">
      <string/>
     </property>
-    <property name="pixmap">
-     <pixmap resource="wardenfort.qrc">:/wardenfort/7-removebg-preview 1.png</pixmap>
-    </property>
    </widget>
-   <widget class="QLabel" name="wf_word_2">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>140</y>
-      <width>251</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgba(0, 0, 0, 0);
-background-color: rgba(0, 0, 0, 0);</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>C:/Users/admin/Downloads/logo (4).png</pixmap>
-    </property>
-   </widget>
-   <widget class="QLabel" name="user_icon">
-    <property name="geometry">
-     <rect>
-      <x>406</x>
-      <y>231</y>
-      <width>30</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="wardenfort.qrc">:/wardenfort/pass_icon (11).png</pixmap>
-    </property>
-   </widget>
-   <widget class="QLabel" name="pass_icon">
-    <property name="geometry">
-     <rect>
-      <x>408</x>
-      <y>310</y>
-      <width>31</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="wardenfort.qrc">:/wardenfort/pass_icon (4).png</pixmap>
-    </property>
-   </widget>
-   <widget class="QLabel" name="wf_word">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>150</y>
-      <width>201</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="wardenfort.qrc">:/wardenfort/wardenfort_word (1).png</pixmap>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="eye_open">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>610</x>
-      <y>327</y>
-      <width>51</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="cursor">
-     <cursorShape>PointingHandCursor</cursorShape>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QCheckBox::indicator {
-    border: none; /* Remove border */
-}
-
-QCheckBox {
-    background-color: transparent; /* Remove background color */
-}
-</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="wardenfort.qrc">
-      <normaloff>:/wardenfort/eye_open.png</normaloff>:/wardenfort/eye_open.png</iconset>
-    </property>
-    <property name="shortcut">
-     <string/>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-    <property name="tristate">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="eye_closed">
-    <property name="geometry">
-     <rect>
-      <x>610</x>
-      <y>326</y>
-      <width>40</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="cursor">
-     <cursorShape>PointingHandCursor</cursorShape>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QCheckBox::indicator {
-    border: none; /* Remove border */
-}
-
-QCheckBox {
-    background-color: transparent; /* Remove background color */
-}
-</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="wardenfort.qrc">
-      <normaloff>:/wardenfort/eye_closed.png</normaloff>:/wardenfort/eye_closed.png</iconset>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="signup_button">
-    <property name="geometry">
-     <rect>
-      <x>487</x>
-      <y>458</y>
-      <width>80</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="cursor">
-     <cursorShape>PointingHandCursor</cursorShape>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);
-border: none;
-text-decoration: underline;
-font: 7.5pt &quot;Segoe UI&quot;;
-
-</string>
-    </property>
-    <property name="text">
-     <string>Sign up</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="forgot_pass">
-    <property name="geometry">
-     <rect>
-      <x>576</x>
-      <y>357</y>
-      <width>80</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="cursor">
-     <cursorShape>PointingHandCursor</cursorShape>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 7.5pt &quot;Segoe UI&quot;;
-color: #ffffff;
-border: 0;
-background-color: rgba(255, 255, 255, 0);
-
-</string>
-    </property>
-    <property name="text">
-     <string>Forgot Password?</string>
-    </property>
-   </widget>
+   <zorder>loading</zorder>
+   <zorder>loginFrame</zorder>
   </widget>
  </widget>
  <resources>

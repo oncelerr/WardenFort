@@ -78,6 +78,7 @@
         <file>wave_2smooth.gif</file>
         <file>framee.png</file>
         <file>crop.png</file>
+        <file>loading.gif</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

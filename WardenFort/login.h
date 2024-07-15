@@ -23,6 +23,7 @@ public:
     void sendEmail(const QString& recipientEmail, const QString& code);
     void resubMail();
     void openEnterWindow();
+    void hideLoginFrame();
 
 private slots:
     void on_loginButton_clicked();

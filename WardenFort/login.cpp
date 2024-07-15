@@ -21,6 +21,7 @@
 #include "wardenfort.h"
 #include "globals.h"
 #include "database.h"
+#include <QMovie>
 
 QString userEmail;
 
@@ -188,11 +189,42 @@ login::login(QWidget *parent) :
     // Initialize alertWindow to nullptr
     otpWindow = nullptr;
     signupWindow = nullptr;
+    ui->error_1->setVisible(false);
+
+    ui->loginFrame->setVisible(false);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &login::hideLoginFrame);
+    timer->start(13330); // 13 seconds in milliseconds
+
+    QMovie *wave = new QMovie(":/wardenfort/loading.gif");
+
+    if (!wave->isValid()) {
+        qDebug() << "Error: GIF file is not valid or not found in the resource file.";
+    } else {
+        ui->loading->setMovie(wave);
+
+        // Start the movie
+        wave->start();
+
+        // Check if the movie is playing
+        connect(wave, &QMovie::stateChanged, this, [](QMovie::MovieState state){
+            if (state == QMovie::Running) {
+                qDebug() << "GIF is playing.";
+            } else {
+                qDebug() << "GIF is not playing.";
+            }
+        });
+    }
 }
 
 login::~login()
 {
     delete ui;
+}
+
+void login::hideLoginFrame(){
+    ui->loginFrame->setVisible(true);
 }
 
 
@@ -250,7 +282,7 @@ void login::on_loginButton_clicked()
 
         this->close();
     } else {
-        QMessageBox::warning(this, "Login Error", "Invalid username or password.");
+        ui->error_1->setVisible(true);
     }
 }
 
